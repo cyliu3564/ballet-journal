@@ -405,6 +405,16 @@
             cursor: pointer;
             padding: 4px;
         }
+        .edit-btn {
+            position: absolute;
+            top: 12px;
+            right: 50px;
+            color: var(--pink-400);
+            font-size: 11px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .edit-btn:active { opacity: 0.6; }
         
         /* Photo Upload */
         .photo-upload { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
@@ -821,6 +831,16 @@
                         <div class="form-group">
                             <label>Price</label>
                             <input type="number" id="equip-price" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label>Qty</label>
+                            <input type="number" id="equip-qty" placeholder="1" min="1">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Size</label>
+                            <input type="text" id="equip-size" placeholder="尺码">
                         </div>
                         <div class="form-group">
                             <label>Date</label>
@@ -1272,20 +1292,37 @@
         // ===== Body Data =====
         function addBodyData() {
             const data = loadData('bodyData');
-            data.push({
+            const record = {
                 date: document.getElementById('body-date').value,
                 height: document.getElementById('body-height').value,
                 weight: document.getElementById('body-weight-input').value,
                 fat: document.getElementById('body-fat').value,
                 note: document.getElementById('body-note').value,
                 photos: getPhotos('body')
-            });
+            };
+            if (editState.module === 'bodyData' && editState.index >= 0) {
+                data[editState.index] = record;
+            } else {
+                data.push(record);
+            }
             saveData('bodyData', data);
             savePhotos('body', []);
+            cancelEdit();
             renderBodyRecords(); renderBodyTrend();
             ['body-height','body-weight-input','body-fat','body-note','body-bmi'].forEach(id => document.getElementById(id).value = '');
             renderPhotoPreview('body');
             closeModal();
+        }
+        function editBodyData(index) {
+            const data = loadData('bodyData');
+            const d = data[index];
+            document.getElementById('body-date').value = d.date || '';
+            document.getElementById('body-height').value = d.height || '';
+            document.getElementById('body-weight-input').value = d.weight || '';
+            document.getElementById('body-fat').value = d.fat || '';
+            document.getElementById('body-note').value = d.note || '';
+            if (d.photos?.length) { savePhotos('body', [...d.photos]); renderPhotoPreview('body'); }
+            startEdit('bodyData', index);
         }
         function renderBodyRecords() {
             const data = loadData('bodyData');
@@ -1298,7 +1335,7 @@
                 let h = `<div class="record-item"><div class="date">${d.date}</div><div class="value">${v.join(' · ')}</div>`;
                 if (d.note) h += `<div class="note">${d.note}</div>`;
                 if (d.photos?.length) h += `<div class="photos">${d.photos.map(p=>`<img src="${p}">`).join('')}</div>`;
-                h += `<div class="delete-btn" onclick="deleteRecord('bodyData',${ri})">Delete</div></div>`;
+                h += `<div class="edit-btn" onclick="editBodyData(${ri})">Edit</div><div class="delete-btn" onclick="deleteRecord('bodyData',${ri})">Delete</div></div>`;
                 return h;
             }).join('') || '<div class="empty">No records</div>';
         }
@@ -1311,18 +1348,34 @@
         // ===== Muscle =====
         function addMuscleData() {
             const data = loadData('muscleData');
-            data.push({
+            const record = {
                 date: document.getElementById('muscle-date').value,
                 part: document.getElementById('muscle-part').value,
                 status: document.getElementById('muscle-status').value,
                 note: document.getElementById('muscle-note').value,
                 photos: getPhotos('muscle')
-            });
+            };
+            if (editState.module === 'muscleData' && editState.index >= 0) {
+                data[editState.index] = record;
+            } else {
+                data.push(record);
+            }
             saveData('muscleData', data); savePhotos('muscle', []);
+            cancelEdit();
             renderMuscleRecords(); renderMuscleTrend(); updateMuscleFilter();
             document.getElementById('muscle-note').value = '';
             renderPhotoPreview('muscle');
             closeModal();
+        }
+        function editMuscleData(index) {
+            const data = loadData('muscleData');
+            const d = data[index];
+            document.getElementById('muscle-date').value = d.date || '';
+            document.getElementById('muscle-part').value = d.part || '';
+            document.getElementById('muscle-status').value = d.status || '';
+            document.getElementById('muscle-note').value = d.note || '';
+            if (d.photos?.length) { savePhotos('muscle', [...d.photos]); renderPhotoPreview('muscle'); }
+            startEdit('muscleData', index);
         }
         function renderMuscleRecords() {
             const data = loadData('muscleData');
@@ -1331,7 +1384,7 @@
                 let h = `<div class="record-item"><div class="date">${d.date}</div><div class="value">${d.part}: ${d.status}</div>`;
                 if (d.note) h += `<div class="note">${d.note}</div>`;
                 if (d.photos?.length) h += `<div class="photos">${d.photos.map(p=>`<img src="${p}">`).join('')}</div>`;
-                h += `<div class="delete-btn" onclick="deleteRecord('muscleData',${ri})">Delete</div></div>`;
+                h += `<div class="edit-btn" onclick="editMuscleData(${ri})">Edit</div><div class="delete-btn" onclick="deleteRecord('muscleData',${ri})">Delete</div></div>`;
                 return h;
             }).join('') || '<div class="empty">No records</div>';
         }
@@ -1350,18 +1403,34 @@
         // ===== Flexibility =====
         function addFlexData() {
             const data = loadData('flexData');
-            data.push({
+            const record = {
                 date: document.getElementById('flex-date').value,
                 part: document.getElementById('flex-part').value,
                 level: document.getElementById('flex-level').value,
                 note: document.getElementById('flex-note').value,
                 photos: getPhotos('flex')
-            });
+            };
+            if (editState.module === 'flexData' && editState.index >= 0) {
+                data[editState.index] = record;
+            } else {
+                data.push(record);
+            }
             saveData('flexData', data); savePhotos('flex', []);
+            cancelEdit();
             renderFlexRecords(); renderFlexTrend(); updateFlexFilter();
             document.getElementById('flex-level').value = ''; document.getElementById('flex-note').value = '';
             renderPhotoPreview('flex');
             closeModal();
+        }
+        function editFlexData(index) {
+            const data = loadData('flexData');
+            const d = data[index];
+            document.getElementById('flex-date').value = d.date || '';
+            document.getElementById('flex-part').value = d.part || '';
+            document.getElementById('flex-level').value = d.level || '';
+            document.getElementById('flex-note').value = d.note || '';
+            if (d.photos?.length) { savePhotos('flex', [...d.photos]); renderPhotoPreview('flex'); }
+            startEdit('flexData', index);
         }
         function renderFlexRecords() {
             const data = loadData('flexData');
@@ -1370,7 +1439,7 @@
                 let h = `<div class="record-item"><div class="date">${d.date}</div><div class="value">${d.part}: ${d.level||'--'}</div>`;
                 if (d.note) h += `<div class="note">${d.note}</div>`;
                 if (d.photos?.length) h += `<div class="photos">${d.photos.map(p=>`<img src="${p}">`).join('')}</div>`;
-                h += `<div class="delete-btn" onclick="deleteRecord('flexData',${ri})">Delete</div></div>`;
+                h += `<div class="edit-btn" onclick="editFlexData(${ri})">Edit</div><div class="delete-btn" onclick="deleteRecord('flexData',${ri})">Delete</div></div>`;
                 return h;
             }).join('') || '<div class="empty">No records</div>';
         }
@@ -1388,18 +1457,34 @@
         // ===== Injury =====
         function addInjuryData() {
             const data = loadData('injuryData');
-            data.push({
+            const record = {
                 date: document.getElementById('injury-date').value,
                 part: document.getElementById('injury-part').value,
                 desc: document.getElementById('injury-desc').value,
                 status: document.getElementById('injury-status').value,
                 photos: getPhotos('injury')
-            });
+            };
+            if (editState.module === 'injuryData' && editState.index >= 0) {
+                data[editState.index] = record;
+            } else {
+                data.push(record);
+            }
             saveData('injuryData', data); savePhotos('injury', []);
+            cancelEdit();
             renderInjuryRecords();
             document.getElementById('injury-part').value = ''; document.getElementById('injury-desc').value = '';
             renderPhotoPreview('injury');
             closeModal();
+        }
+        function editInjuryData(index) {
+            const data = loadData('injuryData');
+            const d = data[index];
+            document.getElementById('injury-date').value = d.date || '';
+            document.getElementById('injury-part').value = d.part || '';
+            document.getElementById('injury-desc').value = d.desc || '';
+            document.getElementById('injury-status').value = d.status || '';
+            if (d.photos?.length) { savePhotos('injury', [...d.photos]); renderPhotoPreview('injury'); }
+            startEdit('injuryData', index);
         }
         function renderInjuryRecords() {
             const data = loadData('injuryData');
@@ -1408,7 +1493,7 @@
                 let h = `<div class="record-item"><div class="date">${d.date} · ${d.status||''}</div><div class="value">${d.part}</div>`;
                 if (d.desc) h += `<div class="note">${d.desc}</div>`;
                 if (d.photos?.length) h += `<div class="photos">${d.photos.map(p=>`<img src="${p}">`).join('')}</div>`;
-                h += `<div class="delete-btn" onclick="deleteRecord('injuryData',${ri})">Delete</div></div>`;
+                h += `<div class="edit-btn" onclick="editInjuryData(${ri})">Edit</div><div class="delete-btn" onclick="deleteRecord('injuryData',${ri})">Delete</div></div>`;
                 return h;
             }).join('') || '<div class="empty">No records</div>';
         }
@@ -1420,39 +1505,66 @@
                 category: document.getElementById('equip-category').value,
                 name: document.getElementById('equip-name').value,
                 price: document.getElementById('equip-price').value,
+                qty: document.getElementById('equip-qty').value || '1',
+                size: document.getElementById('equip-size').value,
                 date: document.getElementById('equip-date').value,
                 channel: document.getElementById('equip-channel').value,
                 photos: getPhotos('equip')
             };
-            equipData.push(newEquip);
-            saveData('equipment', equipData); savePhotos('equip', []);
-            renderEquipList('all');
             
-            // 同步到账本（如果价格>0）
-            if (parseFloat(newEquip.price) > 0) {
-                const expenses = loadData('expenses');
-                expenses.push({
-                    category: 'Gear',
-                    content: `${newEquip.category} - ${newEquip.name}`,
-                    amount: newEquip.price,
-                    date: newEquip.date,
-                    source: 'equipment'  // 标记来源，方便识别
-                });
-                saveData('expenses', expenses);
+            if (editState.module === 'equipment' && editState.index >= 0) {
+                equipData[editState.index] = newEquip;
+            } else {
+                equipData.push(newEquip);
+                // 同步到账本（仅新增时，如果价格>0）
+                if (parseFloat(newEquip.price) > 0) {
+                    const expenses = loadData('expenses');
+                    expenses.push({
+                        category: 'Gear',
+                        content: `${newEquip.category} - ${newEquip.name}`,
+                        amount: newEquip.price,
+                        date: newEquip.date,
+                        source: 'equipment'
+                    });
+                    saveData('expenses', expenses);
+                }
             }
             
-            document.getElementById('equip-name').value = ''; document.getElementById('equip-price').value = ''; document.getElementById('equip-channel').value = '';
+            saveData('equipment', equipData); savePhotos('equip', []);
+            cancelEdit();
+            renderEquipList('all');
+            
+            document.getElementById('equip-name').value = '';
+            document.getElementById('equip-price').value = '';
+            document.getElementById('equip-qty').value = '';
+            document.getElementById('equip-size').value = '';
+            document.getElementById('equip-channel').value = '';
             renderPhotoPreview('equip');
             closeModal();
+        }
+        function editEquipment(index) {
+            const data = loadData('equipment');
+            const d = data[index];
+            document.getElementById('equip-category').value = d.category || '';
+            document.getElementById('equip-name').value = d.name || '';
+            document.getElementById('equip-price').value = d.price || '';
+            document.getElementById('equip-qty').value = d.qty || '1';
+            document.getElementById('equip-size').value = d.size || '';
+            document.getElementById('equip-date').value = d.date || '';
+            document.getElementById('equip-channel').value = d.channel || '';
+            if (d.photos?.length) { savePhotos('equip', [...d.photos]); renderPhotoPreview('equip'); }
+            startEdit('equipment', index);
         }
         function renderEquipList(filter) {
             let data = loadData('equipment');
             if (filter && filter !== 'all') data = data.filter(d=>d.category===filter);
             document.getElementById('equip-list').innerHTML = data.slice().reverse().map((d,i) => {
                 const ri = loadData('equipment').length - 1 - i;
-                let h = `<div class="record-item"><div class="value">${d.name}</div><div class="date" style="margin-top:2px">${d.category} · ¥${d.price||0} · ${d.date} · ${d.channel||''}</div>`;
+                const qtySize = d.size ? ` · ${d.size}` : '';
+                const qty = d.qty && d.qty !== '1' ? ` ×${d.qty}` : '';
+                let h = `<div class="record-item"><div class="value">${d.name}${qty}</div><div class="date" style="margin-top:2px">${d.category} · ¥${d.price||0} · ${d.date}${qtySize} · ${d.channel||''}</div>`;
                 if (d.photos?.length) h += `<div class="photos">${d.photos.map(p=>`<img src="${p}">`).join('')}</div>`;
-                h += `<div class="delete-btn" onclick="deleteRecord('equipment',${ri})">Delete</div></div>`;
+                h += `<div class="edit-btn" onclick="editEquipment(${ri})">Edit</div><div class="delete-btn" onclick="deleteRecord('equipment',${ri})">Delete</div></div>`;
                 return h;
             }).join('') || '<div class="empty">No items</div>';
         }
@@ -1479,19 +1591,41 @@
             const data = loadData('music');
             const linkVal = document.getElementById('music-link').value;
             const neteaseId = extractNeteaseId(linkVal);
-            data.push({
+            const record = {
                 category: document.getElementById('music-category').value,
                 name: document.getElementById('music-name').value,
                 artist: document.getElementById('music-artist').value,
                 link: linkVal,
                 neteaseId: neteaseId || ''
-            });
+            };
+            if (editState.module === 'music' && editState.index >= 0) {
+                data[editState.index] = record;
+            } else {
+                data.push(record);
+            }
             saveData('music', data); renderMusicList();
+            cancelEdit();
             document.getElementById('music-category').value = '';
             document.getElementById('music-name').value = '';
             document.getElementById('music-artist').value = '';
             document.getElementById('music-link').value = '';
             closeModal();
+        }
+        function editMusic(index) {
+            const data = loadData('music');
+            const d = data[index];
+            document.getElementById('music-category').value = d.category || '';
+            document.getElementById('music-name').value = d.name || '';
+            document.getElementById('music-artist').value = d.artist || '';
+            document.getElementById('music-link').value = d.link || '';
+            startEdit('music', index);
+        }
+        function deleteMusic(index) {
+            if (!confirm('Delete this song?')) return;
+            const data = loadData('music');
+            data.splice(index, 1);
+            saveData('music', data);
+            renderMusicList();
         }
         
         function renderMusicList() {
@@ -1505,7 +1639,7 @@
                 g[c].forEach(d => {
                     const playBtn = d.neteaseId ? `<button class="music-play-btn ${currentTrackIndex === d._idx && currentAudio && !currentAudio.paused ? 'playing' : ''}" onclick="playTrack(${d._idx})">▶</button>` : '';
                     const artistLine = d.artist ? `<div style="font-size:11px;color:var(--text-tertiary)">${d.artist}</div>` : '';
-                    html += `<div class="record-item"><div style="flex:1;min-width:0"><div class="value">${d.name}</div>${artistLine}</div><div style="display:flex;align-items:center;gap:6px">${playBtn}${d.link && !d.neteaseId ? `<a href="${d.link}" target="_blank" style="color:var(--pink-400);text-decoration:none;font-size:11px;white-space:nowrap">Link →</a>` : ''}</div></div>`;
+                    html += `<div class="record-item" style="position:relative"><div style="flex:1;min-width:0"><div class="value">${d.name}</div>${artistLine}</div><div style="display:flex;align-items:center;gap:6px">${playBtn}${d.link && !d.neteaseId ? `<a href="${d.link}" target="_blank" style="color:var(--pink-400);text-decoration:none;font-size:11px;white-space:nowrap">Link →</a>` : ''}</div><div class="edit-btn" onclick="editMusic(${d._idx})">Edit</div><div class="delete-btn" onclick="deleteMusic(${d._idx})">Delete</div></div>`;
                 });
             }
             document.getElementById('music-list').innerHTML = html || '<div class="empty">No music</div>';
@@ -1590,13 +1724,52 @@
             renderMusicList();
         }
         
+        // ===== Edit State Management =====
+        let editState = { module: null, index: -1 };
+        
+        function startEdit(module, index) {
+            editState = { module, index };
+            // Open the modal for this module
+            const modalKey = {
+                'bodyData': 'body-basic',
+                'muscleData': 'body-muscle',
+                'flexData': 'body-flex',
+                'injuryData': 'body-injury',
+                'equipment': 'equip',
+                'music': 'music',
+                'expenses': 'account'
+            }[module];
+            if (modalKey) openModal(modalKey);
+        }
+        
+        function cancelEdit() {
+            editState = { module: null, index: -1 };
+        }
+        
         // ===== Expense =====
         function addExpense() {
             const data = loadData('expenses');
-            data.push({ category: document.getElementById('expense-category').value, content: document.getElementById('expense-content').value, amount: document.getElementById('expense-amount').value, date: document.getElementById('expense-date').value });
+            const record = { category: document.getElementById('expense-category').value, content: document.getElementById('expense-content').value, amount: document.getElementById('expense-amount').value, date: document.getElementById('expense-date').value };
+            if (editState.module === 'expenses' && editState.index >= 0) {
+                const old = data[editState.index];
+                record.source = old.source || '';
+                data[editState.index] = record;
+            } else {
+                data.push(record);
+            }
             saveData('expenses', data); renderExpenseList(); updateTotalExpense(); updateExpenseStat();
+            cancelEdit();
             document.getElementById('expense-content').value = ''; document.getElementById('expense-amount').value = '';
             closeModal();
+        }
+        function editExpense(index) {
+            const data = loadData('expenses');
+            const d = data[index];
+            document.getElementById('expense-category').value = d.category || '';
+            document.getElementById('expense-content').value = d.content || '';
+            document.getElementById('expense-amount').value = d.amount || '';
+            document.getElementById('expense-date').value = d.date || '';
+            startEdit('expenses', index);
         }
         let expensePeriod = 'month'; // week | month | last-month | custom
         function switchExpensePeriod(el, period) {
@@ -1641,7 +1814,7 @@
             document.getElementById('expense-list').innerHTML = data.slice().reverse().map((d,i) => {
                 const ri = data.length - 1 - i;
                 const sourceTag = d.source === 'equipment' ? ' 🩰' : '';
-                return `<div class="record-item"><div class="value">${d.content}</div><div class="date" style="margin-top:2px">${d.category}${sourceTag} · ¥${d.amount} · ${d.date}</div><div class="delete-btn" onclick="deleteRecord('expenses',${ri})">Delete</div></div>`;
+                return `<div class="record-item"><div class="value">${d.content}</div><div class="date" style="margin-top:2px">${d.category}${sourceTag} · ¥${d.amount} · ${d.date}</div><div class="edit-btn" onclick="editExpense(${ri})">Edit</div><div class="delete-btn" onclick="deleteRecord('expenses',${ri})">Delete</div></div>`;
             }).join('') || '<div class="empty">No records</div>';
         }
         function updateTotalExpense() {
