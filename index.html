@@ -213,7 +213,7 @@
             position: fixed;
             top: 0;
             left: 50%;
-            transform: translateX(-50%) translateY(-60px);
+            transform: translateX(-50%) translateY(calc(-60px - env(safe-area-inset-top)));
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -226,7 +226,7 @@
             z-index: 9999;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-        .pull-indicator.visible { transform: translateX(-50%) translateY(60px); }
+        .pull-indicator.visible { transform: translateX(-50%) translateY(calc(70px + env(safe-area-inset-top))); }
         .pull-indicator.refreshing svg { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
