@@ -1102,17 +1102,32 @@
         
         // ===== Equipment =====
         function addEquipment() {
-            const data = loadData('equipment');
-            data.push({
+            const equipData = loadData('equipment');
+            const newEquip = {
                 category: document.getElementById('equip-category').value,
                 name: document.getElementById('equip-name').value,
                 price: document.getElementById('equip-price').value,
                 date: document.getElementById('equip-date').value,
                 channel: document.getElementById('equip-channel').value,
                 photos: getPhotos('equip')
-            });
-            saveData('equipment', data); savePhotos('equip', []);
+            };
+            equipData.push(newEquip);
+            saveData('equipment', equipData); savePhotos('equip', []);
             renderEquipList('all');
+            
+            // 同步到账本（如果价格>0）
+            if (parseFloat(newEquip.price) > 0) {
+                const expenses = loadData('expenses');
+                expenses.push({
+                    category: 'Gear',
+                    content: `${newEquip.category} - ${newEquip.name}`,
+                    amount: newEquip.price,
+                    date: newEquip.date,
+                    source: 'equipment'  // 标记来源，方便识别
+                });
+                saveData('expenses', expenses);
+            }
+            
             document.getElementById('equip-name').value = ''; document.getElementById('equip-price').value = ''; document.getElementById('equip-channel').value = '';
             renderPhotoPreview('equip');
             alert('Saved');
@@ -1201,7 +1216,8 @@
             const data = loadData('expenses');
             document.getElementById('expense-list').innerHTML = data.slice().reverse().map((d,i) => {
                 const ri = data.length - 1 - i;
-                return `<div class="record-item"><div class="value">${d.content}</div><div class="date" style="margin-top:2px">${d.category} · ¥${d.amount} · ${d.date}</div><div class="delete-btn" onclick="deleteRecord('expenses',${ri})">Delete</div></div>`;
+                const sourceTag = d.source === 'equipment' ? ' 🩰' : '';
+                return `<div class="record-item"><div class="value">${d.content}</div><div class="date" style="margin-top:2px">${d.category}${sourceTag} · ¥${d.amount} · ${d.date}</div><div class="delete-btn" onclick="deleteRecord('expenses',${ri})">Delete</div></div>`;
             }).join('') || '<div class="empty">No records</div>';
         }
         function updateTotalExpense() {
