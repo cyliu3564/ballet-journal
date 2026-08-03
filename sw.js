@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ballet-app-v2';
+const CACHE_NAME = 'ballet-app-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -10,13 +10,7 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(urlsToCache))
   );
-});
-
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
-  );
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {
@@ -30,5 +24,20 @@ self.addEventListener('activate', event => {
         })
       );
     })
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        const responseClone = response.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseClone);
+        });
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
