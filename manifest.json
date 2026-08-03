@@ -1,0 +1,22 @@
+{
+  "name": "芭蕾训练助手",
+  "short_name": "芭蕾助手",
+  "description": "芭蕾训练辅助应用",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#FDF2F8",
+  "theme_color": "#EC4899",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

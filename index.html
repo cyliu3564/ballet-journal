@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Ballet Journal</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Ballet">
+    <meta name="theme-color" content="#FFF5F0">
+    <style>
+        :root {
+            --pink-50: #FFF5F0;
+            --pink-100: #FDE8E0;
+            --pink-200: #F8D0C8;
+            --pink-300: #E8A8A0;
+            --pink-400: #D4888A;
+            --pink-500: #C06878;
+            --pink-600: #A04860;
+            --cream: #FFFAF7;
+            --text-primary: #2D2825;
+            --text-secondary: #8A807A;
+            --text-tertiary: #B8AEA8;
+            --border: #F0E8E4;
+            --card-shadow: 0 1px 3px rgba(160,72,96,0.04), 0 4px 16px rgba(160,72,96,0.06);
+            --card-shadow-hover: 0 2px 6px rgba(160,72,96,0.08), 0 8px 24px rgba(160,72,96,0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, 'SF Pro Display', BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--pink-50);
+            min-height: 100vh;
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-font-smoothing: antialiased;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+        .app-container { max-width: 430px; margin: 0 auto; min-height: 100vh; background: var(--pink-50); }
+        
+        /* Header */
+        .header {
+            background: var(--cream);
+            padding: calc(env(safe-area-inset-top) + 12px) 24px 16px;
+            border-bottom: 0.5px solid var(--border);
+        }
+        .header-inner { display: flex; justify-content: space-between; align-items: center; }
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+        .header-subtitle {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+            font-weight: 400;
+        }
+        
+        /* Content */
+        .content { padding: 16px 16px 110px; }
+        .module { display: none; animation: fadeIn 0.25s ease; }
+        .module.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 12px;
+            box-shadow: var(--card-shadow);
+            transition: box-shadow 0.2s;
+        }
+        .card-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        
+        /* Form */
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            background: var(--pink-50);
+            color: var(--text-primary);
+            -webkit-appearance: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--pink-300);
+            background: white;
+        }
+        .form-row { display: flex; gap: 10px; }
+        .form-row .form-group { flex: 1; }
+        
+        /* Buttons */
+        .btn {
+            background: var(--text-primary);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 500;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.02em;
+        }
+        .btn:active { transform: scale(0.98); opacity: 0.9; }
+        .btn-ghost {
+            background: transparent;
+            color: var(--pink-500);
+            border: 1.5px solid var(--pink-200);
+        }
+        
+        /* Tab Bar */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 8px 8px calc(env(safe-area-inset-bottom) + 8px);
+            border-top: 0.5px solid var(--border);
+            z-index: 100;
+        }
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 4px 8px;
+            cursor: pointer;
+            color: var(--text-tertiary);
+            transition: color 0.2s;
+            gap: 3px;
+        }
+        .tab-item.active { color: var(--pink-500); }
+        .tab-item svg { width: 22px; height: 22px; }
+        .tab-item .label { font-size: 10px; font-weight: 500; letter-spacing: 0.02em; }
+        
+        /* Sub Tabs */
+        .sub-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding: 4px 0;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .sub-tabs::-webkit-scrollbar { display: none; }
+        .sub-tab {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .sub-tab.active {
+            background: var(--text-primary);
+            color: white;
+            border-color: var(--text-primary);
+        }
+        
+        /* Overview Grid */
+        .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .overview-card {
+            background: var(--pink-50);
+            border-radius: 16px;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .overview-card::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--pink-100);
+            opacity: 0.5;
+        }
+        .ov-icon { margin-bottom: 8px; color: var(--pink-400); }
+        .ov-icon svg { width: 20px; height: 20px; }
+        .ov-label { font-size: 11px; color: var(--text-tertiary); font-weight: 500; }
+        .ov-value { font-size: 22px; font-weight: 600; color: var(--text-primary); margin-top: 2px; letter-spacing: -0.02em; }
+        .ov-change { font-size: 11px; color: var(--pink-400); margin-top: 2px; }
+        
+        /* Records */
+        .record-item {
+            background: var(--pink-50);
+            padding: 14px 16px;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        .record-item .date {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+        .record-item .value {
+            font-size: 15px;
+            color: var(--text-primary);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        .record-item .note {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .record-item .photos {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .record-item .photos img {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .delete-btn {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            color: var(--text-tertiary);
+            font-size: 11px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        /* Photo Upload */
+        .photo-upload { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .photo-preview {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .photo-add-btn {
+            width: 56px;
+            height: 56px;
+            border: 1.5px dashed var(--pink-200);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--pink-300);
+            background: var(--pink-50);
+            transition: all 0.2s;
+        }
+        .photo-add-btn:active { background: var(--pink-100); }
+        
+        /* Chart */
+        .trend-chart { width: 100%; background: var(--pink-50); border-radius: 12px; overflow: hidden; padding: 8px; }
+        .trend-chart svg { width: 100%; height: 140px; display: block; }
+        
+        /* Stat */
+        .stat-row { display: flex; gap: 8px; flex-wrap: wrap; }
+        .stat-chip {
+            background: var(--pink-50);
+            padding: 10px 14px;
+            border-radius: 12px;
+            text-align: center;
+            flex: 1;
+            min-width: 80px;
+        }
+        .stat-chip .val { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+        .stat-chip .label { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; font-weight: 500; }
+        
+        /* Toggle */
+        .section-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .section-toggle .arrow {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            transition: transform 0.2s;
+        }
+        .section-toggle .arrow.collapsed { transform: rotate(-90deg); }
+        
+        /* Filter */
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+        .filter-bar select {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 13px;
+            border-radius: 10px;
+        }
+        
+        /* PWA Hint */
+        .pwa-install-hint {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 24px;
+            font-size: 13px;
+            z-index: 99;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .pwa-install-hint.show { display: flex; align-items: center; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+        .close-hint { margin-left: 10px; cursor: pointer; opacity: 0.6; }
+        
+        /* Empty state */
+        .empty { color: var(--text-tertiary); font-size: 13px; text-align: center; padding: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="header-inner">
+                <div>
+                    <div class="header-title">Ballet Journal</div>
+                    <div class="header-subtitle" id="header-date"></div>
+                </div>
+                <div style="color:var(--pink-300)">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2"/><path d="M12 6v6l4 2"/></svg>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- ===== 身体日记 ===== -->
+            <div class="module active" id="module-body">
+                <div class="sub-tabs" id="body-sub-tabs">
+                    <div class="sub-tab active" onclick="switchBodyTab('overview')">Overview</div>
+                    <div class="sub-tab" onclick="switchBodyTab('basic')">Body</div>
+                    <div class="sub-tab" onclick="switchBodyTab('muscle')">Muscle</div>
+                    <div class="sub-tab" onclick="switchBodyTab('flex')">Flexibility</div>
+                    <div class="sub-tab" onclick="switchBodyTab('injury')">Injury</div>
+                </div>
+                
+                <!-- Overview -->
+                <div id="sub-overview" class="sub-content">
+                    <div class="card">
+                        <div class="overview-grid" id="overview-grid">
+                            <div class="overview-card">
+                                <div class="ov-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12H3M21 6H3M21 18H3"/></svg></div>
+                                <div class="ov-label">Height</div>
+                                <div class="ov-value" id="ov-height">--</div>
+                            </div>
+                            <div class="overview-card">
+                                <div class="ov-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M8 7l4-4 4 4M6 12h12"/></svg></div>
+                                <div class="ov-label">Weight</div>
+                                <div class="ov-value" id="ov-weight">--</div>
+                                <div class="ov-change" id="ov-weight-change"></div>
+                            </div>
+                            <div class="overview-card">
+                                <div class="ov-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+                                <div class="ov-label">Body Fat</div>
+                                <div class="ov-value" id="ov-fat">--</div>
+                            </div>
+                            <div class="overview-card">
+                                <div class="ov-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+                                <div class="ov-label">Days</div>
+                                <div class="ov-value" id="ov-days">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Recent Activity</div>
+                        <div id="overview-records"></div>
+                    </div>
+                </div>
+                
+                <!-- Body Data -->
+                <div id="sub-basic" class="sub-content" style="display:none;">
+                    <div class="card">
+                        <div class="card-title">Log Body Data</div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="body-date">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Height (cm)</label>
+                                <input type="number" step="0.1" id="body-height" placeholder="165.0">
+                            </div>
+                            <div class="form-group">
+                                <label>Weight (kg)</label>
+                                <input type="number" step="0.1" id="body-weight-input" placeholder="50.0">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Body Fat (%)</label>
+                                <input type="number" step="0.1" id="body-fat" placeholder="20.0">
+                            </div>
+                            <div class="form-group">
+                                <label>BMI</label>
+                                <input type="text" id="body-bmi" placeholder="auto" readonly style="background:var(--border);border-color:transparent">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Note</label>
+                            <input type="text" id="body-note" placeholder="如：早起空腹">
+                        </div>
+                        <div class="form-group">
+                            <label>Photo</label>
+                            <div class="photo-upload" id="body-photos">
+                                <div class="photo-add-btn" onclick="addPhoto('body')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="addBodyData()">Save</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Trend</div>
+                        <div class="filter-bar">
+                            <select id="body-trend-field" onchange="renderBodyTrend()">
+                                <option value="weight">Weight</option>
+                                <option value="height">Height</option>
+                                <option value="fat">Body Fat</option>
+                            </select>
+                        </div>
+                        <div class="trend-chart"><svg id="body-trend-chart"></svg></div>
+                    </div>
+                    <div class="card">
+                        <div class="section-toggle" onclick="toggleSection('body-records-section')">
+                            <div class="card-title" style="margin:0">History</div>
+                            <div class="arrow" id="body-records-section-arrow">▼</div>
+                        </div>
+                        <div id="body-records-section" style="margin-top:12px">
+                            <div id="body-records"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Muscle -->
+                <div id="sub-muscle" class="sub-content" style="display:none;">
+                    <div class="card">
+                        <div class="card-title">Log Muscle</div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="muscle-date">
+                        </div>
+                        <div class="form-group">
+                            <label>Part</label>
+                            <select id="muscle-part">
+                                <optgroup label="Lower Body">
+                                    <option value="Sartorius">Sartorius 缝匠肌</option>
+                                    <option value="Quadriceps">Quadriceps 股四头肌</option>
+                                    <option value="Calves">Calves 小腿肌</option>
+                                    <option value="Gluteus Max">Gluteus Max 臀大肌</option>
+                                    <option value="Gluteus Med">Gluteus Med 臀中肌</option>
+                                    <option value="Adductors">Adductors 内收肌群</option>
+                                    <option value="Hamstrings">Hamstrings 腘绳肌</option>
+                                    <option value="Tibialis Ant">Tibialis Ant 胫骨前肌</option>
+                                </optgroup>
+                                <optgroup label="Upper Body">
+                                    <option value="Deltoids">Deltoids 三角肌</option>
+                                    <option value="Trapezius">Trapezius 斜方肌</option>
+                                    <option value="Latissimus">Latissimus 背阔肌</option>
+                                </optgroup>
+                                <optgroup label="Core">
+                                    <option value="Rectus Abdominis">Rectus Abdominis 腹直肌</option>
+                                    <option value="Obliques">Obliques 腹斜肌</option>
+                                    <option value="Erector Spinae">Erector Spinae 竖脊肌</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="muscle-status">
+                                <option value="Good">Good</option>
+                                <option value="Mild Sore">Mild Sore</option>
+                                <option value="Sore">Sore</option>
+                                <option value="Fatigued">Fatigued</option>
+                                <option value="Injured">Injured</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Note</label>
+                            <input type="text" id="muscle-note" placeholder="备注">
+                        </div>
+                        <div class="form-group">
+                            <label>Photo</label>
+                            <div class="photo-upload" id="muscle-photos">
+                                <div class="photo-add-btn" onclick="addPhoto('muscle')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="addMuscleData()">Save</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Trend</div>
+                        <div class="filter-bar">
+                            <select id="muscle-trend-part" onchange="renderMuscleTrend()">
+                                <option value="全部">All Parts</option>
+                            </select>
+                        </div>
+                        <div class="trend-chart"><svg id="muscle-trend-chart"></svg></div>
+                    </div>
+                    <div class="card">
+                        <div class="section-toggle" onclick="toggleSection('muscle-records-section')">
+                            <div class="card-title" style="margin:0">History</div>
+                            <div class="arrow" id="muscle-records-section-arrow">▼</div>
+                        </div>
+                        <div id="muscle-records-section" style="margin-top:12px">
+                            <div id="muscle-records"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Flexibility -->
+                <div id="sub-flex" class="sub-content" style="display:none;">
+                    <div class="card">
+                        <div class="card-title">Log Flexibility</div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="flex-date">
+                        </div>
+                        <div class="form-group">
+                            <label>Part</label>
+                            <select id="flex-part">
+                                <option value="Arch">Arch 脚背</option>
+                                <option value="Side Split">Side Split 横叉</option>
+                                <option value="Front Split L">Front Split L 左竖叉</option>
+                                <option value="Front Split R">Front Split R 右竖叉</option>
+                                <option value="Shoulders">Shoulders 肩膀</option>
+                                <option value="Back">Back 腰部</option>
+                                <option value="Ankle">Ankle 脚踝</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Level</label>
+                            <input type="text" id="flex-level" placeholder="如：180°">
+                        </div>
+                        <div class="form-group">
+                            <label>Note</label>
+                            <input type="text" id="flex-note" placeholder="备注">
+                        </div>
+                        <div class="form-group">
+                            <label>Photo</label>
+                            <div class="photo-upload" id="flex-photos">
+                                <div class="photo-add-btn" onclick="addPhoto('flex')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="addFlexData()">Save</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Trend</div>
+                        <div class="filter-bar">
+                            <select id="flex-trend-part" onchange="renderFlexTrend()">
+                                <option value="全部">All Parts</option>
+                            </select>
+                        </div>
+                        <div class="trend-chart"><svg id="flex-trend-chart"></svg></div>
+                    </div>
+                    <div class="card">
+                        <div class="section-toggle" onclick="toggleSection('flex-records-section')">
+                            <div class="card-title" style="margin:0">History</div>
+                            <div class="arrow" id="flex-records-section-arrow">▼</div>
+                        </div>
+                        <div id="flex-records-section" style="margin-top:12px">
+                            <div id="flex-records"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Injury -->
+                <div id="sub-injury" class="sub-content" style="display:none;">
+                    <div class="card">
+                        <div class="card-title">Log Injury</div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="injury-date">
+                        </div>
+                        <div class="form-group">
+                            <label>Part</label>
+                            <input type="text" id="injury-part" placeholder="如：左脚踝">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="injury-desc" rows="3" placeholder="描述伤情"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="injury-status">
+                                <option value="New">New</option>
+                                <option value="Recovering">Recovering</option>
+                                <option value="Recovered">Recovered</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Photo</label>
+                            <div class="photo-upload" id="injury-photos">
+                                <div class="photo-add-btn" onclick="addPhoto('injury')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="addInjuryData()">Save</button>
+                    </div>
+                    <div class="card">
+                        <div class="section-toggle" onclick="toggleSection('injury-records-section')">
+                            <div class="card-title" style="margin:0">History</div>
+                            <div class="arrow" id="injury-records-section-arrow">▼</div>
+                        </div>
+                        <div id="injury-records-section" style="margin-top:12px">
+                            <div id="injury-records"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ===== 装备库 ===== -->
+            <div class="module" id="module-equip">
+                <div class="sub-tabs">
+                    <div class="sub-tab active" onclick="switchEquipTab(this, 'all')">All</div>
+                    <div class="sub-tab" onclick="switchEquipTab(this, 'Leotard')">Leotard</div>
+                    <div class="sub-tab" onclick="switchEquipTab(this, 'Tights')">Tights</div>
+                    <div class="sub-tab" onclick="switchEquipTab(this, 'Skirt')">Skirt</div>
+                    <div class="sub-tab" onclick="switchEquipTab(this, 'Pants')">Pants</div>
+                    <div class="sub-tab" onclick="switchEquipTab(this, 'Shoes')">Shoes</div>
+                    <div class="sub-tab" onclick="switchEquipTab(this, 'Other')">Other</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Add Item</div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="equip-category">
+                            <option value="Leotard">Leotard 体服</option>
+                            <option value="Tights">Tights 大袜</option>
+                            <option value="Skirt">Skirt 舞裙</option>
+                            <option value="Pants">Pants 舞裤</option>
+                            <option value="Shoes">Shoes 舞鞋</option>
+                            <option value="Other">Other 其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="equip-name" placeholder="名称">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Price</label>
+                            <input type="number" id="equip-price" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="equip-date">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Channel</label>
+                        <input type="text" id="equip-channel" placeholder="购买渠道">
+                    </div>
+                    <div class="form-group">
+                        <label>Photo</label>
+                        <div class="photo-upload" id="equip-photos">
+                            <div class="photo-add-btn" onclick="addPhoto('equip')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="addEquipment()">Save</button>
+                </div>
+                <div class="card">
+                    <div class="card-title">Collection</div>
+                    <div id="equip-list"></div>
+                </div>
+            </div>
+            
+            <!-- ===== 音乐库 ===== -->
+            <div class="module" id="module-music">
+                <div class="card">
+                    <div class="card-title">Add Music</div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" id="music-category" placeholder="如：Adagio / Allegro">
+                    </div>
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="music-name" placeholder="歌曲名">
+                    </div>
+                    <div class="form-group">
+                        <label>Link</label>
+                        <input type="text" id="music-link" placeholder="链接">
+                    </div>
+                    <button class="btn" onclick="addMusic()">Save</button>
+                </div>
+                <div class="card">
+                    <div class="card-title">Playlist</div>
+                    <div id="music-list"></div>
+                </div>
+            </div>
+            
+            <!-- ===== 账本 ===== -->
+            <div class="module" id="module-account">
+                <div class="card">
+                    <div class="card-title">Expense Overview</div>
+                    <div class="sub-tabs" style="margin-bottom:14px">
+                        <div class="sub-tab active" onclick="switchExpensePeriod(this,'week')">This Week</div>
+                        <div class="sub-tab" onclick="switchExpensePeriod(this,'month')">This Month</div>
+                        <div class="sub-tab" onclick="switchExpensePeriod(this,'last-month')">Last Month</div>
+                        <div class="sub-tab" onclick="switchExpensePeriod(this,'custom')">Custom</div>
+                    </div>
+                    <div id="custom-date-range" style="display:none;margin-bottom:14px">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>From</label>
+                                <input type="date" id="expense-from" onchange="updateExpenseStat()">
+                            </div>
+                            <div class="form-group">
+                                <label>To</label>
+                                <input type="date" id="expense-to" onchange="updateExpenseStat()">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size:36px;font-weight:600;color:var(--pink-500);letter-spacing:-0.03em" id="total-expense">¥0</div>
+                    <div style="font-size:12px;color:var(--text-tertiary);margin-top:4px" id="expense-period-label"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Add Expense</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="expense-category">
+                                <option value="Lesson">Lesson</option>
+                                <option value="Gear">Gear</option>
+                                <option value="Transport">Transport</option>
+                                <option value="Food">Food</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <input type="number" id="expense-amount" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Description</label>
+                            <input type="text" id="expense-content" placeholder="内容">
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="expense-date">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="addExpense()">Save</button>
+                </div>
+                <div class="card">
+                    <div class="card-title">Breakdown</div>
+                    <div class="stat-row" id="expense-stat"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">History</div>
+                    <div id="expense-list"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <div class="tab-item" onclick="switchModule('training')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z" rx="2"/><path d="M8 8h8M8 12h5"/></svg>
+                <div class="label">Training</div>
+            </div>
+            <div class="tab-item active" onclick="switchModule('body')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <div class="label">Body</div>
+            </div>
+            <div class="tab-item" onclick="switchModule('equip')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7l-8-4-8 4v10l8 4 8-4V7z"/><path d="M12 3v18M4 7l8 4 8-4"/></svg>
+                <div class="label">Wardrobe</div>
+            </div>
+            <div class="tab-item" onclick="switchModule('music')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                <div class="label">Music</div>
+            </div>
+            <div class="tab-item" onclick="switchModule('account')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><path d="M6 16h4"/></svg>
+                <div class="label">Ledger</div>
+            </div>
+        </div>
+        
+        <div class="pwa-install-hint" id="pwa-hint">
+            Share → Add to Home Screen
+            <span class="close-hint" onclick="closeHint()">✕</span>
+        </div>
+        
+        <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhotoSelect(event)">
+    </div>
+    
+    <script>
+        // ===== Global =====
+        let currentPhotoTarget = '';
+        let pendingPhotos = [];
+        const today = new Date().toISOString().split('T')[0];
+        
+        // ===== Init =====
+        function init() {
+            // Header date
+            const opts = { month: 'long', day: 'numeric', weekday: 'short' };
+            document.getElementById('header-date').textContent = new Date().toLocaleDateString('en-US', opts);
+            
+            // Date limits
+            document.querySelectorAll('input[type="date"]').forEach(i => { i.max = today; i.value = today; });
+            
+            // BMI calc
+            const hI = document.getElementById('body-height');
+            const wI = document.getElementById('body-weight-input');
+            if (hI && wI) { hI.addEventListener('input', calcBMI); wI.addEventListener('input', calcBMI); }
+            
+            renderAll();
+        }
+        
+        function calcBMI() {
+            const h = parseFloat(document.getElementById('body-height').value);
+            const w = parseFloat(document.getElementById('body-weight-input').value);
+            if (h > 0 && w > 0) document.getElementById('body-bmi').value = (w / ((h/100) ** 2)).toFixed(1);
+        }
+        
+        // ===== Photo =====
+        function addPhoto(target) {
+            currentPhotoTarget = target;
+            pendingPhotos = getPhotos(target);
+            document.getElementById('photo-input').click();
+        }
+        function handlePhotoSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const img = new Image();
+                img.onload = function() {
+                    const c = document.createElement('canvas');
+                    const maxW = 600;
+                    let w = img.width, h = img.height;
+                    if (w > maxW) { h = h * maxW / w; w = maxW; }
+                    c.width = w; c.height = h;
+                    c.getContext('2d').drawImage(img, 0, 0, w, h);
+                    pendingPhotos.push(c.toDataURL('image/jpeg', 0.6));
+                    savePhotos(currentPhotoTarget, pendingPhotos);
+                    renderPhotoPreview(currentPhotoTarget);
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+            e.target.value = '';
+        }
+        function getPhotos(t) { return JSON.parse(sessionStorage.getItem('photos_' + t) || '[]'); }
+        function savePhotos(t, p) { sessionStorage.setItem('photos_' + t, JSON.stringify(p)); }
+        function renderPhotoPreview(t) {
+            const photos = getPhotos(t);
+            const c = document.getElementById(t + '-photos');
+            c.innerHTML = photos.map((p,i) => `<img src="${p}" class="photo-preview" onclick="removePhoto('${t}',${i})">`).join('') +
+                `<div class="photo-add-btn" onclick="addPhoto('${t}')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>`;
+        }
+        function removePhoto(t, i) { const p = getPhotos(t); p.splice(i,1); savePhotos(t,p); renderPhotoPreview(t); }
+        
+        // ===== Storage =====
+        function saveData(k, d) { try { localStorage.setItem(k, JSON.stringify(d)); } catch(e) { alert('Storage full'); } }
+        function loadData(k) { return JSON.parse(localStorage.getItem(k) || '[]'); }
+        
+        // ===== Navigation =====
+        function switchModule(name) {
+            document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            if (name === 'training') { alert('Coming soon'); return; }
+            document.getElementById('module-' + name).classList.add('active');
+            event.currentTarget.classList.add('active');
+            if (name === 'account') updateExpenseStat();
+            if (name === 'body') renderOverview();
+        }
+        function switchBodyTab(name) {
+            document.querySelectorAll('#module-body .sub-tab').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.querySelectorAll('#module-body .sub-content').forEach(c => c.style.display = 'none');
+            document.getElementById('sub-' + name).style.display = 'block';
+            if (name === 'overview') renderOverview();
+        }
+        function switchEquipTab(el, cat) {
+            el.parentElement.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            renderEquipList(cat);
+        }
+        function toggleSection(id) {
+            const el = document.getElementById(id);
+            const arrow = document.getElementById(id + '-arrow');
+            if (el.style.display === 'none') { el.style.display = 'block'; arrow.classList.remove('collapsed'); }
+            else { el.style.display = 'none'; arrow.classList.add('collapsed'); }
+        }
+        
+        // ===== Overview =====
+        function renderOverview() {
+            const bd = loadData('bodyData');
+            if (bd.length > 0) {
+                const l = bd[bd.length - 1];
+                document.getElementById('ov-height').textContent = l.height ? l.height + 'cm' : '--';
+                document.getElementById('ov-weight').textContent = l.weight ? l.weight + 'kg' : '--';
+                document.getElementById('ov-fat').textContent = l.fat ? l.fat + '%' : '--';
+                if (bd.length >= 2 && bd[bd.length-2].weight && l.weight) {
+                    const d = (l.weight - bd[bd.length-2].weight).toFixed(1);
+                    document.getElementById('ov-weight-change').textContent = (d > 0 ? '+' : '') + d + 'kg';
+                }
+            }
+            const dates = new Set();
+            ['bodyData','muscleData','flexData'].forEach(k => loadData(k).forEach(d => d.date && dates.add(d.date)));
+            document.getElementById('ov-days').textContent = dates.size;
+            
+            const all = [
+                ...bd.slice(-3).reverse().map(d => ({date:d.date, text:`Weight ${d.weight||'--'}kg · Fat ${d.fat||'--'}%`, type:'body'})),
+                ...loadData('muscleData').slice(-3).reverse().map(d => ({date:d.date, text:`${d.part}: ${d.status}`, type:'muscle'})),
+                ...loadData('flexData').slice(-3).reverse().map(d => ({date:d.date, text:`${d.part}: ${d.level||'--'}`, type:'flex'})),
+                ...loadData('injuryData').slice(-2).reverse().map(d => ({date:d.date, text:`${d.part}: ${d.status||''}`, type:'injury'}))
+            ].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 8);
+            
+            document.getElementById('overview-records').innerHTML = all.length > 0
+                ? all.map(r => `<div class="record-item"><div class="date">${r.date}</div><div class="value">${r.text}</div></div>`).join('')
+                : '<div class="empty">No records yet</div>';
+        }
+        
+        // ===== Body Data =====
+        function addBodyData() {
+            const data = loadData('bodyData');
+            data.push({
+                date: document.getElementById('body-date').value,
+                height: document.getElementById('body-height').value,
+                weight: document.getElementById('body-weight-input').value,
+                fat: document.getElementById('body-fat').value,
+                note: document.getElementById('body-note').value,
+                photos: getPhotos('body')
+            });
+            saveData('bodyData', data);
+            savePhotos('body', []);
+            renderBodyRecords(); renderBodyTrend();
+            ['body-height','body-weight-input','body-fat','body-note','body-bmi'].forEach(id => document.getElementById(id).value = '');
+            renderPhotoPreview('body');
+            alert('Saved');
+        }
+        function renderBodyRecords() {
+            const data = loadData('bodyData');
+            document.getElementById('body-records').innerHTML = data.slice().reverse().map((d,i) => {
+                const ri = data.length - 1 - i;
+                let v = [];
+                if (d.height) v.push('Height: ' + d.height + 'cm');
+                if (d.weight) v.push('Weight: ' + d.weight + 'kg');
+                if (d.fat) v.push('Fat: ' + d.fat + '%');
+                let h = `<div class="record-item"><div class="date">${d.date}</div><div class="value">${v.join(' · ')}</div>`;
+                if (d.note) h += `<div class="note">${d.note}</div>`;
+                if (d.photos?.length) h += `<div class="photos">${d.photos.map(p=>`<img src="${p}">`).join('')}</div>`;
+                h += `<div class="delete-btn" onclick="deleteRecord('bodyData',${ri})">Delete</div></div>`;
+                return h;
+            }).join('') || '<div class="empty">No records</div>';
+        }
+        function renderBodyTrend() {
+            const f = document.getElementById('body-trend-field').value;
+            const data = loadData('bodyData').filter(d => d[f]);
+            drawChart('body-trend-chart', data.map(d => ({date:d.date, value:parseFloat(d[f])})), f==='weight'?'kg':f==='height'?'cm':'%');
+        }
+        
+        // ===== Muscle =====
+        function addMuscleData() {
+            const data = loadData('muscleData');
+            data.push({
+                date: document.getElementById('muscle-date').value,
+                part: document.getElementById('muscle-part').value,
+                status: document.getElementById('muscle-status').value,
+                note: document.getElementById('muscle-note').value,
+                photos: getPhotos('muscle')
+            });
+            saveData('muscleData', data); savePhotos('muscle', []);
+            renderMuscleRecords(); renderMuscleTrend(); updateMuscleFilter();
+            document.getElementById('muscle-note').value = '';
+            renderPhotoPreview('muscle');
+            alert('Saved');
+        }
+        function renderMuscleRecords() {
+            const data = loadData('muscleData');
+            document.getElementById('muscle-records').innerHTML = data.slice().reverse().map((d,i) => {
+                const ri = data.length - 1 - i;
+                let h = `<div class="record-item"><div class="date">${d.date}</div><div class="value">${d.part}: ${d.status}</div>`;
+                if (d.note) h += `<div class="note">${d.note}</div>`;
+                if (d.photos?.length) h += `<div class="photos">${d.photos.map(p=>`<img src="${p}">`).join('')}</div>`;
+                h += `<div class="delete-btn" onclick="deleteRecord('muscleData',${ri})">Delete</div></div>`;
+                return h;
+            }).join('') || '<div class="empty">No records</div>';
+        }
+        function updateMuscleFilter() {
+            const parts = [...new Set(loadData('muscleData').map(d=>d.part))];
+            document.getElementById('muscle-trend-part').innerHTML = '<option value="全部">All</option>' + parts.map(p=>`<option value="${p}">${p}</option>`).join('');
+        }
+        function renderMuscleTrend() {
+            const f = document.getElementById('muscle-trend-part').value;
+            const sm = {Good:5,'Mild Sore':4,Sore:3,Fatigued:2,Injured:1};
+            let data = loadData('muscleData');
+            if (f !== '全部') data = data.filter(d=>d.part===f);
+            drawChart('muscle-trend-chart', data.map(d=>({date:d.date,value:sm[d.status]||3,label:d.status,part:d.part})), '', true);
+        }
+        
+        // ===== Flexibility =====
+        function addFlexData() {
+            const data = loadData('flexData');
+            data.push({
+                date: document.getElementById('flex-date').value,
+                part: document.getElementById('flex-part').value,
+                level: document.getElementById('flex-level').value,
+                note: document.getElementById('flex-note').value,
+                photos: getPhotos('flex')
+            });
+            saveData('flexData', data); savePhotos('flex', []);
+            renderFlexRecords(); renderFlexTrend(); updateFlexFilter();
+            document.getElementById('flex-level').value = ''; document.getElementById('flex-note').value = '';
+            renderPhotoPreview('flex');
+            alert('Saved');
+        }
+        function renderFlexRecords() {
+            const data = loadData('flexData');
+            document.getElementById('flex-records').innerHTML = data.slice().reverse().map((d,i) => {
+                const ri = data.length - 1 - i;
+                let h = `<div class="record-item"><div class="date">${d.date}</div><div class="value">${d.part}: ${d.level||'--'}</div>`;
+                if (d.note) h += `<div class="note">${d.note}</div>`;
+                if (d.photos?.length) h += `<div class="photos">${d.photos.map(p=>`<img src="${p}">`).join('')}</div>`;
+                h += `<div class="delete-btn" onclick="deleteRecord('flexData',${ri})">Delete</div></div>`;
+                return h;
+            }).join('') || '<div class="empty">No records</div>';
+        }
+        function updateFlexFilter() {
+            const parts = [...new Set(loadData('flexData').map(d=>d.part))];
+            document.getElementById('flex-trend-part').innerHTML = '<option value="全部">All</option>' + parts.map(p=>`<option value="${p}">${p}</option>`).join('');
+        }
+        function renderFlexTrend() {
+            const f = document.getElementById('flex-trend-part').value;
+            let data = loadData('flexData');
+            if (f !== '全部') data = data.filter(d=>d.part===f);
+            drawChart('flex-trend-chart', data.map(d=>{const n=parseFloat(d.level);return{date:d.date,value:isNaN(n)?3:n,label:d.level||'--',part:d.part}}), '');
+        }
+        
+        // ===== Injury =====
+        function addInjuryData() {
+            const data = loadData('injuryData');
+            data.push({
+                date: document.getElementById('injury-date').value,
+                part: document.getElementById('injury-part').value,
+                desc: document.getElementById('injury-desc').value,
+                status: document.getElementById('injury-status').value,
+                photos: getPhotos('injury')
+            });
+            saveData('injuryData', data); savePhotos('injury', []);
+            renderInjuryRecords();
+            document.getElementById('injury-part').value = ''; document.getElementById('injury-desc').value = '';
+            renderPhotoPreview('injury');
+            alert('Saved');
+        }
+        function renderInjuryRecords() {
+            const data = loadData('injuryData');
+            document.getElementById('injury-records').innerHTML = data.slice().reverse().map((d,i) => {
+                const ri = data.length - 1 - i;
+                let h = `<div class="record-item"><div class="date">${d.date} · ${d.status||''}</div><div class="value">${d.part}</div>`;
+                if (d.desc) h += `<div class="note">${d.desc}</div>`;
+                if (d.photos?.length) h += `<div class="photos">${d.photos.map(p=>`<img src="${p}">`).join('')}</div>`;
+                h += `<div class="delete-btn" onclick="deleteRecord('injuryData',${ri})">Delete</div></div>`;
+                return h;
+            }).join('') || '<div class="empty">No records</div>';
+        }
+        
+        // ===== Equipment =====
+        function addEquipment() {
+            const data = loadData('equipment');
+            data.push({
+                category: document.getElementById('equip-category').value,
+                name: document.getElementById('equip-name').value,
+                price: document.getElementById('equip-price').value,
+                date: document.getElementById('equip-date').value,
+                channel: document.getElementById('equip-channel').value,
+                photos: getPhotos('equip')
+            });
+            saveData('equipment', data); savePhotos('equip', []);
+            renderEquipList('all');
+            document.getElementById('equip-name').value = ''; document.getElementById('equip-price').value = ''; document.getElementById('equip-channel').value = '';
+            renderPhotoPreview('equip');
+            alert('Saved');
+        }
+        function renderEquipList(filter) {
+            let data = loadData('equipment');
+            if (filter && filter !== 'all') data = data.filter(d=>d.category===filter);
+            document.getElementById('equip-list').innerHTML = data.slice().reverse().map((d,i) => {
+                const ri = loadData('equipment').length - 1 - i;
+                let h = `<div class="record-item"><div class="value">${d.name}</div><div class="date" style="margin-top:2px">${d.category} · ¥${d.price||0} · ${d.date} · ${d.channel||''}</div>`;
+                if (d.photos?.length) h += `<div class="photos">${d.photos.map(p=>`<img src="${p}">`).join('')}</div>`;
+                h += `<div class="delete-btn" onclick="deleteRecord('equipment',${ri})">Delete</div></div>`;
+                return h;
+            }).join('') || '<div class="empty">No items</div>';
+        }
+        
+        // ===== Music =====
+        function addMusic() {
+            const data = loadData('music');
+            data.push({ category: document.getElementById('music-category').value, name: document.getElementById('music-name').value, link: document.getElementById('music-link').value });
+            saveData('music', data); renderMusicList();
+            document.getElementById('music-category').value = ''; document.getElementById('music-name').value = ''; document.getElementById('music-link').value = '';
+            alert('Saved');
+        }
+        function renderMusicList() {
+            const data = loadData('music');
+            const g = {};
+            data.forEach(d => { const c = d.category||'Uncategorized'; if(!g[c])g[c]=[]; g[c].push(d); });
+            let html = '';
+            for (const c in g) {
+                html += `<div style="font-size:12px;color:var(--pink-400);font-weight:600;margin:12px 0 8px;letter-spacing:0.04em;text-transform:uppercase">${c}</div>`;
+                g[c].forEach(d => {
+                    html += `<div class="record-item"><div class="value">${d.name}</div><div class="date"><a href="${d.link}" target="_blank" style="color:var(--pink-400);text-decoration:none">Open Link →</a></div></div>`;
+                });
+            }
+            document.getElementById('music-list').innerHTML = html || '<div class="empty">No music</div>';
+        }
+        
+        // ===== Expense =====
+        function addExpense() {
+            const data = loadData('expenses');
+            data.push({ category: document.getElementById('expense-category').value, content: document.getElementById('expense-content').value, amount: document.getElementById('expense-amount').value, date: document.getElementById('expense-date').value });
+            saveData('expenses', data); renderExpenseList(); updateTotalExpense(); updateExpenseStat();
+            document.getElementById('expense-content').value = ''; document.getElementById('expense-amount').value = '';
+            alert('Saved');
+        }
+        let expensePeriod = 'month'; // week | month | last-month | custom
+        function switchExpensePeriod(el, period) {
+            el.parentElement.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            expensePeriod = period;
+            document.getElementById('custom-date-range').style.display = period === 'custom' ? 'block' : 'none';
+            updateExpenseStat();
+        }
+        function getExpenseDateRange() {
+            const now = new Date();
+            let from, to, label;
+            if (expensePeriod === 'week') {
+                const day = now.getDay() || 7;
+                from = new Date(now); from.setDate(now.getDate() - day + 1);
+                to = now;
+                label = 'This Week';
+            } else if (expensePeriod === 'month') {
+                from = new Date(now.getFullYear(), now.getMonth(), 1);
+                to = now;
+                label = 'This Month';
+            } else if (expensePeriod === 'last-month') {
+                from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                to = new Date(now.getFullYear(), now.getMonth(), 0);
+                label = 'Last Month';
+            } else {
+                from = document.getElementById('expense-from').value ? new Date(document.getElementById('expense-from').value) : null;
+                to = document.getElementById('expense-to').value ? new Date(document.getElementById('expense-to').value) : null;
+                label = from && to ? `${document.getElementById('expense-from').value} ~ ${document.getElementById('expense-to').value}` : 'Custom';
+            }
+            return { from, to, label };
+        }
+        function filterExpensesByPeriod(data) {
+            const { from, to } = getExpenseDateRange();
+            if (!from || !to) return data;
+            const fromStr = from.toISOString().slice(0,10);
+            const toStr = to.toISOString().slice(0,10);
+            return data.filter(d => d.date >= fromStr && d.date <= toStr);
+        }
+        function renderExpenseList() {
+            const data = loadData('expenses');
+            document.getElementById('expense-list').innerHTML = data.slice().reverse().map((d,i) => {
+                const ri = data.length - 1 - i;
+                return `<div class="record-item"><div class="value">${d.content}</div><div class="date" style="margin-top:2px">${d.category} · ¥${d.amount} · ${d.date}</div><div class="delete-btn" onclick="deleteRecord('expenses',${ri})">Delete</div></div>`;
+            }).join('') || '<div class="empty">No records</div>';
+        }
+        function updateTotalExpense() {
+            const data = loadData('expenses');
+            const filtered = filterExpensesByPeriod(data);
+            const t = filtered.reduce((s,d) => s + parseFloat(d.amount||0), 0);
+            document.getElementById('total-expense').textContent = '¥' + t.toFixed(0);
+            const { label } = getExpenseDateRange();
+            document.getElementById('expense-period-label').textContent = label;
+        }
+        function updateExpenseStat() {
+            const data = loadData('expenses');
+            const md = filterExpensesByPeriod(data);
+            const t = md.reduce((s,d) => s + parseFloat(d.amount||0), 0);
+            const bc = {};
+            md.forEach(d => { bc[d.category] = (bc[d.category]||0) + parseFloat(d.amount||0); });
+            let h = `<div class="stat-chip"><div class="val">¥${t.toFixed(0)}</div><div class="label">Total</div></div>`;
+            h += `<div class="stat-chip"><div class="val">${md.length}</div><div class="label">Entries</div></div>`;
+            for (const c in bc) h += `<div class="stat-chip"><div class="val">¥${bc[c].toFixed(0)}</div><div class="label">${c}</div></div>`;
+            document.getElementById('expense-stat').innerHTML = h;
+            const { label } = getExpenseDateRange();
+            document.getElementById('expense-period-label').textContent = label;
+            document.getElementById('total-expense').textContent = '¥' + t.toFixed(0);
+        }
+        
+        // ===== Common =====
+        function deleteRecord(key, idx) {
+            if (!confirm('Delete this record?')) return;
+            const data = loadData(key); data.splice(idx, 1); saveData(key, data); renderAll();
+        }
+        function renderAll() {
+            renderOverview(); renderBodyRecords(); renderBodyTrend();
+            renderMuscleRecords(); updateMuscleFilter(); renderMuscleTrend();
+            renderFlexRecords(); updateFlexFilter(); renderFlexTrend();
+            renderInjuryRecords(); renderEquipList('all'); renderMusicList();
+            renderExpenseList(); updateTotalExpense(); updateExpenseStat();
+        }
+        
+        // ===== Chart (SVG) =====
+        function drawChart(svgId, points, unit, isStatus) {
+            const svg = document.getElementById(svgId);
+            if (!svg || points.length === 0) { if(svg) svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="var(--text-tertiary)" font-size="12">No trend data</text>'; return; }
+            const w = 340, h = 130, pad = 28;
+            const vals = points.map(p=>p.value);
+            const minV = Math.min(...vals), maxV = Math.max(...vals);
+            const range = maxV - minV || 1;
+            const step = points.length > 1 ? (w - pad*2) / (points.length - 1) : 0;
+            
+            let path = '', area = '';
+            const pts = points.map((p,i) => {
+                const x = pad + i * step;
+                const y = h - pad - ((p.value - minV) / range) * (h - pad*2);
+                return {x, y, p};
+            });
+            
+            path = pts.map((pt,i) => (i===0?'M':'L') + pt.x + ',' + pt.y).join(' ');
+            area = path + ` L${pts[pts.length-1].x},${h-pad} L${pts[0].x},${h-pad} Z`;
+            
+            let dots = '';
+            pts.forEach((pt,i) => {
+                dots += `<circle cx="${pt.x}" cy="${pt.y}" r="3" fill="var(--pink-500)"/>`;
+                if (points.length <= 12 || i % Math.ceil(points.length/8) === 0) {
+                    dots += `<text x="${pt.x}" y="${h-8}" text-anchor="middle" fill="var(--text-tertiary)" font-size="8">${pt.p.date.slice(5)}</text>`;
+                    const label = isStatus ? (pt.p.label||'') : (pt.p.value + (unit||''));
+                    dots += `<text x="${pt.x}" y="${pt.y-8}" text-anchor="middle" fill="var(--pink-400)" font-size="8">${label}</text>`;
+                }
+            });
+            
+            svg.innerHTML = `<defs><linearGradient id="areaGrad-${svgId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--pink-300)" stop-opacity="0.2"/><stop offset="100%" stop-color="var(--pink-300)" stop-opacity="0"/></linearGradient></defs>
+                <path d="${area}" fill="url(#areaGrad-${svgId})"/>
+                <path d="${path}" fill="none" stroke="var(--pink-400)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                ${dots}`;
+            svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+        }
+        
+        // ===== PWA =====
+        if (!window.matchMedia('(display-mode: standalone)').matches) {
+            setTimeout(() => document.getElementById('pwa-hint').classList.add('show'), 3000);
+        }
+        function closeHint() { document.getElementById('pwa-hint').classList.remove('show'); }
+        
+        init();
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+    </script>
+</body>
+</html>
