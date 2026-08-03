@@ -1,8 +1,9 @@
 {
-  "name": "Ballet Journal",
+  "name": "CY's Ballet Journal",
   "short_name": "Ballet",
   "description": "芭蕾训练日记",
-  "start_url": "/index.html",
+  "start_url": "/ballet-journal/",
+  "scope": "/ballet-journal/",
   "display": "standalone",
   "background_color": "#FFF5F0",
   "theme_color": "#C06878",
