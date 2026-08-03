@@ -131,6 +131,82 @@
             color: var(--pink-500);
             border: 1.5px solid var(--pink-200);
         }
+        /* Add Button (floating) */
+        .add-float-btn {
+            position: fixed;
+            bottom: 88px;
+            right: calc(50% - 195px);
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--pink-400);
+            color: white;
+            border: none;
+            font-size: 26px;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(192,104,120,0.35);
+            cursor: pointer;
+            z-index: 90;
+            transition: all 0.2s;
+        }
+        .add-float-btn:active { transform: scale(0.92); }
+        @media (max-width: 430px) {
+            .add-float-btn { right: 20px; }
+        }
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.35);
+            z-index: 1000;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-sheet {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-width: 430px;
+            max-height: 88vh;
+            overflow-y: auto;
+            padding: 24px 24px 36px;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--border);
+            border: none;
+            font-size: 18px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .modal-sheet .modal-form { display: block !important; background: transparent; box-shadow: none; padding: 0; margin: 0; border-radius: 0; }
+        .modal-sheet .modal-form > .card-title { display: none; }
         
         /* Tab Bar */
         .tab-bar {
@@ -414,7 +490,7 @@
                 
                 <!-- Body Data -->
                 <div id="sub-basic" class="sub-content" style="display:none;">
-                    <div class="card">
+                    <div class="card modal-form" data-modal="body-basic" style="display:none;">
                         <div class="card-title">Log Body Data</div>
                         <div class="form-group">
                             <label>Date</label>
@@ -476,7 +552,7 @@
                 
                 <!-- Muscle -->
                 <div id="sub-muscle" class="sub-content" style="display:none;">
-                    <div class="card">
+                    <div class="card modal-form" data-modal="body-muscle" style="display:none;">
                         <div class="card-title">Log Muscle</div>
                         <div class="form-group">
                             <label>Date</label>
@@ -551,7 +627,7 @@
                 
                 <!-- Flexibility -->
                 <div id="sub-flex" class="sub-content" style="display:none;">
-                    <div class="card">
+                    <div class="card modal-form" data-modal="body-flex" style="display:none;">
                         <div class="card-title">Log Flexibility</div>
                         <div class="form-group">
                             <label>Date</label>
@@ -607,7 +683,7 @@
                 
                 <!-- Injury -->
                 <div id="sub-injury" class="sub-content" style="display:none;">
-                    <div class="card">
+                    <div class="card modal-form" data-modal="body-injury" style="display:none;">
                         <div class="card-title">Log Injury</div>
                         <div class="form-group">
                             <label>Date</label>
@@ -660,7 +736,7 @@
                     <div class="sub-tab" onclick="switchEquipTab(this, 'Shoes')">Shoes</div>
                     <div class="sub-tab" onclick="switchEquipTab(this, 'Other')">Other</div>
                 </div>
-                <div class="card">
+                <div class="card modal-form" data-modal="equip" style="display:none;">
                     <div class="card-title">Add Item</div>
                     <div class="form-group">
                         <label>Category</label>
@@ -707,7 +783,7 @@
             
             <!-- ===== 音乐库 ===== -->
             <div class="module" id="module-music">
-                <div class="card">
+                <div class="card modal-form" data-modal="music" style="display:none;">
                     <div class="card-title">Add Music</div>
                     <div class="form-group">
                         <label>Category</label>
@@ -754,7 +830,7 @@
                     <div style="font-size:36px;font-weight:600;color:var(--pink-500);letter-spacing:-0.03em" id="total-expense">¥0</div>
                     <div style="font-size:12px;color:var(--text-tertiary);margin-top:4px" id="expense-period-label"></div>
                 </div>
-                <div class="card">
+                <div class="card modal-form" data-modal="account" style="display:none;">
                     <div class="card-title">Add Expense</div>
                     <div class="form-row">
                         <div class="form-group">
@@ -825,6 +901,20 @@
         </div>
         
         <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhotoSelect(event)">
+        
+        <!-- Floating Add Button -->
+        <button class="add-float-btn" id="fab-add" onclick="openModal()">+</button>
+        
+        <!-- Modal -->
+        <div class="modal-overlay" id="modal-overlay" onclick="closeModalOverlay(event)">
+            <div class="modal-sheet" id="modal-sheet">
+                <div class="modal-header">
+                    <div class="modal-title" id="modal-title">Add</div>
+                    <button class="modal-close" onclick="closeModal()">✕</button>
+                </div>
+                <div id="modal-body"></div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -848,6 +938,7 @@
             if (hI && wI) { hI.addEventListener('input', calcBMI); wI.addEventListener('input', calcBMI); }
             
             renderAll();
+            updateFabVisibility();
         }
         
         function calcBMI() {
@@ -907,6 +998,7 @@
             event.currentTarget.classList.add('active');
             if (name === 'account') updateExpenseStat();
             if (name === 'body') renderOverview();
+            updateFabVisibility();
         }
         function switchBodyTab(name) {
             document.querySelectorAll('#module-body .sub-tab').forEach(t => t.classList.remove('active'));
@@ -914,6 +1006,7 @@
             document.querySelectorAll('#module-body .sub-content').forEach(c => c.style.display = 'none');
             document.getElementById('sub-' + name).style.display = 'block';
             if (name === 'overview') renderOverview();
+            updateFabVisibility();
         }
         function switchEquipTab(el, cat) {
             el.parentElement.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
@@ -925,6 +1018,98 @@
             const arrow = document.getElementById(id + '-arrow');
             if (el.style.display === 'none') { el.style.display = 'block'; arrow.classList.remove('collapsed'); }
             else { el.style.display = 'none'; arrow.classList.add('collapsed'); }
+        }
+        
+        // ===== Modal =====
+        let currentFormEl = null;
+        let formParentBackup = null;
+        let formNextSiblingBackup = null;
+        
+        function getActiveModalKey() {
+            const activeModule = document.querySelector('.module.active');
+            if (!activeModule) return null;
+            const moduleId = activeModule.id;
+            if (moduleId === 'module-body') {
+                const activeTab = document.querySelector('#module-body .sub-tab.active');
+                if (!activeTab) return null;
+                const tabText = activeTab.textContent.trim().toLowerCase();
+                if (tabText.includes('basic') || tabText.includes('body')) return 'body-basic';
+                if (tabText.includes('muscle')) return 'body-muscle';
+                if (tabText.includes('flex')) return 'body-flex';
+                if (tabText.includes('injury')) return 'body-injury';
+                return null; // overview has no form
+            }
+            if (moduleId === 'module-equip') return 'equip';
+            if (moduleId === 'module-music') return 'music';
+            if (moduleId === 'module-account') return 'account';
+            return null;
+        }
+        
+        function updateFabVisibility() {
+            const fab = document.getElementById('fab-add');
+            const key = getActiveModalKey();
+            fab.style.display = key ? 'flex' : 'none';
+        }
+        
+        function openModal() {
+            const key = getActiveModalKey();
+            if (!key) return;
+            const formEl = document.querySelector(`.modal-form[data-modal="${key}"]`);
+            if (!formEl) return;
+            
+            // Store original position for restoration
+            formParentBackup = formEl.parentNode;
+            formNextSiblingBackup = formEl.nextSibling;
+            currentFormEl = formEl;
+            
+            // Move form to modal
+            const modalBody = document.getElementById('modal-body');
+            const modalTitle = document.getElementById('modal-title');
+            modalBody.innerHTML = '';
+            
+            // Set title
+            const titleMap = {
+                'body-basic': 'Body Data',
+                'body-muscle': 'Muscle',
+                'body-flex': 'Flexibility',
+                'body-injury': 'Injury',
+                'equip': 'New Item',
+                'music': 'New Music',
+                'account': 'New Expense'
+            };
+            modalTitle.textContent = titleMap[key] || 'Add';
+            
+            // Show form
+            formEl.style.display = 'block';
+            modalBody.appendChild(formEl);
+            
+            // Show modal
+            document.getElementById('modal-overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            document.body.style.overflow = '';
+            
+            // Move form back to original position
+            if (currentFormEl && formParentBackup) {
+                currentFormEl.style.display = 'none';
+                if (formNextSiblingBackup) {
+                    formParentBackup.insertBefore(currentFormEl, formNextSiblingBackup);
+                } else {
+                    formParentBackup.appendChild(currentFormEl);
+                }
+            }
+            currentFormEl = null;
+            formParentBackup = null;
+            formNextSiblingBackup = null;
+        }
+        
+        function closeModalOverlay(e) {
+            if (e.target === document.getElementById('modal-overlay')) {
+                closeModal();
+            }
         }
         
         // ===== Overview =====
@@ -972,7 +1157,7 @@
             renderBodyRecords(); renderBodyTrend();
             ['body-height','body-weight-input','body-fat','body-note','body-bmi'].forEach(id => document.getElementById(id).value = '');
             renderPhotoPreview('body');
-            alert('Saved');
+            closeModal();
         }
         function renderBodyRecords() {
             const data = loadData('bodyData');
@@ -1009,7 +1194,7 @@
             renderMuscleRecords(); renderMuscleTrend(); updateMuscleFilter();
             document.getElementById('muscle-note').value = '';
             renderPhotoPreview('muscle');
-            alert('Saved');
+            closeModal();
         }
         function renderMuscleRecords() {
             const data = loadData('muscleData');
@@ -1048,7 +1233,7 @@
             renderFlexRecords(); renderFlexTrend(); updateFlexFilter();
             document.getElementById('flex-level').value = ''; document.getElementById('flex-note').value = '';
             renderPhotoPreview('flex');
-            alert('Saved');
+            closeModal();
         }
         function renderFlexRecords() {
             const data = loadData('flexData');
@@ -1086,7 +1271,7 @@
             renderInjuryRecords();
             document.getElementById('injury-part').value = ''; document.getElementById('injury-desc').value = '';
             renderPhotoPreview('injury');
-            alert('Saved');
+            closeModal();
         }
         function renderInjuryRecords() {
             const data = loadData('injuryData');
@@ -1130,7 +1315,7 @@
             
             document.getElementById('equip-name').value = ''; document.getElementById('equip-price').value = ''; document.getElementById('equip-channel').value = '';
             renderPhotoPreview('equip');
-            alert('Saved');
+            closeModal();
         }
         function renderEquipList(filter) {
             let data = loadData('equipment');
@@ -1150,7 +1335,7 @@
             data.push({ category: document.getElementById('music-category').value, name: document.getElementById('music-name').value, link: document.getElementById('music-link').value });
             saveData('music', data); renderMusicList();
             document.getElementById('music-category').value = ''; document.getElementById('music-name').value = ''; document.getElementById('music-link').value = '';
-            alert('Saved');
+            closeModal();
         }
         function renderMusicList() {
             const data = loadData('music');
@@ -1172,7 +1357,7 @@
             data.push({ category: document.getElementById('expense-category').value, content: document.getElementById('expense-content').value, amount: document.getElementById('expense-amount').value, date: document.getElementById('expense-date').value });
             saveData('expenses', data); renderExpenseList(); updateTotalExpense(); updateExpenseStat();
             document.getElementById('expense-content').value = ''; document.getElementById('expense-amount').value = '';
-            alert('Saved');
+            closeModal();
         }
         let expensePeriod = 'month'; // week | month | last-month | custom
         function switchExpensePeriod(el, period) {
