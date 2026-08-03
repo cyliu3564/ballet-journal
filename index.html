@@ -63,14 +63,15 @@
             font-weight: 400;
         }
         .header-module {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--pink-400);
-            background: var(--pink-50);
-            padding: 4px 12px;
-            border-radius: 20px;
+            font-size: inherit;
+            font-weight: inherit;
+            color: var(--text-tertiary);
             white-space: nowrap;
-            transition: all 0.3s ease;
+        }
+        .header-module::before {
+            content: '|';
+            margin: 0 10px;
+            color: var(--pink-200);
         }
         
         /* Content */
@@ -540,10 +541,9 @@
         <div class="header">
             <div class="header-inner">
                 <div>
-                    <div class="header-title"><span class="header-ballet">🩰 CY's Ballet Journal</span></div>
+                    <div class="header-title">🩰 CY's Ballet Journal<span class="header-module" id="header-module"></span></div>
                     <div class="header-subtitle" id="header-date"></div>
                 </div>
-                <div class="header-module" id="header-module"></div>
             </div>
         </div>
         
