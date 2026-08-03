@@ -416,6 +416,23 @@
         }
         .edit-btn:active { opacity: 0.6; }
         
+        /* Equipment thumbnail list */
+        .equip-thumb-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+        .equip-thumb { background: white; border-radius: 12px; padding: 10px; text-align: center; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(0,0,0,0.04); }
+        .equip-thumb:active { transform: scale(0.96); }
+        .equip-thumb-photo { width: 100%; aspect-ratio: 1; border-radius: 8px; object-fit: cover; background: var(--pink-50); margin-bottom: 6px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); font-size: 11px; }
+        .equip-thumb-photo img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+        .equip-thumb-name { font-size: 12px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .equip-thumb-info { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
+        
+        /* Equipment detail view */
+        .equip-detail-view { display: none; }
+        .equip-detail-view.active { display: block; }
+        .equip-list-view { display: block; }
+        .equip-list-view.hidden { display: none; }
+        .equip-detail-back { display: flex; align-items: center; gap: 6px; color: var(--pink-400); font-size: 14px; cursor: pointer; margin-bottom: 12px; padding: 8px 0; }
+        .equip-detail-back:active { opacity: 0.6; }
+        
         /* Photo Upload */
         .photo-upload { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
         .photo-preview {
@@ -829,6 +846,16 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
+                            <label>Brand</label>
+                            <input type="text" id="equip-brand" placeholder="品牌">
+                        </div>
+                        <div class="form-group">
+                            <label>Color</label>
+                            <input type="text" id="equip-color" placeholder="颜色">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
                             <label>Price</label>
                             <input type="number" id="equip-price" placeholder="0.00">
                         </div>
@@ -861,7 +888,13 @@
                 </div>
                 <div class="card">
                     <div class="card-title">👗 Collection</div>
-                    <div id="equip-list"></div>
+                    <div class="equip-list-view" id="equip-list-view">
+                        <div class="equip-thumb-list" id="equip-list"></div>
+                    </div>
+                    <div class="equip-detail-view" id="equip-detail-view">
+                        <div class="equip-detail-back" onclick="closeEquipDetail()">← Back</div>
+                        <div id="equip-detail-content"></div>
+                    </div>
                 </div>
             </div>
             
@@ -1504,6 +1537,8 @@
             const newEquip = {
                 category: document.getElementById('equip-category').value,
                 name: document.getElementById('equip-name').value,
+                brand: document.getElementById('equip-brand').value,
+                color: document.getElementById('equip-color').value,
                 price: document.getElementById('equip-price').value,
                 qty: document.getElementById('equip-qty').value || '1',
                 size: document.getElementById('equip-size').value,
@@ -1535,6 +1570,8 @@
             renderEquipList('all');
             
             document.getElementById('equip-name').value = '';
+            document.getElementById('equip-brand').value = '';
+            document.getElementById('equip-color').value = '';
             document.getElementById('equip-price').value = '';
             document.getElementById('equip-qty').value = '';
             document.getElementById('equip-size').value = '';
@@ -1547,6 +1584,8 @@
             const d = data[index];
             document.getElementById('equip-category').value = d.category || '';
             document.getElementById('equip-name').value = d.name || '';
+            document.getElementById('equip-brand').value = d.brand || '';
+            document.getElementById('equip-color').value = d.color || '';
             document.getElementById('equip-price').value = d.price || '';
             document.getElementById('equip-qty').value = d.qty || '1';
             document.getElementById('equip-size').value = d.size || '';
@@ -1558,15 +1597,63 @@
         function renderEquipList(filter) {
             let data = loadData('equipment');
             if (filter && filter !== 'all') data = data.filter(d=>d.category===filter);
-            document.getElementById('equip-list').innerHTML = data.slice().reverse().map((d,i) => {
+            
+            let html = '';
+            data.forEach((d, i) => {
                 const ri = loadData('equipment').length - 1 - i;
-                const qtySize = d.size ? ` · ${d.size}` : '';
+                const photoHtml = d.photos?.length ? `<img src="${d.photos[0]}">` : '🩰';
                 const qty = d.qty && d.qty !== '1' ? ` ×${d.qty}` : '';
-                let h = `<div class="record-item"><div class="value">${d.name}${qty}</div><div class="date" style="margin-top:2px">${d.category} · ¥${d.price||0} · ${d.date}${qtySize} · ${d.channel||''}</div>`;
-                if (d.photos?.length) h += `<div class="photos">${d.photos.map(p=>`<img src="${p}">`).join('')}</div>`;
-                h += `<div class="edit-btn" onclick="editEquipment(${ri})">Edit</div><div class="delete-btn" onclick="deleteRecord('equipment',${ri})">Delete</div></div>`;
-                return h;
-            }).join('') || '<div class="empty">No items</div>';
+                const size = d.size ? ` · ${d.size}` : '';
+                html += `<div class="equip-thumb" onclick="openEquipDetail(${d._idx !== undefined ? d._idx : ri})">
+                    <div class="equip-thumb-photo">${photoHtml}</div>
+                    <div class="equip-thumb-name">${d.name}${qty}</div>
+                    <div class="equip-thumb-info">${d.brand || d.category}${size}</div>
+                </div>`;
+            });
+            
+            document.getElementById('equip-list').innerHTML = html || '<div class="empty">No items</div>';
+        }
+        function openEquipDetail(index) {
+            const data = loadData('equipment');
+            const d = data[index];
+            if (!d) return;
+            
+            const qty = d.qty && d.qty !== '1' ? ` ×${d.qty}` : '';
+            const photosHtml = d.photos?.length ? `<div class="photos">${d.photos.map(p=>`<img src="${p}">`).join('')}</div>` : '';
+            
+            let html = `<div class="record-item" style="position:relative">
+                <div class="value" style="font-size:16px;margin-bottom:8px">${d.name}${qty}</div>
+                <div style="font-size:13px;color:var(--text-secondary);line-height:1.8">
+                    <div>Category: ${d.category}</div>
+                    ${d.brand ? `<div>Brand: ${d.brand}</div>` : ''}
+                    ${d.color ? `<div>Color: ${d.color}</div>` : ''}
+                    ${d.size ? `<div>Size: ${d.size}</div>` : ''}
+                    <div>Price: ¥${d.price || 0}</div>
+                    <div>Date: ${d.date || '--'}</div>
+                    ${d.channel ? `<div>Channel: ${d.channel}</div>` : ''}
+                </div>
+                ${photosHtml}
+                <div style="margin-top:12px;display:flex;gap:12px">
+                    <div class="edit-btn" style="position:static" onclick="editEquipment(${index})">Edit</div>
+                    <div class="delete-btn" style="position:static" onclick="deleteEquipAndClose(${index})">Delete</div>
+                </div>
+            </div>`;
+            
+            document.getElementById('equip-detail-content').innerHTML = html;
+            document.getElementById('equip-list-view').classList.add('hidden');
+            document.getElementById('equip-detail-view').classList.add('active');
+        }
+        function closeEquipDetail() {
+            document.getElementById('equip-list-view').classList.remove('hidden');
+            document.getElementById('equip-detail-view').classList.remove('active');
+        }
+        function deleteEquipAndClose(index) {
+            if (!confirm('Delete this item?')) return;
+            const data = loadData('equipment');
+            data.splice(index, 1);
+            saveData('equipment', data);
+            closeEquipDetail();
+            renderEquipList('all');
         }
         
         // ===== Music =====
