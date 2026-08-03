@@ -5,23 +5,28 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    // Fetch the outer URL with redirect follow to get the final CDN URL
     const res = await fetch(`https://music.163.com/song/media/outer/url?id=${songId}.mp3`, {
-      redirect: 'manual',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)',
+        'Referer': 'https://music.163.com/',
+      },
     });
 
-    let audioUrl = res.headers.get('location');
-    if (!audioUrl) {
-      return { statusCode: 404, body: JSON.stringify({ error: 'Song not found' }) };
+    // res.url contains the final redirected URL after following all redirects
+    const finalUrl = res.url;
+
+    if (!finalUrl || finalUrl.includes('404')) {
+      return { statusCode: 404, body: JSON.stringify({ error: 'Song unavailable' }) };
     }
 
     // Force HTTPS on CDN URL
-    audioUrl = audioUrl.replace(/^http:\/\//, 'https://');
+    const httpsUrl = finalUrl.replace(/^http:\/\//, 'https://');
 
-    // Redirect browser directly to HTTPS CDN
     return {
       statusCode: 302,
       headers: {
-        'Location': audioUrl,
+        'Location': httpsUrl,
         'Cache-Control': 'public, max-age=3600',
       },
     };
