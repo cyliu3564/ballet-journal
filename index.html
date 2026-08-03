@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Ballet Journal</title>
+    <title>🩰 CY's Ballet Journal</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -57,6 +57,16 @@
             color: var(--text-tertiary);
             margin-top: 2px;
             font-weight: 400;
+        }
+        .header-module {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--pink-400);
+            background: var(--pink-50);
+            padding: 4px 12px;
+            border-radius: 20px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
         }
         
         /* Content */
@@ -526,12 +536,10 @@
         <div class="header">
             <div class="header-inner">
                 <div>
-                    <div class="header-title"><span class="header-ballet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8.5 19c0 0 .5-1 1.5-2.5S12 13 12 10.5V7c0-1.5-.5-2.5-1.5-3"/><path d="M15.5 19c0 0-.5-1-1.5-2.5S12 13 12 10.5V7c0-1.5.5-2.5 1.5-3"/><path d="M9 4l3 2 3-2"/><ellipse cx="12" cy="20" rx="5" ry="1.5"/></svg>Ballet Journal</span></div>
+                    <div class="header-title"><span class="header-ballet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8.5 19c0 0 .5-1 1.5-2.5S12 13 12 10.5V7c0-1.5-.5-2.5-1.5-3"/><path d="M15.5 19c0 0-.5-1-1.5-2.5S12 13 12 10.5V7c0-1.5.5-2.5 1.5-3"/><path d="M9 4l3 2 3-2"/><ellipse cx="12" cy="20" rx="5" ry="1.5"/></svg>🩰 CY's Ballet Journal</span></div>
                     <div class="header-subtitle" id="header-date"></div>
                 </div>
-                <div style="color:var(--pink-300)">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2"/><path d="M12 6v6l4 2"/></svg>
-                </div>
+                <div class="header-module" id="header-module"></div>
             </div>
         </div>
         
@@ -1078,6 +1086,7 @@
             if (hI && wI) { hI.addEventListener('input', calcBMI); wI.addEventListener('input', calcBMI); }
             
             renderAll();
+            document.getElementById('header-module').textContent = moduleNames['body'] || '';
             updateFabVisibility();
             initPullToRefresh();
         }
@@ -1171,6 +1180,12 @@
         function loadData(k) { return JSON.parse(localStorage.getItem(k) || '[]'); }
         
         // ===== Navigation =====
+        const moduleNames = {
+            body: '🩰 身体日记',
+            equip: '👗 装备库',
+            music: '🎵 音乐库',
+            account: '💰 账本'
+        };
         function switchModule(name) {
             document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
@@ -1179,6 +1194,7 @@
             event.currentTarget.classList.add('active');
             if (name === 'account') updateExpenseStat();
             if (name === 'body') renderOverview();
+            document.getElementById('header-module').textContent = moduleNames[name] || '';
             updateFabVisibility();
         }
         function switchBodyTab(name) {
