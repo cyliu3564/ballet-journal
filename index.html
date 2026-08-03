@@ -230,6 +230,38 @@
         .pull-indicator.refreshing svg { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
+        /* Mini Player */
+        .mini-player {
+            position: fixed;
+            bottom: 62px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: rgba(255,245,240,0.96);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 0.5px solid rgba(192,104,120,0.15);
+            padding: 8px 16px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 99;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.04);
+        }
+        .mini-player.active { display: flex; }
+        .mini-player .mp-info { flex: 1; min-width: 0; }
+        .mini-player .mp-title { font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-player .mp-artist { font-size: 11px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-player .mp-btn { width: 36px; height: 36px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+        .mini-player .mp-play-btn { background: var(--pink-400); color: white; }
+        .mini-player .mp-close-btn { background: transparent; color: var(--text-tertiary); font-size: 18px; }
+        .mini-player .mp-progress { position: absolute; bottom: 0; left: 0; height: 2px; background: var(--pink-400); transition: width 0.3s; }
+        /* Music list play button */
+        .music-play-btn { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--pink-400); background: transparent; color: var(--pink-400); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; margin-left: 8px; flex-shrink: 0; }
+        .music-play-btn:active { background: var(--pink-50); }
+        .music-play-btn.playing { background: var(--pink-400); color: white; }
+        
         /* Tab Bar */
         .tab-bar {
             position: fixed;
@@ -826,8 +858,13 @@
                         <input type="text" id="music-name" placeholder="歌曲名">
                     </div>
                     <div class="form-group">
-                        <label>Link</label>
-                        <input type="text" id="music-link" placeholder="链接">
+                        <label>Artist</label>
+                        <input type="text" id="music-artist" placeholder="艺术家（可选）">
+                    </div>
+                    <div class="form-group">
+                        <label>Netease Link or ID</label>
+                        <input type="text" id="music-link" placeholder="网易云链接或歌曲ID">
+                        <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">粘贴网易云链接或输入歌曲ID即可播放</div>
                     </div>
                     <button class="btn" onclick="addMusic()">Save</button>
                 </div>
@@ -901,6 +938,19 @@
                     <div id="expense-list"></div>
                 </div>
             </div>
+        </div>
+        
+        <!-- Mini Player -->
+        <div class="mini-player" id="mini-player">
+            <div class="mp-info">
+                <div class="mp-title" id="mp-title">--</div>
+                <div class="mp-artist" id="mp-artist">--</div>
+            </div>
+            <button class="mp-btn mp-play-btn" id="mp-play-btn" onclick="togglePlay()">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path id="mp-icon-play" d="M8 5v14l11-7z"/><path id="mp-icon-pause" d="M6 4h4v16H6zM14 4h4v16h-4z" style="display:none"/></svg>
+            </button>
+            <button class="mp-btn mp-close-btn" onclick="closePlayer()">×</button>
+            <div class="mp-progress" id="mp-progress"></div>
         </div>
         
         <!-- Tab Bar -->
@@ -1408,25 +1458,135 @@
         }
         
         // ===== Music =====
+        let currentAudio = null;
+        let currentTrackIndex = -1;
+        let musicPlaylist = [];
+        
+        function extractNeteaseId(input) {
+            if (!input) return null;
+            input = input.trim();
+            // Pure number = ID
+            if (/^\d+$/.test(input)) return input;
+            // URL patterns
+            const m = input.match(/[?&]id=(\d+)/);
+            if (m) return m[1];
+            const m2 = input.match(/\/song\/(\d+)/);
+            if (m2) return m2[1];
+            return null;
+        }
+        
         function addMusic() {
             const data = loadData('music');
-            data.push({ category: document.getElementById('music-category').value, name: document.getElementById('music-name').value, link: document.getElementById('music-link').value });
+            const linkVal = document.getElementById('music-link').value;
+            const neteaseId = extractNeteaseId(linkVal);
+            data.push({
+                category: document.getElementById('music-category').value,
+                name: document.getElementById('music-name').value,
+                artist: document.getElementById('music-artist').value,
+                link: linkVal,
+                neteaseId: neteaseId || ''
+            });
             saveData('music', data); renderMusicList();
-            document.getElementById('music-category').value = ''; document.getElementById('music-name').value = ''; document.getElementById('music-link').value = '';
+            document.getElementById('music-category').value = '';
+            document.getElementById('music-name').value = '';
+            document.getElementById('music-artist').value = '';
+            document.getElementById('music-link').value = '';
             closeModal();
         }
+        
         function renderMusicList() {
             const data = loadData('music');
+            musicPlaylist = data;
             const g = {};
-            data.forEach(d => { const c = d.category||'Uncategorized'; if(!g[c])g[c]=[]; g[c].push(d); });
+            data.forEach((d, i) => { const c = d.category||'Uncategorized'; if(!g[c])g[c]=[]; g[c].push({...d, _idx: i}); });
             let html = '';
             for (const c in g) {
                 html += `<div style="font-size:12px;color:var(--pink-400);font-weight:600;margin:12px 0 8px;letter-spacing:0.04em;text-transform:uppercase">${c}</div>`;
                 g[c].forEach(d => {
-                    html += `<div class="record-item"><div class="value">${d.name}</div><div class="date"><a href="${d.link}" target="_blank" style="color:var(--pink-400);text-decoration:none">Open Link →</a></div></div>`;
+                    const playBtn = d.neteaseId ? `<button class="music-play-btn ${currentTrackIndex === d._idx && currentAudio && !currentAudio.paused ? 'playing' : ''}" onclick="playTrack(${d._idx})">▶</button>` : '';
+                    const artistLine = d.artist ? `<div style="font-size:11px;color:var(--text-tertiary)">${d.artist}</div>` : '';
+                    html += `<div class="record-item"><div style="flex:1;min-width:0"><div class="value">${d.name}</div>${artistLine}</div><div style="display:flex;align-items:center;gap:6px">${playBtn}${d.link && !d.neteaseId ? `<a href="${d.link}" target="_blank" style="color:var(--pink-400);text-decoration:none;font-size:11px;white-space:nowrap">Link →</a>` : ''}</div></div>`;
                 });
             }
             document.getElementById('music-list').innerHTML = html || '<div class="empty">No music</div>';
+        }
+        
+        function playTrack(index) {
+            const track = musicPlaylist[index];
+            if (!track || !track.neteaseId) return;
+            
+            // If same track and playing, toggle pause
+            if (currentTrackIndex === index && currentAudio) {
+                togglePlay();
+                return;
+            }
+            
+            // Stop previous
+            if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+            
+            // Create new audio
+            currentAudio = new Audio(`https://music.163.com/song/media/outer/url?id=${track.neteaseId}.mp3`);
+            currentTrackIndex = index;
+            
+            // Update player UI
+            document.getElementById('mp-title').textContent = track.name;
+            document.getElementById('mp-artist').textContent = track.artist || 'Unknown';
+            document.getElementById('mini-player').classList.add('active');
+            updatePlayIcon(true);
+            
+            // Progress tracking
+            currentAudio.addEventListener('timeupdate', () => {
+                if (currentAudio.duration) {
+                    const pct = (currentAudio.currentTime / currentAudio.duration) * 100;
+                    document.getElementById('mp-progress').style.width = pct + '%';
+                }
+            });
+            currentAudio.addEventListener('ended', () => {
+                updatePlayIcon(false);
+                document.getElementById('mp-progress').style.width = '0%';
+                // Auto play next
+                const nextIdx = (currentTrackIndex + 1) % musicPlaylist.length;
+                if (musicPlaylist[nextIdx] && musicPlaylist[nextIdx].neteaseId) {
+                    playTrack(nextIdx);
+                }
+            });
+            currentAudio.addEventListener('error', () => {
+                // Fallback: try to open in browser
+                alert('播放失败，可能需要在网易云APP中播放');
+                closePlayer();
+            });
+            
+            currentAudio.play().catch(() => {
+                alert('播放失败，请检查网络');
+                closePlayer();
+            });
+            
+            renderMusicList(); // Update play button states
+        }
+        
+        function togglePlay() {
+            if (!currentAudio) return;
+            if (currentAudio.paused) {
+                currentAudio.play();
+                updatePlayIcon(true);
+            } else {
+                currentAudio.pause();
+                updatePlayIcon(false);
+            }
+            renderMusicList();
+        }
+        
+        function updatePlayIcon(isPlaying) {
+            document.getElementById('mp-icon-play').style.display = isPlaying ? 'none' : '';
+            document.getElementById('mp-icon-pause').style.display = isPlaying ? '' : 'none';
+        }
+        
+        function closePlayer() {
+            if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+            currentTrackIndex = -1;
+            document.getElementById('mini-player').classList.remove('active');
+            document.getElementById('mp-progress').style.width = '0%';
+            renderMusicList();
         }
         
         // ===== Expense =====
