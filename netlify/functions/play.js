@@ -5,7 +5,6 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Get the redirect URL from NetEase
     const res = await fetch(`https://music.163.com/song/media/outer/url?id=${songId}.mp3`, {
       redirect: 'manual',
     });
@@ -15,36 +14,16 @@ exports.handler = async (event, context) => {
       return { statusCode: 404, body: JSON.stringify({ error: 'Song not found' }) };
     }
 
-    // Force HTTPS on the CDN URL
+    // Force HTTPS on CDN URL
     audioUrl = audioUrl.replace(/^http:\/\//, 'https://');
 
-    // Stream the audio back with CORS headers
-    const audioRes = await fetch(audioUrl, {
-      headers: {
-        'Range': event.headers?.range || '',
-      },
-    });
-
-    const headers = {
-      'Content-Type': 'audio/mpeg',
-      'Access-Control-Allow-Origin': '*',
-      'Cache-Control': 'public, max-age=3600',
-    };
-
-    if (audioRes.headers.get('content-length')) {
-      headers['Content-Length'] = audioRes.headers.get('content-length');
-    }
-    if (audioRes.headers.get('accept-ranges')) {
-      headers['Accept-Ranges'] = 'bytes';
-    }
-    if (audioRes.headers.get('content-range')) {
-      headers['Content-Range'] = audioRes.headers.get('content-range');
-    }
-
+    // Redirect browser directly to HTTPS CDN
     return {
-      statusCode: audioRes.status,
-      headers,
-      body: await audioRes.text(),
+      statusCode: 302,
+      headers: {
+        'Location': audioUrl,
+        'Cache-Control': 'public, max-age=3600',
+      },
     };
   } catch (err) {
     return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
