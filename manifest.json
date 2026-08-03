@@ -1,22 +1,24 @@
 {
-  "name": "芭蕾训练助手",
-  "short_name": "芭蕾助手",
-  "description": "芭蕾训练辅助应用",
+  "name": "Ballet Journal",
+  "short_name": "Ballet",
+  "description": "芭蕾训练日记",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#FDF2F8",
-  "theme_color": "#EC4899",
+  "background_color": "#FFF5F0",
+  "theme_color": "#C06878",
   "orientation": "portrait",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
