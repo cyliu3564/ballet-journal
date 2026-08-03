@@ -1524,8 +1524,9 @@
             // Stop previous
             if (currentAudio) { currentAudio.pause(); currentAudio = null; }
             
-            // Create new audio
-            currentAudio = new Audio(`https://music.163.com/song/media/outer/url?id=${track.neteaseId}.mp3`);
+            // Create new audio via Netlify proxy (bypasses HTTP redirect issue)
+            currentAudio = new Audio(`/.netlify/functions/play?id=${track.neteaseId}`);
+            currentAudio.crossOrigin = 'anonymous';
             currentTrackIndex = index;
             
             // Update player UI
