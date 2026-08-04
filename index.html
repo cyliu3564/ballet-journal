@@ -859,31 +859,79 @@
         .cal-photo-count { position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.5); color: white; font-size: 8px; padding: 1px 4px; border-radius: 6px; z-index: 1; }
         
         /* ===== Heatmap (Density) View ===== */
-        .hm-stats-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .hm-achievement-card {
+            background: white;
+            border-radius: 20px;
+            padding: 28px 20px 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--card-shadow);
+        }
+        .hm-achievement-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 6px;
+        }
+        .hm-achievement-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .hm-year-badge {
+            display: inline-block;
+            background: var(--pink-100);
+            color: var(--pink-500);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 24px;
+            border-radius: 20px;
+            margin: 0 auto 24px;
+        }
+        .hm-stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
         .hm-stat-card {
-            flex: 1; background: white; border-radius: 14px;
-            padding: 18px 8px 14px; text-align: center;
-            box-shadow: 0 1px 4px rgba(160,72,96,0.06);
+            background: var(--pink-50);
+            border-radius: 16px;
+            padding: 20px 8px 16px;
+            text-align: center;
         }
         .hm-stat-num {
-            font-size: 28px; font-weight: 700;
-            color: var(--text-primary); line-height: 1.2;
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.1;
         }
         .hm-stat-label {
-            font-size: 11px; color: var(--text-tertiary);
-            margin-top: 4px; font-weight: 400;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 6px;
+            font-weight: 400;
         }
-        
+
+        .hm-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
         .hm-year-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 14px 8px;
-            margin-bottom: 18px;
+            gap: 16px 10px;
+            margin-bottom: 24px;
         }
         .hm-month-block {}
         .hm-month-label {
-            font-size: 11px; color: var(--text-secondary);
-            font-weight: 600; margin-bottom: 6px;
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            margin-bottom: 6px;
             padding-left: 2px;
         }
         .hm-month-grid {
@@ -897,20 +945,20 @@
             border-radius: 3px;
             background: var(--border);
         }
-        .hm-cell.lvl-1 { background: var(--pink-200); opacity: 0.5; }
-        .hm-cell.lvl-2 { background: var(--pink-300); opacity: 0.7; }
-        .hm-cell.lvl-3 { background: var(--pink-400); opacity: 0.85; }
+        .hm-cell.lvl-1 { background: var(--pink-200); opacity: 0.45; }
+        .hm-cell.lvl-2 { background: var(--pink-300); opacity: 0.65; }
+        .hm-cell.lvl-3 { background: var(--pink-400); opacity: 0.8; }
         .hm-cell.lvl-4 { background: var(--pink-500); }
         .hm-cell.today-ring { box-shadow: 0 0 0 1.5px var(--pink-500); }
-        
+
         .hm-legend {
             display: flex; align-items: center; justify-content: flex-end;
-            gap: 3px; margin-bottom: 20px; font-size: 10px; color: var(--text-tertiary);
+            gap: 3px; margin-bottom: 24px; font-size: 10px; color: var(--text-tertiary);
         }
         .hm-legend-cell { width: 10px; height: 10px; border-radius: 2px; }
-        
+
         .hm-dist-title {
-            font-size: 14px; font-weight: 600; color: var(--text-primary);
+            font-size: 16px; font-weight: 700; color: var(--text-primary);
             margin-bottom: 14px;
         }
         .hm-dist-bar-row {
@@ -1643,7 +1691,10 @@
                 <!-- Calendar -->
                 <div class="training-sub" id="sub-training-calendar" style="display:none;">
                     <div class="training-back" onclick="switchTrainingSub('home')">← 返回</div>
-                    <div class="card">
+                    <div id="cal-heatmap-area">
+                        <!-- Heatmap content rendered here -->
+                    </div>
+                    <div class="card" id="cal-standard-area" style="display:none;">
                         <div class="cal-nav">
                             <button class="cal-nav-btn" onclick="changeCalYear(-1)">‹</button>
                             <div class="cal-month-label" id="cal-month-label"></div>
@@ -1651,7 +1702,7 @@
                         </div>
                         <div class="cal-mode-tabs">
                             <div class="cal-mode-tab" onclick="switchCalMode('photo',this)">照片墙</div>
-                            <div class="cal-mode-tab active" onclick="switchCalMode('heatmap',this)">热力图</div>
+                            <div class="cal-mode-tab" onclick="switchCalMode('heatmap',this)">热力图</div>
                             <div class="cal-mode-tab" onclick="switchCalMode('course',this)">课程</div>
                             <div class="cal-mode-tab" onclick="switchCalMode('self',this)">自训</div>
                         </div>
@@ -3276,8 +3327,9 @@
         }
         
         function renderCalendar() {
+            const heatmapArea = document.getElementById('cal-heatmap-area');
+            const standardArea = document.getElementById('cal-standard-area');
             const el = document.getElementById('cal-grid');
-            if (!el) return;
             const label = document.getElementById('cal-month-label');
             
             // Gather all data
@@ -3293,42 +3345,47 @@
                 records = loadData('selfTrainingPlans').map(r => ({...r, _source: 'self'}));
             }
             
-            if (calMode === 'photo') {
-                // Monthly photo wall
-                if (label) label.textContent = calCurrentYear + '年 ' + (calCurrentMonth.getMonth()+1) + '月';
-                document.querySelector('.cal-weekday-row').style.display = 'grid';
-                
-                const year = calCurrentMonth.getFullYear();
-                const month = calCurrentMonth.getMonth();
-                const firstDay = new Date(year, month, 1);
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                const startWeekday = firstDay.getDay();
-                const monthPrefix = year + '-' + String(month+1).padStart(2,'0');
-                const monthRecords = records.filter(r => (r.date||'').startsWith(monthPrefix));
-                
-                let html = '';
-                for (let i = 0; i < startWeekday; i++) html += '<div class="cal-cell empty"></div>';
-                for (let d = 1; d <= daysInMonth; d++) {
-                    const dateStr = monthPrefix + '-' + String(d).padStart(2,'0');
-                    const dayRecords = monthRecords.filter(r => r.date === dateStr);
-                    html += renderCalPhotoCell(d, dayRecords);
-                }
-                el.innerHTML = html;
-            } else if (calMode === 'heatmap') {
-                // Year heatmap view
-                if (label) label.textContent = calCurrentYear + '年';
-                document.querySelector('.cal-weekday-row').style.display = 'none';
-                el.innerHTML = renderHeatmap(records);
+            if (calMode === 'heatmap') {
+                // Heatmap: show achievement card area, hide standard calendar
+                if (heatmapArea) heatmapArea.style.display = 'block';
+                if (standardArea) standardArea.style.display = 'none';
+                if (heatmapArea) heatmapArea.innerHTML = renderHeatmap(records);
             } else {
-                // Monthly timeline for course/self
-                if (label) label.textContent = calCurrentYear + '年 ' + (calCurrentMonth.getMonth()+1) + '月';
-                document.querySelector('.cal-weekday-row').style.display = 'none';
+                // Other modes: show standard calendar area
+                if (heatmapArea) heatmapArea.style.display = 'none';
+                if (standardArea) standardArea.style.display = 'block';
+                if (!el) return;
                 
-                const year = calCurrentMonth.getFullYear();
-                const month = calCurrentMonth.getMonth();
-                const monthPrefix = year + '-' + String(month+1).padStart(2,'0');
-                const monthRecords = records.filter(r => (r.date||'').startsWith(monthPrefix));
-                el.innerHTML = renderCalTimeline(monthRecords);
+                if (calMode === 'photo') {
+                    if (label) label.textContent = calCurrentYear + '年 ' + (calCurrentMonth.getMonth()+1) + '月';
+                    document.querySelector('.cal-weekday-row').style.display = 'grid';
+                    
+                    const year = calCurrentMonth.getFullYear();
+                    const month = calCurrentMonth.getMonth();
+                    const firstDay = new Date(year, month, 1);
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    const startWeekday = firstDay.getDay();
+                    const monthPrefix = year + '-' + String(month+1).padStart(2,'0');
+                    const monthRecords = records.filter(r => (r.date||'').startsWith(monthPrefix));
+                    
+                    let html = '';
+                    for (let i = 0; i < startWeekday; i++) html += '<div class="cal-cell empty"></div>';
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const dateStr = monthPrefix + '-' + String(d).padStart(2,'0');
+                        const dayRecords = monthRecords.filter(r => r.date === dateStr);
+                        html += renderCalPhotoCell(d, dayRecords);
+                    }
+                    el.innerHTML = html;
+                } else {
+                    if (label) label.textContent = calCurrentYear + '年 ' + (calCurrentMonth.getMonth()+1) + '月';
+                    document.querySelector('.cal-weekday-row').style.display = 'none';
+                    
+                    const year = calCurrentMonth.getFullYear();
+                    const month = calCurrentMonth.getMonth();
+                    const monthPrefix = year + '-' + String(month+1).padStart(2,'0');
+                    const monthRecords = records.filter(r => (r.date||'').startsWith(monthPrefix));
+                    el.innerHTML = renderCalTimeline(monthRecords);
+                }
             }
         }
         
@@ -3377,13 +3434,20 @@
             
             // Build month grids
             let html = '';
+            // Achievement card container
+            html += '<div class="hm-achievement-card">';
+            html += '<div class="hm-achievement-title">来芭 · 芭蕾训练日记</div>';
+            html += '<div style="text-align:center"><div class="hm-year-badge">'+year+'年</div></div>';
             // Stats row
             html += '<div class="hm-stats-row">';
             html += '<div class="hm-stat-card"><div class="hm-stat-num">'+totalCount+'</div><div class="hm-stat-label">训练次数</div></div>';
             html += '<div class="hm-stat-card"><div class="hm-stat-num">'+totalHours.toFixed(1)+'</div><div class="hm-stat-label">累计小时</div></div>';
             html += '<div class="hm-stat-card"><div class="hm-stat-num">'+maxStreak+'</div><div class="hm-stat-label">连续打卡</div></div>';
             html += '</div>';
+            html += '</div>';
             
+            // Heatmap section title
+            html += '<div class="hm-section-title">打卡热力图</div>';
             // Year grid: 12 months
             html += '<div class="hm-year-grid">';
             const monthNames = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
@@ -3445,7 +3509,7 @@
             const maxHours = sortedTypes.length > 0 ? sortedTypes[0][1].hours : 1;
             
             if (sortedTypes.length > 0) {
-                html += '<div class="hm-dist-title">训练分布</div>';
+                html += '<div class="hm-dist-title">课程分布</div>';
                 sortedTypes.forEach(([name, data]) => {
                     const pct = (data.hours / maxHours * 100).toFixed(0);
                     html += '<div class="hm-dist-bar-row">';
