@@ -467,8 +467,33 @@
             height: 56px;
             object-fit: cover;
             border-radius: 10px;
-            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
         }
+        .photo-preview-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+        .photo-delete-btn {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 20px;
+            height: 20px;
+            background: var(--pink-400);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            line-height: 1;
+            z-index: 2;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .photo-delete-btn:active { transform: scale(0.9); }
         .photo-add-btn {
             width: 56px;
             height: 56px;
@@ -1062,7 +1087,7 @@
             <span class="close-hint" onclick="closeHint()">✕</span>
         </div>
         
-        <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhotoSelect(event)">
+        <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event)">
         
         <!-- Pull to Refresh -->
         <div class="pull-indicator" id="pull-indicator">
@@ -1167,25 +1192,31 @@
             document.getElementById('photo-input').click();
         }
         function handlePhotoSelect(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                const img = new Image();
-                img.onload = function() {
-                    const c = document.createElement('canvas');
-                    const maxW = 600;
-                    let w = img.width, h = img.height;
-                    if (w > maxW) { h = h * maxW / w; w = maxW; }
-                    c.width = w; c.height = h;
-                    c.getContext('2d').drawImage(img, 0, 0, w, h);
-                    pendingPhotos.push(c.toDataURL('image/jpeg', 0.6));
-                    savePhotos(currentPhotoTarget, pendingPhotos);
-                    renderPhotoPreview(currentPhotoTarget);
+            const files = Array.from(e.target.files);
+            if (!files.length) return;
+            let processed = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const c = document.createElement('canvas');
+                        const maxW = 400;
+                        let w = img.width, h = img.height;
+                        if (w > maxW) { h = h * maxW / w; w = maxW; }
+                        c.width = w; c.height = h;
+                        c.getContext('2d').drawImage(img, 0, 0, w, h);
+                        pendingPhotos.push(c.toDataURL('image/jpeg', 0.5));
+                        processed++;
+                        if (processed === files.length) {
+                            savePhotos(currentPhotoTarget, pendingPhotos);
+                            renderPhotoPreview(currentPhotoTarget);
+                        }
+                    };
+                    img.src = ev.target.result;
                 };
-                img.src = ev.target.result;
-            };
-            reader.readAsDataURL(file);
+                reader.readAsDataURL(file);
+            });
             e.target.value = '';
         }
         function getPhotos(t) { return JSON.parse(sessionStorage.getItem('photos_' + t) || '[]'); }
@@ -1193,7 +1224,7 @@
         function renderPhotoPreview(t) {
             const photos = getPhotos(t);
             const c = document.getElementById(t + '-photos');
-            c.innerHTML = photos.map((p,i) => `<img src="${p}" class="photo-preview" onclick="removePhoto('${t}',${i})">`).join('') +
+            c.innerHTML = photos.map((p,i) => `<div class="photo-preview-wrap"><img src="${p}" class="photo-preview"><div class="photo-delete-btn" onclick="removePhoto('${t}',${i})">✕</div></div>`).join('') +
                 `<div class="photo-add-btn" onclick="addPhoto('${t}')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>`;
         }
         function removePhoto(t, i) { const p = getPhotos(t); p.splice(i,1); savePhotos(t,p); renderPhotoPreview(t); }
