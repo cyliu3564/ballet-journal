@@ -1512,7 +1512,7 @@
                             <div class="tw-cal-stats">
                                 <div class="tw-stat-block">
                                     <div class="tw-stat-num" id="tw-cal-num">0</div>
-                                    <div class="tw-stat-label">本月训练</div>
+                                    <div class="tw-stat-label">总训练</div>
                                 </div>
                                 <div class="tw-stat-block">
                                     <div class="tw-stat-num" id="tw-cal-hours">0</div>
@@ -1529,12 +1529,12 @@
                             <div class="training-widget" onclick="switchTrainingSub('course')">
                                 <div class="tw-widget-header">📋 课程</div>
                                 <div class="tw-widget-num" id="tw-course-num">0<span class="tw-widget-unit">节</span></div>
-                                <div class="tw-widget-sub" id="tw-course-sub">本月</div>
+                                <div class="tw-widget-sub" id="tw-course-sub">累计</div>
                             </div>
                             <div class="training-widget" onclick="switchTrainingSub('self')">
                                 <div class="tw-widget-header">🏃 自训</div>
                                 <div class="tw-widget-num" id="tw-self-num">0<span class="tw-widget-unit">次</span></div>
-                                <div class="tw-widget-sub" id="tw-self-sub">本月</div>
+                                <div class="tw-widget-sub" id="tw-self-sub">累计</div>
                             </div>
                         </div>
                     </div>
@@ -3178,18 +3178,14 @@
             const el = document.getElementById('course-list');
             if (!el) return;
             
-            // Stats
-            const now = new Date();
-            const curMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
-            const monthRecs = sorted.filter(r => (r.date||'').startsWith(curMonth));
-            const monthHours = monthRecs.reduce((s,r) => s + parseFloat(r.hours||'0'), 0);
-            const monthCost = monthRecs.reduce((s,r) => s + parseFloat(r.price||'0'), 0);
+            // Stats (all-time)
             const totalHours = sorted.reduce((s,r) => s + parseFloat(r.hours||'0'), 0);
+            const totalCost = sorted.reduce((s,r) => s + parseFloat(r.price||'0'), 0);
             
             let statsHtml = '<div class="training-stats-row">' +
-                '<div class="training-stat-card"><div class="training-stat-num">'+monthRecs.length+'</div><div class="training-stat-label">本月课时</div></div>' +
-                '<div class="training-stat-card"><div class="training-stat-num">'+monthHours.toFixed(1)+'h</div><div class="training-stat-label">本月时长</div></div>' +
-                '<div class="training-stat-card"><div class="training-stat-num">¥'+Math.round(monthCost)+'</div><div class="training-stat-label">本月花费</div></div>' +
+                '<div class="training-stat-card"><div class="training-stat-num">'+sorted.length+'</div><div class="training-stat-label">总课时</div></div>' +
+                '<div class="training-stat-card"><div class="training-stat-num">'+totalHours.toFixed(1)+'h</div><div class="training-stat-label">总时长</div></div>' +
+                '<div class="training-stat-card"><div class="training-stat-num">¥'+Math.round(totalCost)+'</div><div class="training-stat-label">总花费</div></div>' +
                 '</div>';
             
             // Type distribution
@@ -3319,18 +3315,14 @@
             const el = document.getElementById('selftraining-list');
             if (!el) return;
             
-            // Stats
-            const now = new Date();
-            const curMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
-            const monthRecs = sorted.filter(r => (r.date||'').startsWith(curMonth));
-            const monthHours = monthRecs.reduce((s,r) => s + parseFloat(r.hours||'0'), 0);
-            // Count unique training days
-            const trainDays = new Set(monthRecs.map(r => r.date).filter(Boolean));
+            // Stats (all-time)
+            const allHours = sorted.reduce((s,r) => s + parseFloat(r.hours||'0'), 0);
+            const trainDays = new Set(sorted.map(r => r.date).filter(Boolean));
             
             let statsHtml = '<div class="training-stats-row">' +
-                '<div class="training-stat-card"><div class="training-stat-num">'+monthRecs.length+'</div><div class="training-stat-label">本月次数</div></div>' +
-                '<div class="training-stat-card"><div class="training-stat-num">'+monthHours.toFixed(1)+'h</div><div class="training-stat-label">本月时长</div></div>' +
-                '<div class="training-stat-card"><div class="training-stat-num">'+trainDays.size+'</div><div class="training-stat-label">本月天数</div></div>' +
+                '<div class="training-stat-card"><div class="training-stat-num">'+sorted.length+'</div><div class="training-stat-label">总次数</div></div>' +
+                '<div class="training-stat-card"><div class="training-stat-num">'+allHours.toFixed(1)+'h</div><div class="training-stat-label">总时长</div></div>' +
+                '<div class="training-stat-card"><div class="training-stat-num">'+trainDays.size+'</div><div class="training-stat-label">总天数</div></div>' +
                 '</div>';
             
             // Type distribution
@@ -3732,18 +3724,13 @@
             const selfData = loadData('selfTrainingPlans');
             const allData = [...courseData, ...selfData];
             
-            // This month
-            const mAll = allData.filter(r => (r.date||'').startsWith(prefix));
-            const mCourse = courseData.filter(r => (r.date||'').startsWith(prefix));
-            const mSelf = selfData.filter(r => (r.date||'').startsWith(prefix));
-            
-            // Calendar: 3 stats
+            // Calendar: 3 stats (all-time)
             const calNumEl = document.getElementById('tw-cal-num');
-            if (calNumEl) calNumEl.textContent = mAll.length;
+            if (calNumEl) calNumEl.textContent = allData.length;
             
-            const mHours = mAll.reduce((s,r) => s + (parseFloat(r.hours)||0), 0);
+            const allHours = allData.reduce((s,r) => s + (parseFloat(r.hours)||0), 0);
             const calHoursEl = document.getElementById('tw-cal-hours');
-            if (calHoursEl) calHoursEl.textContent = mHours.toFixed(1);
+            if (calHoursEl) calHoursEl.textContent = allHours.toFixed(1);
             
             // Streak (consecutive training days ending today or most recent)
             const uniqueDates = [...new Set(allData.map(r => r.date))].filter(Boolean).sort();
@@ -3782,22 +3769,22 @@
                 heatEl.innerHTML = heatHtml;
             }
             
-            // Course widget
+            // Course widget (all-time)
             const courseNumEl = document.getElementById('tw-course-num');
-            if (courseNumEl) courseNumEl.innerHTML = mCourse.length + '<span class="tw-widget-unit">节</span>';
+            if (courseNumEl) courseNumEl.innerHTML = courseData.length + '<span class="tw-widget-unit">节</span>';
             const courseSubEl = document.getElementById('tw-course-sub');
             if (courseSubEl) {
-                const cHours = mCourse.reduce((s,r) => s + (parseFloat(r.hours)||0), 0);
-                courseSubEl.innerHTML = cHours > 0 ? '本月 <b>'+cHours.toFixed(1)+'h</b>' : '本月暂无';
+                const cHours = courseData.reduce((s,r) => s + (parseFloat(r.hours)||0), 0);
+                courseSubEl.innerHTML = cHours > 0 ? '累计 <b>'+cHours.toFixed(1)+'h</b>' : '暂无记录';
             }
             
-            // Self widget
+            // Self widget (all-time)
             const selfNumEl = document.getElementById('tw-self-num');
-            if (selfNumEl) selfNumEl.innerHTML = mSelf.length + '<span class="tw-widget-unit">次</span>';
+            if (selfNumEl) selfNumEl.innerHTML = selfData.length + '<span class="tw-widget-unit">次</span>';
             const selfSubEl = document.getElementById('tw-self-sub');
             if (selfSubEl) {
-                const sHours = mSelf.reduce((s,r) => s + (parseFloat(r.hours)||0), 0);
-                selfSubEl.innerHTML = sHours > 0 ? '本月 <b>'+sHours.toFixed(1)+'h</b>' : '本月暂无';
+                const sHours = selfData.reduce((s,r) => s + (parseFloat(r.hours)||0), 0);
+                selfSubEl.innerHTML = sHours > 0 ? '累计 <b>'+sHours.toFixed(1)+'h</b>' : '暂无记录';
             }
         }
         
