@@ -432,6 +432,9 @@
         .edit-btn:active { opacity: 0.6; }
         
         /* Equipment thumbnail list */
+        /* Scrollable list container */
+        .scroll-list { max-height: 60vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-right: 4px; }
+
         .equip-thumb-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; max-height: 60vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-right: 4px; }
         .equip-thumb { background: white; border-radius: 12px; padding: 10px; text-align: center; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(0,0,0,0.04); }
         .equip-thumb:active { transform: scale(0.96); }
@@ -685,7 +688,7 @@
                             <div class="arrow" id="body-records-section-arrow">▼</div>
                         </div>
                         <div id="body-records-section" style="margin-top:12px">
-                            <div id="body-records"></div>
+                            <div class="scroll-list" id="body-records"></div>
                         </div>
                     </div>
                 </div>
@@ -760,7 +763,7 @@
                             <div class="arrow" id="muscle-records-section-arrow">▼</div>
                         </div>
                         <div id="muscle-records-section" style="margin-top:12px">
-                            <div id="muscle-records"></div>
+                            <div class="scroll-list" id="muscle-records"></div>
                         </div>
                     </div>
                 </div>
@@ -816,7 +819,7 @@
                             <div class="arrow" id="flex-records-section-arrow">▼</div>
                         </div>
                         <div id="flex-records-section" style="margin-top:12px">
-                            <div id="flex-records"></div>
+                            <div class="scroll-list" id="flex-records"></div>
                         </div>
                     </div>
                 </div>
@@ -859,7 +862,7 @@
                             <div class="arrow" id="injury-records-section-arrow">▼</div>
                         </div>
                         <div id="injury-records-section" style="margin-top:12px">
-                            <div id="injury-records"></div>
+                            <div class="scroll-list" id="injury-records"></div>
                         </div>
                     </div>
                 </div>
@@ -975,7 +978,7 @@
                 </div>
                 <div class="card">
                     <div class="card-title">🎵 Playlist</div>
-                    <div id="music-list"></div>
+                    <div class="scroll-list" id="music-list"></div>
                 </div>
             </div>
             
@@ -1041,7 +1044,7 @@
                 </div>
                 <div class="card">
                     <div class="card-title">🩰 History</div>
-                    <div id="expense-list"></div>
+                    <div class="scroll-list" id="expense-list"></div>
                 </div>
             </div>
         </div>
