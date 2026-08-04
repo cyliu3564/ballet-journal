@@ -1639,16 +1639,17 @@
             startEdit('equipment', index);
         }
         function renderEquipList(filter) {
-            let data = loadData('equipment');
+            const allData = loadData('equipment');
+            let data = allData;
             if (filter && filter !== 'all') data = data.filter(d=>d.category===filter);
             
             let html = '';
-            data.forEach((d, i) => {
-                const ri = loadData('equipment').length - 1 - i;
+            data.forEach((d) => {
+                const origIdx = allData.indexOf(d);
                 const photoHtml = d.photos?.length ? `<img src="${d.photos[0]}">` : '🩰';
                 const qty = d.qty && d.qty !== '1' ? ` ×${d.qty}` : '';
                 const size = d.size ? ` · ${d.size}` : '';
-                html += `<div class="equip-thumb" onclick="openEquipDetail(${d._idx !== undefined ? d._idx : ri})">
+                html += `<div class="equip-thumb" onclick="openEquipDetail(${origIdx})">
                     <div class="equip-thumb-photo">${photoHtml}</div>
                     <div class="equip-thumb-name">${d.name}${qty}</div>
                     <div class="equip-thumb-info">${d.brand || d.category}${size}</div>
