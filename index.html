@@ -1458,8 +1458,9 @@
                             </div>
                         </div>
                     </div>
-                    <div style="font-size:36px;font-weight:600;color:var(--pink-500);letter-spacing:-0.03em" id="total-expense">¥0</div>
+                    <div style="font-size:36px;font-weight:600;color:#BE6070;letter-spacing:-0.03em" id="total-expense">¥0</div>
                     <div style="font-size:12px;color:var(--text-tertiary);margin-top:4px" id="expense-period-label"></div>
+                    <div id="expense-source-breakdown" style="display:flex;gap:10px;margin-top:14px"></div>
                 </div>
                 <div class="card modal-form" data-modal="account" style="display:none;">
                     <div class="card-title">Add Expense</div>
@@ -2901,8 +2902,10 @@
             const sorted = data.slice().sort((a,b) => (b.date||'').localeCompare(a.date||''));
             document.getElementById('expense-list').innerHTML = sorted.map((d) => {
                 const ri = data.indexOf(d);
-                const sourceTag = d.source === 'equipment' ? ' 🩰' : '';
-                return `<div class="record-item"><div class="value">${d.content}</div><div class="date" style="margin-top:2px">${d.category}${sourceTag} · ¥${d.amount} · ${d.date}</div><div class="edit-btn" onclick="editExpense(${ri})">Edit</div><div class="delete-btn" onclick="deleteRecord('expenses',${ri})">Delete</div></div>`;
+                const isSynced = d.source === 'course' || d.source === 'equipment';
+                const sourceTag = d.source === 'equipment' ? ' <span style="background:#F5F0EE;color:#BE6070;font-size:10px;padding:1px 6px;border-radius:4px">装备</span>' : d.source === 'course' ? ' <span style="background:#F5F0EE;color:#BE6070;font-size:10px;padding:1px 6px;border-radius:4px">课程</span>' : '';
+                const actions = isSynced ? '<div style="font-size:10px;color:var(--text-tertiary);margin-top:2px">自动同步</div>' : `<div class="edit-btn" onclick="editExpense(${ri})">Edit</div><div class="delete-btn" onclick="deleteRecord('expenses',${ri})">Delete</div>`;
+                return `<div class="record-item"><div class="value">${d.content}${sourceTag}</div><div class="date" style="margin-top:2px">${d.category} · ¥${d.amount} · ${d.date}</div>${actions}</div>`;
             }).join('') || '<div class="empty">No records</div>';
         }
         function updateTotalExpense() {
@@ -2926,6 +2929,28 @@
             const { label } = getExpenseDateRange();
             document.getElementById('expense-period-label').textContent = label;
             document.getElementById('total-expense').textContent = '¥' + t.toFixed(0);
+            
+            // Source breakdown: course / equipment / other
+            let courseTotal = 0, equipTotal = 0, otherTotal = 0;
+            md.forEach(d => {
+                const amt = parseFloat(d.amount||0);
+                if (d.source === 'course') courseTotal += amt;
+                else if (d.source === 'equipment') equipTotal += amt;
+                else otherTotal += amt;
+            });
+            document.getElementById('expense-source-breakdown').innerHTML =
+                `<div style="flex:1;background:#F5F0EE;border-radius:10px;padding:10px 12px;text-align:center">
+                    <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px">课程</div>
+                    <div style="font-size:20px;font-weight:700;color:#BE6070">¥${courseTotal.toFixed(0)}</div>
+                </div>
+                <div style="flex:1;background:#F5F0EE;border-radius:10px;padding:10px 12px;text-align:center">
+                    <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px">装备</div>
+                    <div style="font-size:20px;font-weight:700;color:#BE6070">¥${equipTotal.toFixed(0)}</div>
+                </div>
+                <div style="flex:1;background:#F5F0EE;border-radius:10px;padding:10px 12px;text-align:center">
+                    <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px">其他</div>
+                    <div style="font-size:20px;font-weight:700;color:#BE6070">¥${otherTotal.toFixed(0)}</div>
+                </div>`;
         }
         
 
@@ -3081,6 +3106,7 @@
             }
             saveData('coursePlans', data);
             savePhotos('course', []); savePhotos('course-notes', []);
+            syncCourseToExpenses();
             cancelEdit();
             renderCourseList(); renderCalendar();
             resetCourseForm();
@@ -3125,6 +3151,27 @@
             renderCourseList(); renderCalendar();
         }
         
+        function syncCourseToExpenses() {
+            const courses = loadData('coursePlans');
+            const expenses = loadData('expenses');
+            // Remove old course-sourced expenses
+            const nonCourseExp = expenses.filter(e => e.source !== 'course');
+            // Add fresh ones from course plans
+            courses.forEach(c => {
+                const price = parseFloat(c.price || 0);
+                if (price > 0 && c.date) {
+                    nonCourseExp.push({
+                        category: 'Lesson',
+                        content: c.institution ? c.institution + ' ' + (c.courseType || '') : (c.courseType || '课程'),
+                        amount: price,
+                        date: c.date,
+                        source: 'course'
+                    });
+                }
+            });
+            saveData('expenses', nonCourseExp);
+        }
+
         function renderCourseList() {
             const data = loadData('coursePlans');
             const sorted = data.slice().sort((a,b) => (b.date||'').localeCompare(a.date||''));
@@ -3671,7 +3718,9 @@
         // ===== Common =====
         function deleteRecord(key, idx) {
             if (!confirm('Delete this record?')) return;
-            const data = loadData(key); data.splice(idx, 1); saveData(key, data); renderAll();
+            const data = loadData(key); data.splice(idx, 1); saveData(key, data);
+            if (key === 'coursePlans') syncCourseToExpenses();
+            renderAll();
         }
         function renderTrainingWidgets() {
             const now = new Date();
@@ -3753,6 +3802,7 @@
         }
         
         function renderAll() {
+            syncCourseToExpenses();
             renderOverview(); renderBodyRecords(); renderBodyTrend();
             renderMuscleRecords(); updateMuscleFilter(); renderMuscleTrend();
             renderFlexRecords(); updateFlexFilter(); renderFlexTrend();
