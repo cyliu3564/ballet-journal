@@ -860,11 +860,8 @@
         
         /* ===== Heatmap (Density) View ===== */
         .hm-achievement-card {
-            background: white;
-            border-radius: 20px;
-            padding: 28px 20px 24px;
-            margin-bottom: 16px;
-            box-shadow: var(--card-shadow);
+            padding: 4px 0 8px;
+            margin-bottom: 8px;
         }
         .hm-achievement-title {
             font-size: 22px;
@@ -1691,10 +1688,7 @@
                 <!-- Calendar -->
                 <div class="training-sub" id="sub-training-calendar" style="display:none;">
                     <div class="training-back" onclick="switchTrainingSub('home')">← 返回</div>
-                    <div id="cal-heatmap-area">
-                        <!-- Heatmap content rendered here -->
-                    </div>
-                    <div class="card" id="cal-standard-area" style="display:none;">
+                    <div class="card">
                         <div class="cal-nav">
                             <button class="cal-nav-btn" onclick="changeCalYear(-1)">‹</button>
                             <div class="cal-month-label" id="cal-month-label"></div>
@@ -1702,11 +1696,11 @@
                         </div>
                         <div class="cal-mode-tabs">
                             <div class="cal-mode-tab" onclick="switchCalMode('photo',this)">照片墙</div>
-                            <div class="cal-mode-tab" onclick="switchCalMode('heatmap',this)">热力图</div>
+                            <div class="cal-mode-tab active" onclick="switchCalMode('heatmap',this)">全部</div>
                             <div class="cal-mode-tab" onclick="switchCalMode('course',this)">课程</div>
                             <div class="cal-mode-tab" onclick="switchCalMode('self',this)">自训</div>
                         </div>
-                        <div class="cal-weekday-row">
+                        <div class="cal-weekday-row" id="cal-weekday-row">
                             <div class="cal-weekday">日</div>
                             <div class="cal-weekday">一</div>
                             <div class="cal-weekday">二</div>
@@ -3327,10 +3321,10 @@
         }
         
         function renderCalendar() {
-            const heatmapArea = document.getElementById('cal-heatmap-area');
-            const standardArea = document.getElementById('cal-standard-area');
             const el = document.getElementById('cal-grid');
+            if (!el) return;
             const label = document.getElementById('cal-month-label');
+            const weekdayRow = document.getElementById('cal-weekday-row');
             
             // Gather all data
             let records = [];
@@ -3345,47 +3339,39 @@
                 records = loadData('selfTrainingPlans').map(r => ({...r, _source: 'self'}));
             }
             
-            if (calMode === 'heatmap') {
-                // Heatmap: show achievement card area, hide standard calendar
-                if (heatmapArea) heatmapArea.style.display = 'block';
-                if (standardArea) standardArea.style.display = 'none';
-                if (heatmapArea) heatmapArea.innerHTML = renderHeatmap(records);
-            } else {
-                // Other modes: show standard calendar area
-                if (heatmapArea) heatmapArea.style.display = 'none';
-                if (standardArea) standardArea.style.display = 'block';
-                if (!el) return;
+            if (calMode === 'photo') {
+                if (label) label.textContent = calCurrentYear + '年 ' + (calCurrentMonth.getMonth()+1) + '月';
+                if (weekdayRow) weekdayRow.style.display = 'grid';
                 
-                if (calMode === 'photo') {
-                    if (label) label.textContent = calCurrentYear + '年 ' + (calCurrentMonth.getMonth()+1) + '月';
-                    document.querySelector('.cal-weekday-row').style.display = 'grid';
-                    
-                    const year = calCurrentMonth.getFullYear();
-                    const month = calCurrentMonth.getMonth();
-                    const firstDay = new Date(year, month, 1);
-                    const daysInMonth = new Date(year, month + 1, 0).getDate();
-                    const startWeekday = firstDay.getDay();
-                    const monthPrefix = year + '-' + String(month+1).padStart(2,'0');
-                    const monthRecords = records.filter(r => (r.date||'').startsWith(monthPrefix));
-                    
-                    let html = '';
-                    for (let i = 0; i < startWeekday; i++) html += '<div class="cal-cell empty"></div>';
-                    for (let d = 1; d <= daysInMonth; d++) {
-                        const dateStr = monthPrefix + '-' + String(d).padStart(2,'0');
-                        const dayRecords = monthRecords.filter(r => r.date === dateStr);
-                        html += renderCalPhotoCell(d, dayRecords);
-                    }
-                    el.innerHTML = html;
-                } else {
-                    if (label) label.textContent = calCurrentYear + '年 ' + (calCurrentMonth.getMonth()+1) + '月';
-                    document.querySelector('.cal-weekday-row').style.display = 'none';
-                    
-                    const year = calCurrentMonth.getFullYear();
-                    const month = calCurrentMonth.getMonth();
-                    const monthPrefix = year + '-' + String(month+1).padStart(2,'0');
-                    const monthRecords = records.filter(r => (r.date||'').startsWith(monthPrefix));
-                    el.innerHTML = renderCalTimeline(monthRecords);
+                const year = calCurrentMonth.getFullYear();
+                const month = calCurrentMonth.getMonth();
+                const firstDay = new Date(year, month, 1);
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const startWeekday = firstDay.getDay();
+                const monthPrefix = year + '-' + String(month+1).padStart(2,'0');
+                const monthRecords = records.filter(r => (r.date||'').startsWith(monthPrefix));
+                
+                let html = '';
+                for (let i = 0; i < startWeekday; i++) html += '<div class="cal-cell empty"></div>';
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr = monthPrefix + '-' + String(d).padStart(2,'0');
+                    const dayRecords = monthRecords.filter(r => r.date === dateStr);
+                    html += renderCalPhotoCell(d, dayRecords);
                 }
+                el.innerHTML = html;
+            } else if (calMode === 'heatmap') {
+                if (label) label.textContent = calCurrentYear + '年';
+                if (weekdayRow) weekdayRow.style.display = 'none';
+                el.innerHTML = renderHeatmap(records);
+            } else {
+                if (label) label.textContent = calCurrentYear + '年 ' + (calCurrentMonth.getMonth()+1) + '月';
+                if (weekdayRow) weekdayRow.style.display = 'none';
+                
+                const year = calCurrentMonth.getFullYear();
+                const month = calCurrentMonth.getMonth();
+                const monthPrefix = year + '-' + String(month+1).padStart(2,'0');
+                const monthRecords = records.filter(r => (r.date||'').startsWith(monthPrefix));
+                el.innerHTML = renderCalTimeline(monthRecords);
             }
         }
         
