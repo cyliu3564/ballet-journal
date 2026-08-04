@@ -257,10 +257,10 @@
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-top: 0.5px solid rgba(192,104,120,0.15);
-            padding: 8px 16px;
+            padding: 10px 16px 6px;
             display: none;
-            align-items: center;
-            gap: 12px;
+            flex-direction: column;
+            gap: 6px;
             z-index: 99;
             box-shadow: 0 -2px 12px rgba(0,0,0,0.04);
         }
@@ -268,10 +268,18 @@
         .mini-player .mp-info { flex: 1; min-width: 0; }
         .mini-player .mp-title { font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .mini-player .mp-artist { font-size: 11px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mini-player .mp-btn { width: 36px; height: 36px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-        .mini-player .mp-play-btn { background: var(--pink-400); color: white; }
-        .mini-player .mp-close-btn { background: transparent; color: var(--text-tertiary); font-size: 18px; }
-        .mini-player .mp-progress { position: absolute; bottom: 0; left: 0; height: 2px; background: var(--pink-400); transition: width 0.3s; }
+        .mini-player .mp-time { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
+        .mp-top-row { display: flex; align-items: center; gap: 8px; width: 100%; }
+        .mini-player .mp-controls { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        .mini-player .mp-btn { width: 32px; height: 32px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; background: transparent; color: var(--text-secondary); }
+        .mini-player .mp-play-btn { background: var(--pink-400); color: white; width: 36px; height: 36px; }
+        .mini-player .mp-play-btn:active { background: var(--pink-500); }
+        .mini-player .mp-prev-btn:active, .mini-player .mp-next-btn:active { background: var(--pink-100); }
+        .mini-player .mp-volume-btn:active { background: var(--pink-100); }
+        .mini-player .mp-close-btn { color: var(--text-tertiary); font-size: 18px; }
+        .mini-player .mp-progress-bar { width: 100%; height: 16px; display: flex; align-items: center; cursor: pointer; position: relative; padding: 6px 0; }
+        .mini-player .mp-progress-track { width: 100%; height: 3px; background: var(--pink-100); border-radius: 2px; position: relative; overflow: hidden; }
+        .mini-player .mp-progress { position: absolute; top: 0; left: 0; height: 100%; background: var(--pink-400); transition: width 0.1s linear; border-radius: 2px; }
         /* Music list play button */
         .music-play-btn { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--pink-400); background: transparent; color: var(--pink-400); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; margin-left: 8px; flex-shrink: 0; }
         .music-play-btn:active { background: var(--pink-50); }
@@ -1051,15 +1059,33 @@
         
         <!-- Mini Player -->
         <div class="mini-player" id="mini-player">
-            <div class="mp-info">
-                <div class="mp-title" id="mp-title">--</div>
-                <div class="mp-artist" id="mp-artist">--</div>
+            <div class="mp-top-row">
+                <div class="mp-info">
+                    <div class="mp-title" id="mp-title">--</div>
+                    <div class="mp-artist" id="mp-artist">--</div>
+                </div>
+                <div class="mp-controls">
+                    <button class="mp-btn mp-prev-btn" onclick="playPrevTrack()" title="上一首">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                    </button>
+                    <button class="mp-btn mp-play-btn" id="mp-play-btn" onclick="togglePlay()">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path id="mp-icon-play" d="M8 5v14l11-7z"/><path id="mp-icon-pause" d="M6 4h4v16H6zM14 4h4v16h-4z" style="display:none"/></svg>
+                    </button>
+                    <button class="mp-btn mp-next-btn" onclick="playNextTrack()" title="下一首">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                    </button>
+                    <button class="mp-btn mp-volume-btn" onclick="toggleMute()" title="音量">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path id="mp-icon-vol-on" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/><path id="mp-icon-vol-off" d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" style="display:none"/></svg>
+                    </button>
+                    <button class="mp-btn mp-close-btn" onclick="closePlayer()">×</button>
+                </div>
             </div>
-            <button class="mp-btn mp-play-btn" id="mp-play-btn" onclick="togglePlay()">
-                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path id="mp-icon-play" d="M8 5v14l11-7z"/><path id="mp-icon-pause" d="M6 4h4v16H6zM14 4h4v16h-4z" style="display:none"/></svg>
-            </button>
-            <button class="mp-btn mp-close-btn" onclick="closePlayer()">×</button>
-            <div class="mp-progress" id="mp-progress"></div>
+            <div class="mp-progress-bar" id="mp-progress-bar" onclick="seekAudio(event)">
+                <div class="mp-progress-track">
+                    <div class="mp-progress" id="mp-progress"></div>
+                </div>
+            </div>
+            <div class="mp-time" id="mp-time" style="text-align:center;width:100%">0:00 / 0:00</div>
         </div>
         
         <!-- Tab Bar -->
@@ -1880,9 +1906,13 @@
             // Stop previous
             if (currentAudio) { currentAudio.pause(); currentAudio = null; }
             
-            // Create new audio via Netlify proxy (bypasses HTTP redirect issue)
-            currentAudio = new Audio(`/.netlify/functions/play?id=${track.neteaseId}`);
-            currentAudio.crossOrigin = 'anonymous';
+            // Create new audio using Netease direct URL
+            const audioUrl = `https://music.163.com/song/media/outer/url?id=${track.neteaseId}.mp3`;
+            currentAudio = new Audio(audioUrl);
+            currentAudio.preload = 'auto';
+            // Set volume from saved value or default
+            const savedVolume = localStorage.getItem('playerVolume');
+            currentAudio.volume = savedVolume !== null ? parseFloat(savedVolume) : 0.7;
             currentTrackIndex = index;
             
             // Update player UI
@@ -1890,35 +1920,74 @@
             document.getElementById('mp-artist').textContent = track.artist || 'Unknown';
             document.getElementById('mini-player').classList.add('active');
             updatePlayIcon(true);
+            updateVolumeIcon(currentAudio.volume);
             
             // Progress tracking
             currentAudio.addEventListener('timeupdate', () => {
                 if (currentAudio.duration) {
                     const pct = (currentAudio.currentTime / currentAudio.duration) * 100;
                     document.getElementById('mp-progress').style.width = pct + '%';
+                    // Update time display
+                    const currentTime = formatTime(currentAudio.currentTime);
+                    const duration = formatTime(currentAudio.duration);
+                    document.getElementById('mp-time').textContent = `${currentTime} / ${duration}`;
                 }
             });
             currentAudio.addEventListener('ended', () => {
                 updatePlayIcon(false);
                 document.getElementById('mp-progress').style.width = '0%';
-                // Auto play next
-                const nextIdx = (currentTrackIndex + 1) % musicPlaylist.length;
-                if (musicPlaylist[nextIdx] && musicPlaylist[nextIdx].neteaseId) {
-                    playTrack(nextIdx);
+                // Auto play next track
+                let nextIdx = currentTrackIndex + 1;
+                if (nextIdx >= musicPlaylist.length) nextIdx = 0;
+                // Find next track with neteaseId
+                let attempts = 0;
+                while (attempts < musicPlaylist.length) {
+                    if (musicPlaylist[nextIdx] && musicPlaylist[nextIdx].neteaseId) {
+                        playTrack(nextIdx);
+                        return;
+                    }
+                    nextIdx = (nextIdx + 1) % musicPlaylist.length;
+                    attempts++;
+                }
+                // No more playable tracks
+                closePlayer();
+            });
+            currentAudio.addEventListener('error', (e) => {
+                console.error('Audio error:', e);
+                // Try to auto-play next track on error
+                let nextIdx = currentTrackIndex + 1;
+                if (nextIdx >= musicPlaylist.length) nextIdx = 0;
+                if (nextIdx !== currentTrackIndex && musicPlaylist[nextIdx] && musicPlaylist[nextIdx].neteaseId) {
+                    setTimeout(() => playTrack(nextIdx), 500);
+                } else {
+                    closePlayer();
                 }
             });
-            currentAudio.addEventListener('error', () => {
-                // Fallback: try to open in browser
-                alert('播放失败，可能需要在网易云APP中播放');
-                closePlayer();
-            });
             
-            currentAudio.play().catch(() => {
-                alert('播放失败，请检查网络');
-                closePlayer();
-            });
+            const playPromise = currentAudio.play();
+            if (playPromise) {
+                playPromise.catch((err) => {
+                    console.warn('Play failed:', err);
+                    // Retry once after short delay (iOS Safari sometimes needs this)
+                    setTimeout(() => {
+                        if (currentAudio) {
+                            currentAudio.play().catch(() => {
+                                alert('播放失败，请检查网络或歌曲是否可用');
+                                closePlayer();
+                            });
+                        }
+                    }, 100);
+                });
+            }
             
             renderMusicList(); // Update play button states
+        }
+        
+        function formatTime(seconds) {
+            if (!seconds || isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
         
         function togglePlay() {
@@ -1943,7 +2012,79 @@
             currentTrackIndex = -1;
             document.getElementById('mini-player').classList.remove('active');
             document.getElementById('mp-progress').style.width = '0%';
+            document.getElementById('mp-time').textContent = '0:00 / 0:00';
             renderMusicList();
+        }
+        
+        function playNextTrack() {
+            if (musicPlaylist.length === 0) return;
+            let nextIdx = currentTrackIndex + 1;
+            if (nextIdx >= musicPlaylist.length) nextIdx = 0;
+            // Find next track with neteaseId
+            let attempts = 0;
+            while (attempts < musicPlaylist.length) {
+                if (musicPlaylist[nextIdx] && musicPlaylist[nextIdx].neteaseId) {
+                    playTrack(nextIdx);
+                    return;
+                }
+                nextIdx = (nextIdx + 1) % musicPlaylist.length;
+                attempts++;
+            }
+        }
+        
+        function playPrevTrack() {
+            if (musicPlaylist.length === 0) return;
+            let prevIdx = currentTrackIndex - 1;
+            if (prevIdx < 0) prevIdx = musicPlaylist.length - 1;
+            // Find previous track with neteaseId
+            let attempts = 0;
+            while (attempts < musicPlaylist.length) {
+                if (musicPlaylist[prevIdx] && musicPlaylist[prevIdx].neteaseId) {
+                    playTrack(prevIdx);
+                    return;
+                }
+                prevIdx = (prevIdx - 1 + musicPlaylist.length) % musicPlaylist.length;
+                attempts++;
+            }
+        }
+        
+        function toggleMute() {
+            if (!currentAudio) return;
+            if (currentAudio.volume > 0) {
+                // Save current volume and mute
+                localStorage.setItem('playerVolumeBeforeMute', currentAudio.volume.toString());
+                currentAudio.volume = 0;
+                updateVolumeIcon(0);
+            } else {
+                // Restore previous volume
+                const prevVol = localStorage.getItem('playerVolumeBeforeMute');
+                const vol = prevVol !== null ? parseFloat(prevVol) : 0.7;
+                currentAudio.volume = vol;
+                localStorage.setItem('playerVolume', vol.toString());
+                updateVolumeIcon(vol);
+            }
+        }
+        
+        function updateVolumeIcon(volume) {
+            const volOn = document.getElementById('mp-icon-vol-on');
+            const volOff = document.getElementById('mp-icon-vol-off');
+            if (!volOn || !volOff) return;
+            if (volume > 0) {
+                volOn.style.display = '';
+                volOff.style.display = 'none';
+            } else {
+                volOn.style.display = 'none';
+                volOff.style.display = '';
+            }
+        }
+        
+        function seekAudio(event) {
+            if (!currentAudio || !currentAudio.duration) return;
+            const bar = document.getElementById('mp-progress-bar');
+            const rect = bar.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const pct = Math.max(0, Math.min(1, x / rect.width));
+            currentAudio.currentTime = pct * currentAudio.duration;
         }
         
         // ===== Edit State Management =====
