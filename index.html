@@ -864,6 +864,25 @@
             padding: 4px 0 8px;
             margin-bottom: 8px;
         }
+        .hm-filter-tabs {
+            grid-column: 1 / -1;
+            display: flex; gap: 6px; margin-bottom: 20px;
+        }
+        .hm-filter-tab {
+            flex: 1; padding: 8px 0; text-align: center;
+            font-size: 13px; font-weight: 500;
+            border-radius: 10px;
+            background: var(--pink-100);
+            color: var(--text-secondary);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .hm-filter-tab.active {
+            background: var(--pink-500);
+            color: white;
+            font-weight: 600;
+        }
         .hm-achievement-title {
             font-size: 22px;
             font-weight: 700;
@@ -1704,8 +1723,6 @@
                         <div class="cal-mode-tabs">
                             <div class="cal-mode-tab" onclick="switchCalMode('photo',this)">照片墙</div>
                             <div class="cal-mode-tab active" onclick="switchCalMode('heatmap',this)">热力图</div>
-                            <div class="cal-mode-tab" onclick="switchCalMode('course',this)">课程</div>
-                            <div class="cal-mode-tab" onclick="switchCalMode('self',this)">自训</div>
                         </div>
                         <div class="cal-weekday-row" id="cal-weekday-row">
                             <div class="cal-weekday">日</div>
@@ -2912,6 +2929,12 @@
         let calCurrentMonth = new Date();
         let calCurrentYear = new Date().getFullYear();
         let calMode = 'heatmap';
+        let calHeatFilter = 'all'; // 'all' | 'course' | 'self'
+        
+        function switchHeatFilter(filter) {
+            calHeatFilter = filter;
+            renderCalendar();
+        }
         
         function switchTrainingSub(name, skipUpdate) {
             currentTrainingSub = name;
@@ -3333,18 +3356,11 @@
             const label = document.getElementById('cal-month-label');
             const weekdayRow = document.getElementById('cal-weekday-row');
             
-            // Gather all data
-            let records = [];
-            if (calMode === 'photo' || calMode === 'heatmap') {
-                records = [
-                    ...loadData('coursePlans').map(r => ({...r, _source: 'course'})),
-                    ...loadData('selfTrainingPlans').map(r => ({...r, _source: 'self'}))
-                ];
-            } else if (calMode === 'course') {
-                records = loadData('coursePlans').map(r => ({...r, _source: 'course'}));
-            } else if (calMode === 'self') {
-                records = loadData('selfTrainingPlans').map(r => ({...r, _source: 'self'}));
-            }
+            // Gather all data (course + self)
+            let allRecords = [
+                ...loadData('coursePlans').map(r => ({...r, _source: 'course'})),
+                ...loadData('selfTrainingPlans').map(r => ({...r, _source: 'self'}))
+            ];
             
             if (calMode === 'photo') {
                 if (label) label.textContent = calCurrentYear + '年 ' + (calCurrentMonth.getMonth()+1) + '月';
@@ -3356,7 +3372,7 @@
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
                 const startWeekday = firstDay.getDay();
                 const monthPrefix = year + '-' + String(month+1).padStart(2,'0');
-                const monthRecords = records.filter(r => (r.date||'').startsWith(monthPrefix));
+                const monthRecords = allRecords.filter(r => (r.date||'').startsWith(monthPrefix));
                 
                 let html = '';
                 for (let i = 0; i < startWeekday; i++) html += '<div class="cal-cell empty"></div>';
@@ -3369,16 +3385,7 @@
             } else if (calMode === 'heatmap') {
                 if (label) label.textContent = calCurrentYear + '年';
                 if (weekdayRow) weekdayRow.style.display = 'none';
-                el.innerHTML = renderHeatmap(records);
-            } else {
-                if (label) label.textContent = calCurrentYear + '年 ' + (calCurrentMonth.getMonth()+1) + '月';
-                if (weekdayRow) weekdayRow.style.display = 'none';
-                
-                const year = calCurrentMonth.getFullYear();
-                const month = calCurrentMonth.getMonth();
-                const monthPrefix = year + '-' + String(month+1).padStart(2,'0');
-                const monthRecords = records.filter(r => (r.date||'').startsWith(monthPrefix));
-                el.innerHTML = renderCalTimeline(monthRecords);
+                el.innerHTML = renderHeatmap(allRecords);
             }
         }
         
@@ -3394,10 +3401,20 @@
             return '<div class="cal-cell"><div class="cal-day-num">'+day+'</div></div>';
         }
         
-        function renderHeatmap(records) {
+        function renderHeatmap(allRecords) {
             const year = calCurrentYear;
             const today = new Date();
             const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+            
+            // Filter by calHeatFilter
+            let records;
+            if (calHeatFilter === 'course') {
+                records = allRecords.filter(r => r._source === 'course');
+            } else if (calHeatFilter === 'self') {
+                records = allRecords.filter(r => r._source === 'self');
+            } else {
+                records = allRecords;
+            }
             
             // Filter to current year
             const yearRecords = records.filter(r => (r.date||'').startsWith(year + '-'));
@@ -3427,6 +3444,14 @@
             
             // Build month grids
             let html = '';
+            
+            // Filter tabs
+            html += '<div class="hm-filter-tabs">';
+            html += '<div class="hm-filter-tab'+(calHeatFilter==='all'?' active':'')+'" onclick="switchHeatFilter(\'all\')">全部</div>';
+            html += '<div class="hm-filter-tab'+(calHeatFilter==='course'?' active':'')+'" onclick="switchHeatFilter(\'course\')">课程</div>';
+            html += '<div class="hm-filter-tab'+(calHeatFilter==='self'?' active':'')+'" onclick="switchHeatFilter(\'self\')">自训</div>';
+            html += '</div>';
+            
             // Achievement card container
             html += '<div class="hm-achievement-card">';
             html += '<div class="hm-achievement-title">来芭 · 芭蕾训练日记</div>';
