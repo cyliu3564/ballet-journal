@@ -432,7 +432,7 @@
         .edit-btn:active { opacity: 0.6; }
         
         /* Equipment thumbnail list */
-        .equip-thumb-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+        .equip-thumb-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; max-height: 60vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-right: 4px; }
         .equip-thumb { background: white; border-radius: 12px; padding: 10px; text-align: center; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(0,0,0,0.04); }
         .equip-thumb:active { transform: scale(0.96); }
         .equip-thumb-photo { width: 100%; aspect-ratio: 1; border-radius: 8px; object-fit: cover; background: var(--pink-50); margin-bottom: 6px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); font-size: 11px; }
