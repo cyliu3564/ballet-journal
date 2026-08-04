@@ -448,6 +448,18 @@
         .equip-detail-back { display: flex; align-items: center; gap: 6px; color: var(--pink-400); font-size: 14px; cursor: pointer; margin-bottom: 12px; padding: 8px 0; }
         .equip-detail-back:active { opacity: 0.6; }
         
+        /* Sync button */
+        .sync-btn {
+            font-size: 12px;
+            color: var(--pink-400);
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 16px;
+            background: var(--pink-50);
+            transition: all 0.2s;
+        }
+        .sync-btn:active { opacity: 0.6; transform: scale(0.95); }
+        
         /* Photo Upload */
         .photo-upload { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
         .photo-preview {
@@ -899,7 +911,10 @@
                     <button class="btn" onclick="addEquipment()">Save</button>
                 </div>
                 <div class="card">
-                    <div class="card-title">👗 Collection</div>
+                    <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+                        <span>👗 Collection</span>
+                        <span class="sync-btn" onclick="syncFromLedger()" title="从账本恢复数据">🔄 Sync</span>
+                    </div>
                     <div class="equip-list-view" id="equip-list-view">
                         <div class="equip-thumb-list" id="equip-list"></div>
                     </div>
@@ -1090,7 +1105,11 @@
             if (hI && wI) { hI.addEventListener('input', calcBMI); wI.addEventListener('input', calcBMI); }
             
             renderAll();
-            document.getElementById('header-module').textContent = moduleNames['body'] || '';
+            
+            // Restore last active module
+            const savedModule = localStorage.getItem('activeModule') || 'body';
+            switchModule(savedModule, true);
+            
             updateFabVisibility();
             initPullToRefresh();
         }
@@ -1190,15 +1209,20 @@
             music: 'Music',
             account: 'Ledger'
         };
-        function switchModule(name) {
+        function switchModule(name, skipSave) {
             document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             if (name === 'training') { alert('Coming soon'); return; }
             document.getElementById('module-' + name).classList.add('active');
-            event.currentTarget.classList.add('active');
+            // Find and activate the correct tab
+            const tabs = document.querySelectorAll('.tab-item');
+            const moduleKeys = ['training','body','equip','music','account'];
+            const idx = moduleKeys.indexOf(name);
+            if (idx >= 0 && tabs[idx]) tabs[idx].classList.add('active');
             if (name === 'account') updateExpenseStat();
             if (name === 'body') renderOverview();
             document.getElementById('header-module').textContent = moduleNames[name] || '';
+            if (!skipSave) localStorage.setItem('activeModule', name);
             updateFabVisibility();
         }
         function switchBodyTab(name) {
@@ -1674,6 +1698,57 @@
             saveData('equipment', data);
             closeEquipDetail();
             renderEquipList('all');
+        }
+        function syncFromLedger() {
+            const expenses = loadData('expenses');
+            const equipData = loadData('equipment');
+            
+            // Find equipment-sourced expenses
+            const equipExpenses = expenses.filter(e => e.source === 'equipment');
+            
+            // Check which ones are missing from equipment
+            const missing = equipExpenses.filter(exp => {
+                return !equipData.some(eq => {
+                    // Match by content (e.g. "Leotard - Pink bodysuit" matches category "Leotard" and name "Pink bodysuit")
+                    const parts = (exp.content || '').split(' - ');
+                    const matchCat = parts[0] === eq.category;
+                    const matchName = parts[1] === eq.name;
+                    return matchCat && matchName;
+                });
+            });
+            
+            if (missing.length === 0) {
+                alert('✅ 账本与装备库数据一致，无需同步');
+                return;
+            }
+            
+            let msg = `发现 ${missing.length} 项账本记录在装备库中缺失：\n\n`;
+            missing.forEach((m, i) => {
+                msg += `${i+1}. ${m.content} (¥${m.amount}) - ${m.date}\n`;
+            });
+            msg += '\n是否恢复这些项目到装备库？';
+            
+            if (confirm(msg)) {
+                missing.forEach(m => {
+                    const parts = (m.content || '').split(' - ');
+                    equipData.push({
+                        category: parts[0] || 'Other',
+                        name: parts[1] || m.content,
+                        price: m.amount || '0',
+                        date: m.date || '',
+                        brand: '',
+                        color: '',
+                        qty: '1',
+                        size: '',
+                        channel: '',
+                        photos: [],
+                        syncedFrom: 'ledger'
+                    });
+                });
+                saveData('equipment', equipData);
+                renderEquipList('all');
+                alert(`✅ 已恢复 ${missing.length} 项装备数据`);
+            }
         }
         
         // ===== Music =====
