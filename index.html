@@ -1716,9 +1716,9 @@
                     <div class="training-back" onclick="switchTrainingSub('home')">← 返回</div>
                     <div class="card">
                         <div class="cal-nav">
-                            <button class="cal-nav-btn" onclick="changeCalYear(-1)">‹</button>
+                            <button class="cal-nav-btn" onclick="navCal(-1)">‹</button>
                             <div class="cal-month-label" id="cal-month-label"></div>
-                            <button class="cal-nav-btn" onclick="changeCalYear(1)">›</button>
+                            <button class="cal-nav-btn" onclick="navCal(1)">›</button>
                         </div>
                         <div class="cal-mode-tabs">
                             <div class="cal-mode-tab" onclick="switchCalMode('photo',this)">照片墙</div>
@@ -3348,6 +3348,22 @@
         function changeCalYear(delta) {
             calCurrentYear += delta;
             calCurrentMonth = new Date(calCurrentYear, calCurrentMonth.getMonth(), 1);
+            renderCalendar();
+        }
+        function navCal(delta) {
+            if (calMode === 'photo') {
+                // Photo mode: navigate months
+                let m = calCurrentMonth.getMonth() + delta;
+                let y = calCurrentYear;
+                if (m < 0) { m = 11; y--; }
+                if (m > 11) { m = 0; y++; }
+                calCurrentMonth = new Date(y, m, 1);
+                calCurrentYear = y;
+            } else {
+                // Heatmap mode: navigate years
+                calCurrentYear += delta;
+                calCurrentMonth = new Date(calCurrentYear, calCurrentMonth.getMonth(), 1);
+            }
             renderCalendar();
         }
         
