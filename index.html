@@ -272,18 +272,22 @@
         .mp-top-row { display: flex; align-items: center; gap: 8px; width: 100%; }
         .mini-player .mp-controls { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
         .mini-player .mp-btn { width: 32px; height: 32px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; background: transparent; color: var(--text-secondary); }
-        .mini-player .mp-play-btn { background: var(--pink-400); color: white; width: 36px; height: 36px; }
-        .mini-player .mp-play-btn:active { background: var(--pink-500); }
         .mini-player .mp-prev-btn:active, .mini-player .mp-next-btn:active { background: var(--pink-100); }
-        .mini-player .mp-volume-btn:active { background: var(--pink-100); }
         .mini-player .mp-close-btn { color: var(--text-tertiary); font-size: 18px; }
-        .mini-player .mp-progress-bar { width: 100%; height: 16px; display: flex; align-items: center; cursor: pointer; position: relative; padding: 6px 0; }
-        .mini-player .mp-progress-track { width: 100%; height: 3px; background: var(--pink-100); border-radius: 2px; position: relative; overflow: hidden; }
-        .mini-player .mp-progress { position: absolute; top: 0; left: 0; height: 100%; background: var(--pink-400); transition: width 0.1s linear; border-radius: 2px; }
         /* Music list play button */
         .music-play-btn { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--pink-400); background: transparent; color: var(--pink-400); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; margin-left: 8px; flex-shrink: 0; }
         .music-play-btn:active { background: var(--pink-50); }
         .music-play-btn.playing { background: var(--pink-400); color: white; }
+        
+        /* Music Modal (iframe player) */
+        .music-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; }
+        .music-modal-content { width: 100%; max-width: 430px; background: white; border-radius: 20px 20px 0 0; box-shadow: 0 -4px 24px rgba(0,0,0,0.12); max-height: 80vh; display: flex; flex-direction: column; }
+        .music-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--pink-100); }
+        .music-modal-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+        .music-modal-close { width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--pink-50); color: var(--text-secondary); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .music-modal-close:active { background: var(--pink-100); }
+        .music-modal-body { flex: 1; overflow: hidden; min-height: 360px; }
+        .music-modal-body iframe { width: 100%; height: 100%; min-height: 360px; border: none; }
         
         /* Tab Bar */
         .tab-bar {
@@ -1750,33 +1754,34 @@
         
         <!-- Mini Player -->
         <div class="mini-player" id="mini-player">
-            <div class="mp-top-row">
+            <div class="mp-top-row" onclick="expandMusicPlayer()">
                 <div class="mp-info">
                     <div class="mp-title" id="mp-title">--</div>
                     <div class="mp-artist" id="mp-artist">--</div>
                 </div>
-                <div class="mp-controls">
+                <div class="mp-controls" onclick="event.stopPropagation()">
                     <button class="mp-btn mp-prev-btn" onclick="playPrevTrack()" title="上一首">
                         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-                    </button>
-                    <button class="mp-btn mp-play-btn" id="mp-play-btn" onclick="togglePlay()">
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path id="mp-icon-play" d="M8 5v14l11-7z"/><path id="mp-icon-pause" d="M6 4h4v16H6zM14 4h4v16h-4z" style="display:none"/></svg>
                     </button>
                     <button class="mp-btn mp-next-btn" onclick="playNextTrack()" title="下一首">
                         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
                     </button>
-                    <button class="mp-btn mp-volume-btn" onclick="toggleMute()" title="音量">
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path id="mp-icon-vol-on" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/><path id="mp-icon-vol-off" d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" style="display:none"/></svg>
-                    </button>
                     <button class="mp-btn mp-close-btn" onclick="closePlayer()">×</button>
                 </div>
             </div>
-            <div class="mp-progress-bar" id="mp-progress-bar" onclick="seekAudio(event)">
-                <div class="mp-progress-track">
-                    <div class="mp-progress" id="mp-progress"></div>
+        </div>
+        
+        <!-- Music Player Modal (iframe) -->
+        <div class="music-modal" id="music-modal" style="display:none">
+            <div class="music-modal-content">
+                <div class="music-modal-header">
+                    <div class="music-modal-title" id="mm-title">--</div>
+                    <button class="music-modal-close" onclick="collapseMusicPlayer()">×</button>
+                </div>
+                <div class="music-modal-body">
+                    <iframe id="music-iframe" frameborder="0" allow="autoplay; encrypted-media"></iframe>
                 </div>
             </div>
-            <div class="mp-time" id="mp-time" style="text-align:center;width:100%">0:00 / 0:00</div>
         </div>
         
         <!-- Tab Bar -->
@@ -2530,27 +2535,34 @@
         }
         
         // ===== Music =====
-        let currentAudio = null;
-        let currentTrackIndex = -1;
         let musicPlaylist = [];
         
-        function extractNeteaseId(input) {
+        async function extractNeteaseId(input) {
             if (!input) return null;
             input = input.trim();
             // Pure number = ID
             if (/^\d+$/.test(input)) return input;
-            // URL patterns
+            // URL patterns with id=
             const m = input.match(/[?&]id=(\d+)/);
             if (m) return m[1];
             const m2 = input.match(/\/song\/(\d+)/);
             if (m2) return m2[1];
+            // Short link: 163cn.tv — fetch via CORS proxy to resolve
+            if (input.includes('163cn.tv')) {
+                try {
+                    const resp = await fetch('https://corsproxy.io/?' + encodeURIComponent(input), { redirect: 'follow' });
+                    const html = await resp.text();
+                    const mm = html.match(/[?&]id=(\d+)/) || html.match(/\/song\/(\d+)/);
+                    if (mm) return mm[1];
+                } catch(e) { console.warn('Short link resolve failed:', e); }
+            }
             return null;
         }
         
-        function addMusic() {
+        async function addMusic() {
             const data = loadData('music');
             const linkVal = document.getElementById('music-link').value;
-            const neteaseId = extractNeteaseId(linkVal);
+            const neteaseId = await extractNeteaseId(linkVal);
             const record = {
                 category: document.getElementById('music-category').value,
                 name: document.getElementById('music-name').value,
@@ -2597,7 +2609,8 @@
             for (const c in g) {
                 html += `<div style="font-size:12px;color:var(--pink-400);font-weight:600;margin:12px 0 8px;letter-spacing:0.04em;text-transform:uppercase">${c}</div>`;
                 g[c].forEach(d => {
-                    const playBtn = d.neteaseId ? `<button class="music-play-btn ${currentTrackIndex === d._idx && currentAudio && !currentAudio.paused ? 'playing' : ''}" onclick="playTrack(${d._idx})">▶</button>` : '';
+                    const isCur = d._idx === currentTrackIndex;
+                    const playBtn = d.neteaseId ? `<button class="music-play-btn ${isCur && playerVisible ? 'playing' : ''}" onclick="playTrack(${d._idx})">${isCur && playerVisible ? '⏸' : '▶'}</button>` : '';
                     const artistLine = d.artist ? `<div style="font-size:11px;color:var(--text-tertiary)">${d.artist}</div>` : '';
                     html += `<div class="record-item" style="position:relative"><div style="flex:1;min-width:0"><div class="value">${d.name}</div>${artistLine}</div><div style="display:flex;align-items:center;gap:6px">${playBtn}${d.link && !d.neteaseId ? `<a href="${d.link}" target="_blank" style="color:var(--pink-400);text-decoration:none;font-size:11px;white-space:nowrap">Link →</a>` : ''}</div><div class="edit-btn" onclick="editMusic(${d._idx})">Edit</div><div class="delete-btn" onclick="deleteMusic(${d._idx})">Delete</div></div>`;
                 });
@@ -2605,126 +2618,62 @@
             document.getElementById('music-list').innerHTML = html || '<div class="empty">No music</div>';
         }
         
+        // ===== Music Player (iframe-based) =====
+        let currentTrackIndex = -1;
+        let playerVisible = false;  // whether the modal is expanded
+        
         function playTrack(index) {
             const track = musicPlaylist[index];
             if (!track || !track.neteaseId) return;
             
-            // If same track and playing, toggle pause
-            if (currentTrackIndex === index && currentAudio) {
-                togglePlay();
-                return;
-            }
-            
-            // Stop previous
-            if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-            
-            // Create new audio using Netease direct URL
-            const audioUrl = `https://music.163.com/song/media/outer/url?id=${track.neteaseId}.mp3`;
-            currentAudio = new Audio(audioUrl);
-            currentAudio.preload = 'auto';
-            // Set volume from saved value or default
-            const savedVolume = localStorage.getItem('playerVolume');
-            currentAudio.volume = savedVolume !== null ? parseFloat(savedVolume) : 0.7;
             currentTrackIndex = index;
             
-            // Update player UI
+            // Update mini-player info
             document.getElementById('mp-title').textContent = track.name;
             document.getElementById('mp-artist').textContent = track.artist || 'Unknown';
             document.getElementById('mini-player').classList.add('active');
-            updatePlayIcon(true);
-            updateVolumeIcon(currentAudio.volume);
             
-            // Progress tracking
-            currentAudio.addEventListener('timeupdate', () => {
-                if (currentAudio.duration) {
-                    const pct = (currentAudio.currentTime / currentAudio.duration) * 100;
-                    document.getElementById('mp-progress').style.width = pct + '%';
-                    // Update time display
-                    const currentTime = formatTime(currentAudio.currentTime);
-                    const duration = formatTime(currentAudio.duration);
-                    document.getElementById('mp-time').textContent = `${currentTime} / ${duration}`;
-                }
-            });
-            currentAudio.addEventListener('ended', () => {
-                updatePlayIcon(false);
-                document.getElementById('mp-progress').style.width = '0%';
-                // Auto play next track
-                let nextIdx = currentTrackIndex + 1;
-                if (nextIdx >= musicPlaylist.length) nextIdx = 0;
-                // Find next track with neteaseId
-                let attempts = 0;
-                while (attempts < musicPlaylist.length) {
-                    if (musicPlaylist[nextIdx] && musicPlaylist[nextIdx].neteaseId) {
-                        playTrack(nextIdx);
-                        return;
-                    }
-                    nextIdx = (nextIdx + 1) % musicPlaylist.length;
-                    attempts++;
-                }
-                // No more playable tracks
-                closePlayer();
-            });
-            currentAudio.addEventListener('error', (e) => {
-                console.error('Audio error:', e);
-                // Try to auto-play next track on error
-                let nextIdx = currentTrackIndex + 1;
-                if (nextIdx >= musicPlaylist.length) nextIdx = 0;
-                if (nextIdx !== currentTrackIndex && musicPlaylist[nextIdx] && musicPlaylist[nextIdx].neteaseId) {
-                    setTimeout(() => playTrack(nextIdx), 500);
-                } else {
-                    closePlayer();
-                }
-            });
+            // Update modal info
+            document.getElementById('mm-title').textContent = track.name + (track.artist ? ' - ' + track.artist : '');
             
-            const playPromise = currentAudio.play();
-            if (playPromise) {
-                playPromise.catch((err) => {
-                    console.warn('Play failed:', err);
-                    // Retry once after short delay (iOS Safari sometimes needs this)
-                    setTimeout(() => {
-                        if (currentAudio) {
-                            currentAudio.play().catch(() => {
-                                alert('播放失败，请检查网络或歌曲是否可用');
-                                closePlayer();
-                            });
-                        }
-                    }, 100);
-                });
-            }
+            // Set iframe src — use Netease embed player
+            const iframe = document.getElementById('music-iframe');
+            iframe.src = `https://music.163.com/outchain/player?type=2&id=${track.neteaseId}&auto=1&height=430`;
             
-            renderMusicList(); // Update play button states
-        }
-        
-        function formatTime(seconds) {
-            if (!seconds || isNaN(seconds)) return '0:00';
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-        
-        function togglePlay() {
-            if (!currentAudio) return;
-            if (currentAudio.paused) {
-                currentAudio.play();
-                updatePlayIcon(true);
-            } else {
-                currentAudio.pause();
-                updatePlayIcon(false);
-            }
+            // Show modal
+            document.getElementById('music-modal').style.display = 'flex';
+            playerVisible = true;
+            
             renderMusicList();
         }
         
-        function updatePlayIcon(isPlaying) {
-            document.getElementById('mp-icon-play').style.display = isPlaying ? 'none' : '';
-            document.getElementById('mp-icon-pause').style.display = isPlaying ? '' : 'none';
+        function expandMusicPlayer() {
+            if (currentTrackIndex < 0) return;
+            document.getElementById('music-modal').style.display = 'flex';
+            playerVisible = true;
+        }
+        
+        function collapseMusicPlayer() {
+            document.getElementById('music-modal').style.display = 'none';
+            playerVisible = false;
+            renderMusicList();
+        }
+        
+        function togglePlay() {
+            // For iframe, we just toggle the modal visibility
+            if (playerVisible) {
+                collapseMusicPlayer();
+            } else {
+                expandMusicPlayer();
+            }
         }
         
         function closePlayer() {
-            if (currentAudio) { currentAudio.pause(); currentAudio = null; }
             currentTrackIndex = -1;
+            playerVisible = false;
             document.getElementById('mini-player').classList.remove('active');
-            document.getElementById('mp-progress').style.width = '0%';
-            document.getElementById('mp-time').textContent = '0:00 / 0:00';
+            document.getElementById('music-modal').style.display = 'none';
+            document.getElementById('music-iframe').src = '';
             renderMusicList();
         }
         
@@ -2732,7 +2681,6 @@
             if (musicPlaylist.length === 0) return;
             let nextIdx = currentTrackIndex + 1;
             if (nextIdx >= musicPlaylist.length) nextIdx = 0;
-            // Find next track with neteaseId
             let attempts = 0;
             while (attempts < musicPlaylist.length) {
                 if (musicPlaylist[nextIdx] && musicPlaylist[nextIdx].neteaseId) {
@@ -2748,7 +2696,6 @@
             if (musicPlaylist.length === 0) return;
             let prevIdx = currentTrackIndex - 1;
             if (prevIdx < 0) prevIdx = musicPlaylist.length - 1;
-            // Find previous track with neteaseId
             let attempts = 0;
             while (attempts < musicPlaylist.length) {
                 if (musicPlaylist[prevIdx] && musicPlaylist[prevIdx].neteaseId) {
@@ -2758,45 +2705,6 @@
                 prevIdx = (prevIdx - 1 + musicPlaylist.length) % musicPlaylist.length;
                 attempts++;
             }
-        }
-        
-        function toggleMute() {
-            if (!currentAudio) return;
-            if (currentAudio.volume > 0) {
-                // Save current volume and mute
-                localStorage.setItem('playerVolumeBeforeMute', currentAudio.volume.toString());
-                currentAudio.volume = 0;
-                updateVolumeIcon(0);
-            } else {
-                // Restore previous volume
-                const prevVol = localStorage.getItem('playerVolumeBeforeMute');
-                const vol = prevVol !== null ? parseFloat(prevVol) : 0.7;
-                currentAudio.volume = vol;
-                localStorage.setItem('playerVolume', vol.toString());
-                updateVolumeIcon(vol);
-            }
-        }
-        
-        function updateVolumeIcon(volume) {
-            const volOn = document.getElementById('mp-icon-vol-on');
-            const volOff = document.getElementById('mp-icon-vol-off');
-            if (!volOn || !volOff) return;
-            if (volume > 0) {
-                volOn.style.display = '';
-                volOff.style.display = 'none';
-            } else {
-                volOn.style.display = 'none';
-                volOff.style.display = '';
-            }
-        }
-        
-        function seekAudio(event) {
-            if (!currentAudio || !currentAudio.duration) return;
-            const bar = document.getElementById('mp-progress-bar');
-            const rect = bar.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const pct = Math.max(0, Math.min(1, x / rect.width));
-            currentAudio.currentTime = pct * currentAudio.duration;
         }
         
         // ===== Edit State Management =====
