@@ -860,6 +860,7 @@
         
         /* ===== Heatmap (Density) View ===== */
         .hm-achievement-card {
+            grid-column: 1 / -1;
             padding: 4px 0 8px;
             margin-bottom: 8px;
         }
@@ -887,6 +888,7 @@
             margin: 0 auto 24px;
         }
         .hm-stats-row {
+            grid-column: 1 / -1;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
@@ -912,12 +914,14 @@
         }
 
         .hm-section-title {
+            grid-column: 1 / -1;
             font-size: 16px;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 16px;
         }
         .hm-year-grid {
+            grid-column: 1 / -1;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 16px 10px;
@@ -949,16 +953,19 @@
         .hm-cell.today-ring { box-shadow: 0 0 0 1.5px var(--pink-500); }
 
         .hm-legend {
+            grid-column: 1 / -1;
             display: flex; align-items: center; justify-content: flex-end;
             gap: 3px; margin-bottom: 24px; font-size: 10px; color: var(--text-tertiary);
         }
         .hm-legend-cell { width: 10px; height: 10px; border-radius: 2px; }
 
         .hm-dist-title {
+            grid-column: 1 / -1;
             font-size: 16px; font-weight: 700; color: var(--text-primary);
             margin-bottom: 14px;
         }
         .hm-dist-bar-row {
+            grid-column: 1 / -1;
             display: flex; align-items: center; margin-bottom: 10px; gap: 8px;
         }
         .hm-dist-label {
