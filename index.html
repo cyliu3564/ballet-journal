@@ -1740,40 +1740,44 @@
                 return;
             }
             
-            // Find equipment items that don't have a matching expense entry
-            const missing = equipData.filter(eq => {
-                return !expenses.some(exp => {
-                    if (exp.source !== 'equipment') return false;
-                    // Match by content format: "Category - Name"
-                    return exp.content === `${eq.category} - ${eq.name}`;
-                });
+            let added = 0;
+            let updated = 0;
+            
+            equipData.forEach(eq => {
+                if (parseFloat(eq.price) <= 0) return;
+                const content = `${eq.category} - ${eq.name}`;
+                const matchIdx = expenses.findIndex(exp => exp.source === 'equipment' && exp.content === content);
+                
+                if (matchIdx === -1) {
+                    // Missing entry — add it
+                    expenses.push({
+                        category: 'Gear',
+                        content: content,
+                        amount: eq.price || '0',
+                        date: eq.date || '',
+                        source: 'equipment'
+                    });
+                    added++;
+                } else if (eq.date && expenses[matchIdx].date !== eq.date) {
+                    // Date changed — update it
+                    expenses[matchIdx].date = eq.date;
+                    updated++;
+                }
             });
             
-            if (missing.length === 0) {
+            if (added === 0 && updated === 0) {
                 alert('✅ 装备库数据已全部同步到账本');
                 return;
             }
             
-            let msg = `发现 ${missing.length} 项装备未同步到账本：\n\n`;
-            missing.forEach((eq, i) => {
-                msg += `${i+1}. ${eq.name} (¥${eq.price || 0})\n`;
-            });
-            msg += '\n是否同步到账本？';
+            let msg = '';
+            if (added > 0) msg += `新增 ${added} 项\n`;
+            if (updated > 0) msg += `更新日期 ${updated} 项`;
+            msg += '\n\n确认同步？';
             
             if (confirm(msg)) {
-                missing.forEach(eq => {
-                    if (parseFloat(eq.price) > 0) {
-                        expenses.push({
-                            category: 'Gear',
-                            content: `${eq.category} - ${eq.name}`,
-                            amount: eq.price || '0',
-                            date: eq.date || '',
-                            source: 'equipment'
-                        });
-                    }
-                });
                 saveData('expenses', expenses);
-                alert(`✅ 已同步 ${missing.length} 项到账本`);
+                alert('✅ 同步完成');
             }
         }
         
