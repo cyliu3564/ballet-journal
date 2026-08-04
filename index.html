@@ -703,14 +703,16 @@
         .training-list-note { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
         .training-list-photos { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
         .training-list-photos img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; cursor: pointer; }
+        .training-list-item.done { background: rgba(192,104,120,0.08); border-left: 3px solid var(--pink-400); }
+        .training-list-item.pending { background: white; border-left: 3px solid var(--border); opacity: 0.85; }
         .training-list-status {
-            width: 28px; height: 28px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; cursor: pointer; margin-top: 2px;
+            padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+            display: flex; align-items: center; justify-content: center; gap: 4px;
+            flex-shrink: 0; cursor: pointer; margin-top: 2px; white-space: nowrap;
         }
-        .training-list-status svg { width: 16px; height: 16px; }
+        .training-list-status svg { width: 14px; height: 14px; }
         .training-list-status.done { background: var(--pink-400); color: white; }
-        .training-list-status.pending { background: white; color: var(--pink-300); border: 2px solid var(--pink-200); }
+        .training-list-status.pending { background: white; color: var(--text-tertiary); border: 1.5px solid var(--border); }
         
         /* Calendar */
         .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
@@ -2856,9 +2858,10 @@
             if (!el) return;
             el.innerHTML = sorted.map(d => {
                 const ri = data.indexOf(d);
-                const statusIcon = d.type === 'done'
-                    ? '<div class="training-list-status done" onclick="toggleCourseStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>'
-                    : '<div class="training-list-status pending" onclick="toggleCourseStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>';
+                const isDone = d.type === 'done';
+                const statusBtn = isDone
+                    ? '<div class="training-list-status done" onclick="toggleCourseStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>已完成</div>'
+                    : '<div class="training-list-status pending" onclick="toggleCourseStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>待完成</div>';
                 let detail = [d.hours, d.courseType, d.difficulty, d.institution].filter(x => x).join(' · ');
                 let photosHtml = '';
                 if (d.photos?.length) {
@@ -2867,12 +2870,12 @@
                     ).join('') + '</div>';
                 }
                 let noteHtml = d.notes ? '<div class="training-list-note">'+d.notes+'</div>' : '';
-                return '<div class="training-list-item">' +
+                return '<div class="training-list-item '+(isDone?'done':'pending')+'">' +
                     '<div class="training-list-info" onclick="editCoursePlan('+ri+')">' +
                     '<div class="training-list-date">'+(d.date||'')+'</div>' +
                     '<div class="training-list-detail">'+detail+'</div>' +
                     noteHtml + photosHtml +
-                    '</div>' + statusIcon +
+                    '</div>' + statusBtn +
                     '<div class="edit-btn" onclick="editCoursePlan('+ri+')">Edit</div>' +
                     '<div class="delete-btn" onclick="deleteCoursePlan('+ri+')">Delete</div>' +
                     '</div>';
@@ -2949,9 +2952,10 @@
             if (!el) return;
             el.innerHTML = sorted.map(d => {
                 const ri = data.indexOf(d);
-                const statusIcon = d.type === 'done'
-                    ? '<div class="training-list-status done" onclick="toggleSelfStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>'
-                    : '<div class="training-list-status pending" onclick="toggleSelfStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>';
+                const isDone = d.type === 'done';
+                const statusBtn = isDone
+                    ? '<div class="training-list-status done" onclick="toggleSelfStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>已完成</div>'
+                    : '<div class="training-list-status pending" onclick="toggleSelfStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>待完成</div>';
                 let detail = [d.hours, d.trainingType, d.location].filter(x => x).join(' · ');
                 let photosHtml = '';
                 if (d.photos?.length) {
@@ -2960,12 +2964,12 @@
                     ).join('') + '</div>';
                 }
                 let noteHtml = d.notes ? '<div class="training-list-note">'+d.notes+'</div>' : '';
-                return '<div class="training-list-item">' +
+                return '<div class="training-list-item '+(isDone?'done':'pending')+'">' +
                     '<div class="training-list-info" onclick="editSelfTraining('+ri+')">' +
                     '<div class="training-list-date">'+(d.date||'')+'</div>' +
                     '<div class="training-list-detail">'+detail+'</div>' +
                     noteHtml + photosHtml +
-                    '</div>' + statusIcon +
+                    '</div>' + statusBtn +
                     '<div class="edit-btn" onclick="editSelfTraining('+ri+')">Edit</div>' +
                     '<div class="delete-btn" onclick="deleteSelfTraining('+ri+')">Delete</div>' +
                     '</div>';
