@@ -590,34 +590,114 @@
         .training-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
             margin-top: 8px;
         }
-        .training-icon-card {
+        .training-widget {
             background: white;
-            border-radius: 20px;
-            padding: 28px 16px;
-            text-align: center;
+            border-radius: 16px;
+            padding: 16px 14px 14px;
             cursor: pointer;
             box-shadow: var(--card-shadow);
             transition: all 0.2s;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 110px;
         }
-        .training-icon-card:active { transform: scale(0.96); }
-        .training-icon-card::after {
+        .training-widget:active { transform: scale(0.97); }
+        .training-widget::after {
             content: '';
             position: absolute;
-            top: -16px;
-            right: -16px;
-            width: 50px;
-            height: 50px;
+            top: -12px;
+            right: -12px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: var(--pink-100);
-            opacity: 0.4;
+            opacity: 0.3;
         }
-        .training-icon { font-size: 36px; margin-bottom: 10px; position: relative; z-index: 1; }
-        .training-icon-label { font-size: 14px; font-weight: 500; color: var(--text-primary); position: relative; z-index: 1; }
+        .tw-header {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        .tw-icon { font-size: 16px; }
+        .tw-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .tw-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+        .tw-number {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.1;
+        }
+        .tw-unit {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-left: 2px;
+        }
+        .tw-sub {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+        .tw-sub b {
+            color: var(--pink-500);
+            font-weight: 600;
+        }
+        /* Calendar widget full width */
+        .tw-calendar {
+            grid-column: 1 / -1;
+            flex-direction: row;
+            align-items: center;
+            gap: 14px;
+            min-height: 72px;
+            padding: 14px 16px;
+        }
+        .tw-calendar .tw-header {
+            margin-bottom: 0;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+            min-width: 52px;
+        }
+        .tw-calendar .tw-main {
+            flex: 1;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .tw-calendar .tw-number { font-size: 22px; }
+        .tw-calendar .tw-sub { margin-top: 0; }
+        .tw-mini-heat {
+            display: flex;
+            gap: 3px;
+            align-items: flex-end;
+        }
+        .tw-mini-bar {
+            width: 6px;
+            border-radius: 3px;
+            background: var(--pink-200);
+            min-height: 6px;
+            transition: height 0.3s;
+        }
         
         /* Training Back Button */
         .training-back {
@@ -1347,20 +1427,42 @@
             
             <!-- ===== 训练日记 ===== -->
             <div class="module" id="module-training">
-                <!-- Home: Icon Grid -->
+                <!-- Home: Widget Grid -->
                 <div class="training-sub active" id="sub-training-home">
                     <div class="training-grid">
-                        <div class="training-icon-card" onclick="switchTrainingSub('course')">
-                            <div class="training-icon">📋</div>
-                            <div class="training-icon-label">课程计划</div>
+                        <div class="training-widget tw-calendar" onclick="switchTrainingSub('calendar')">
+                            <div class="tw-header">
+                                <div class="tw-icon">📅</div>
+                                <div class="tw-title">日历</div>
+                            </div>
+                            <div class="tw-main">
+                                <div>
+                                    <div class="tw-number" id="tw-cal-num">0</div>
+                                    <div class="tw-sub">本月训练次数</div>
+                                </div>
+                                <div class="tw-mini-heat" id="tw-mini-heat"></div>
+                            </div>
+                            <div class="tw-sub" id="tw-cal-hours" style="min-width:60px;text-align:right"></div>
                         </div>
-                        <div class="training-icon-card" onclick="switchTrainingSub('self')">
-                            <div class="training-icon">🏃</div>
-                            <div class="training-icon-label">自训计划</div>
+                        <div class="training-widget" onclick="switchTrainingSub('course')">
+                            <div class="tw-header">
+                                <div class="tw-icon">📋</div>
+                                <div class="tw-title">课程</div>
+                            </div>
+                            <div class="tw-main">
+                                <div class="tw-number" id="tw-course-num">0<span class="tw-unit">节</span></div>
+                                <div class="tw-sub" id="tw-course-sub">本月</div>
+                            </div>
                         </div>
-                        <div class="training-icon-card" onclick="switchTrainingSub('calendar')">
-                            <div class="training-icon">📅</div>
-                            <div class="training-icon-label">日历</div>
+                        <div class="training-widget" onclick="switchTrainingSub('self')">
+                            <div class="tw-header">
+                                <div class="tw-icon">🏃</div>
+                                <div class="tw-title">自训</div>
+                            </div>
+                            <div class="tw-main">
+                                <div class="tw-number" id="tw-self-num">0<span class="tw-unit">次</span></div>
+                                <div class="tw-sub" id="tw-self-sub">本月</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3449,6 +3551,65 @@
             if (!confirm('Delete this record?')) return;
             const data = loadData(key); data.splice(idx, 1); saveData(key, data); renderAll();
         }
+        function renderTrainingWidgets() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const prefix = year + '-' + String(month+1).padStart(2,'0');
+            const todayStr = prefix + '-' + String(now.getDate()).padStart(2,'0');
+            
+            const courseData = loadData('coursePlans');
+            const selfData = loadData('selfTrainingPlans');
+            const allData = [...courseData.map(r=>({...r,_s:'c'})), ...selfData.map(r=>({...r,_s:'s'}))];
+            
+            // This month data
+            const mAll = allData.filter(r => (r.date||'').startsWith(prefix));
+            const mCourse = courseData.filter(r => (r.date||'').startsWith(prefix));
+            const mSelf = selfData.filter(r => (r.date||'').startsWith(prefix));
+            
+            // Calendar widget: month count + hours + mini heatmap (last 7 days)
+            const calNumEl = document.getElementById('tw-cal-num');
+            if (calNumEl) calNumEl.textContent = mAll.length;
+            
+            const mHours = mAll.reduce((s,r) => s + (parseFloat(r.hours)||0), 0);
+            const calHoursEl = document.getElementById('tw-cal-hours');
+            if (calHoursEl) calHoursEl.textContent = mHours > 0 ? mHours.toFixed(1) + 'h' : '';
+            
+            // Mini heat: last 7 days
+            const heatEl = document.getElementById('tw-mini-heat');
+            if (heatEl) {
+                let heatHtml = '';
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date(now);
+                    d.setDate(d.getDate() - i);
+                    const ds = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+                    const cnt = allData.filter(r => r.date === ds).length;
+                    const h = Math.max(6, Math.min(28, 6 + cnt * 8));
+                    const lvl = cnt === 0 ? 'var(--border)' : cnt === 1 ? 'var(--pink-200)' : cnt === 2 ? 'var(--pink-300)' : 'var(--pink-500)';
+                    heatHtml += '<div class="tw-mini-bar" style="height:'+h+'px;background:'+lvl+'"></div>';
+                }
+                heatEl.innerHTML = heatHtml;
+            }
+            
+            // Course widget
+            const courseNumEl = document.getElementById('tw-course-num');
+            if (courseNumEl) courseNumEl.innerHTML = mCourse.length + '<span class="tw-unit">节</span>';
+            const courseSubEl = document.getElementById('tw-course-sub');
+            if (courseSubEl) {
+                const cHours = mCourse.reduce((s,r) => s + (parseFloat(r.hours)||0), 0);
+                courseSubEl.innerHTML = cHours > 0 ? '本月 <b>'+cHours.toFixed(1)+'h</b>' : '本月暂无';
+            }
+            
+            // Self widget
+            const selfNumEl = document.getElementById('tw-self-num');
+            if (selfNumEl) selfNumEl.innerHTML = mSelf.length + '<span class="tw-unit">次</span>';
+            const selfSubEl = document.getElementById('tw-self-sub');
+            if (selfSubEl) {
+                const sHours = mSelf.reduce((s,r) => s + (parseFloat(r.hours)||0), 0);
+                selfSubEl.innerHTML = sHours > 0 ? '本月 <b>'+sHours.toFixed(1)+'h</b>' : '本月暂无';
+            }
+        }
+        
         function renderAll() {
             renderOverview(); renderBodyRecords(); renderBodyTrend();
             renderMuscleRecords(); updateMuscleFilter(); renderMuscleTrend();
@@ -3456,6 +3617,7 @@
             renderInjuryRecords(); renderEquipList('all'); renderMusicList();
             renderExpenseList(); updateTotalExpense(); updateExpenseStat();
             renderCourseList(); renderSelfTrainingList(); renderCalendar();
+            renderTrainingWidgets();
         }
         
         // ===== Chart (SVG) =====
