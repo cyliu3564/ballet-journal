@@ -1429,7 +1429,7 @@
                     <div class="form-group">
                         <label>Netease Link or ID</label>
                         <input type="text" id="music-link" placeholder="网易云链接或歌曲ID">
-                        <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">粘贴网易云链接或输入歌曲ID即可播放</div>
+                        <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">支持：歌曲数字ID、完整链接、163cn.tv短链接。短链接如无法自动解析，请打开链接后从地址栏复制含id=的完整URL</div>
                     </div>
                     <button class="btn" onclick="addMusic()">Save</button>
                 </div>
@@ -2547,14 +2547,16 @@
             if (m) return m[1];
             const m2 = input.match(/\/song\/(\d+)/);
             if (m2) return m2[1];
-            // Short link: 163cn.tv — fetch via CORS proxy to resolve
+            // Short link 163cn.tv — try direct fetch (browser follows redirect)
             if (input.includes('163cn.tv')) {
                 try {
-                    const resp = await fetch('https://corsproxy.io/?' + encodeURIComponent(input), { redirect: 'follow' });
-                    const html = await resp.text();
-                    const mm = html.match(/[?&]id=(\d+)/) || html.match(/\/song\/(\d+)/);
-                    if (mm) return mm[1];
-                } catch(e) { console.warn('Short link resolve failed:', e); }
+                    const resp = await fetch(input, { redirect: 'follow', mode: 'cors' });
+                    if (resp.ok) {
+                        const html = await resp.text();
+                        const mm = html.match(/[?&]id=(\d+)/) || html.match(/\/song\/(\d+)/);
+                        if (mm) return mm[1];
+                    }
+                } catch(e) { console.warn('Short link direct fetch failed:', e); }
             }
             return null;
         }
@@ -2611,8 +2613,9 @@
                 g[c].forEach(d => {
                     const isCur = d._idx === currentTrackIndex;
                     const playBtn = d.neteaseId ? `<button class="music-play-btn ${isCur && playerVisible ? 'playing' : ''}" onclick="playTrack(${d._idx})">${isCur && playerVisible ? '⏸' : '▶'}</button>` : '';
+                    const openBtn = d.neteaseId ? `<a href="https://music.163.com/song?id=${d.neteaseId}" target="_blank" style="color:var(--pink-400);text-decoration:none;font-size:11px;white-space:nowrap">打开</a>` : '';
                     const artistLine = d.artist ? `<div style="font-size:11px;color:var(--text-tertiary)">${d.artist}</div>` : '';
-                    html += `<div class="record-item" style="position:relative"><div style="flex:1;min-width:0"><div class="value">${d.name}</div>${artistLine}</div><div style="display:flex;align-items:center;gap:6px">${playBtn}${d.link && !d.neteaseId ? `<a href="${d.link}" target="_blank" style="color:var(--pink-400);text-decoration:none;font-size:11px;white-space:nowrap">Link →</a>` : ''}</div><div class="edit-btn" onclick="editMusic(${d._idx})">Edit</div><div class="delete-btn" onclick="deleteMusic(${d._idx})">Delete</div></div>`;
+                    html += `<div class="record-item" style="position:relative"><div style="flex:1;min-width:0"><div class="value">${d.name}</div>${artistLine}</div><div style="display:flex;align-items:center;gap:6px">${playBtn}${openBtn}${d.link && !d.neteaseId ? `<a href="${d.link}" target="_blank" style="color:var(--pink-400);text-decoration:none;font-size:11px;white-space:nowrap">Link →</a>` : ''}</div><div class="edit-btn" onclick="editMusic(${d._idx})">Edit</div><div class="delete-btn" onclick="deleteMusic(${d._idx})">Delete</div></div>`;
                 });
             }
             document.getElementById('music-list').innerHTML = html || '<div class="empty">No music</div>';
@@ -2624,35 +2627,25 @@
         
         function playTrack(index) {
             const track = musicPlaylist[index];
-            if (!track || !track.neteaseId) return;
-            
+            if (!track || !track.neteaseId) {
+                if (track && track.link) window.open(track.link, '_blank');
+                return;
+            }
             currentTrackIndex = index;
-            
-            // Update mini-player info
             document.getElementById('mp-title').textContent = track.name;
             document.getElementById('mp-artist').textContent = track.artist || 'Unknown';
             document.getElementById('mini-player').classList.add('active');
-            
-            // Update modal info
-            document.getElementById('mm-title').textContent = track.name + (track.artist ? ' - ' + track.artist : '');
-            
-            // Set iframe src — use Netease embed player
-            const iframe = document.getElementById('music-iframe');
-            iframe.src = `https://music.163.com/outchain/player?type=2&id=${track.neteaseId}&auto=1&height=430`;
-            
-            // Show modal
-            document.getElementById('music-modal').style.display = 'flex';
+            window.open(`https://music.163.com/song?id=${track.neteaseId}`, '_blank');
             playerVisible = true;
-            
             renderMusicList();
         }
         
         function expandMusicPlayer() {
             if (currentTrackIndex < 0) return;
-            document.getElementById('music-modal').style.display = 'flex';
-            playerVisible = true;
+            const track = musicPlaylist[currentTrackIndex];
+            if (track && track.neteaseId) window.open(`https://music.163.com/song?id=${track.neteaseId}`, '_blank');
+            else if (track && track.link) window.open(track.link, '_blank');
         }
-        
         function collapseMusicPlayer() {
             document.getElementById('music-modal').style.display = 'none';
             playerVisible = false;
