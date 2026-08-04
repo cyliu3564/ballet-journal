@@ -595,18 +595,18 @@
         }
         /* --- Calendar Widget (full width, 3 stats + mini heat) --- */
         .tw-calendar {
-            background: var(--pink-100);
-            border-radius: 18px;
-            padding: 20px 16px 16px;
+            background: white;
+            border-radius: 14px;
+            padding: 16px 14px 14px;
             cursor: pointer;
-            box-shadow: var(--card-shadow);
+            box-shadow: 0 1px 6px rgba(180,120,120,0.08);
         }
         .tw-calendar:active { opacity: 0.92; }
         .tw-cal-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 14px;
+            color: var(--text-tertiary);
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 5px;
@@ -614,20 +614,20 @@
         .tw-cal-stats {
             display: flex;
             gap: 0;
-            margin-bottom: 14px;
+            margin-bottom: 10px;
         }
         .tw-stat-block {
             flex: 1;
             text-align: center;
         }
         .tw-stat-num {
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1.2;
         }
         .tw-stat-label {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-tertiary);
             margin-top: 2px;
             font-weight: 400;
@@ -642,52 +642,57 @@
         .tw-mini-bar {
             width: 8px;
             border-radius: 4px;
-            background: var(--pink-200);
+            background: #E4ADA2;
             min-height: 6px;
             transition: all 0.3s;
         }
         
-        /* --- Course / Self Widgets (full width) --- */
+        /* --- Course / Self Widgets (side by side) --- */
         .training-widget {
-            background: var(--pink-50);
-            border-radius: 18px;
-            padding: 22px 20px;
+            background: white;
+            border-radius: 14px;
+            padding: 14px 12px 12px;
             cursor: pointer;
-            box-shadow: var(--card-shadow);
+            box-shadow: 0 1px 6px rgba(180,120,120,0.08);
             text-align: center;
             transition: all 0.2s;
+            flex: 1;
         }
-        .training-widget:active { transform: scale(0.98); }
+        .training-widget:active { transform: scale(0.97); }
         .tw-widget-header {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 4px;
         }
         .tw-widget-num {
-            font-size: 36px;
+            font-size: 26px;
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1.1;
         }
         .tw-widget-unit {
-            font-size: 16px;
+            font-size: 12px;
             font-weight: 400;
             color: var(--text-secondary);
-            margin-left: 3px;
+            margin-left: 2px;
         }
         .tw-widget-sub {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-tertiary);
-            margin-top: 6px;
+            margin-top: 4px;
         }
         .tw-widget-sub b {
             color: var(--pink-500);
             font-weight: 600;
+        }
+        .tw-widget-row {
+            display: flex;
+            gap: 10px;
         }
         
         /* Training Back Button */
@@ -866,20 +871,20 @@
         }
         .hm-filter-tabs {
             grid-column: 1 / -1;
-            display: flex; gap: 6px; margin-bottom: 20px;
+            display: flex; gap: 6px; margin-bottom: 14px;
         }
         .hm-filter-tab {
-            flex: 1; padding: 8px 0; text-align: center;
-            font-size: 13px; font-weight: 500;
-            border-radius: 10px;
-            background: var(--pink-100);
+            flex: 1; padding: 7px 0; text-align: center;
+            font-size: 12px; font-weight: 500;
+            border-radius: 8px;
+            background: #F5F0EE;
             color: var(--text-secondary);
             cursor: pointer;
             border: none;
             transition: all 0.2s;
         }
         .hm-filter-tab.active {
-            background: var(--pink-500);
+            background: #BE6070;
             color: white;
             font-weight: 600;
         }
@@ -898,13 +903,13 @@
         }
         .hm-year-badge {
             display: inline-block;
-            background: var(--pink-100);
-            color: var(--pink-500);
-            font-size: 13px;
+            background: #F5F0EE;
+            color: #BE6070;
+            font-size: 12px;
             font-weight: 600;
-            padding: 6px 24px;
-            border-radius: 20px;
-            margin: 0 auto 24px;
+            padding: 5px 20px;
+            border-radius: 16px;
+            margin: 0 auto 14px;
         }
         .hm-stats-row {
             grid-column: 1 / -1;
@@ -914,15 +919,16 @@
             margin-bottom: 12px;
         }
         .hm-stat-card {
-            background: var(--pink-50);
-            border-radius: 14px;
-            padding: 14px 8px 12px;
+            background: white;
+            border-radius: 12px;
+            padding: 12px 6px 10px;
             text-align: center;
+            box-shadow: 0 1px 4px rgba(180,120,120,0.06);
         }
         .hm-stat-num {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: #BE6070;
             line-height: 1.1;
         }
         .hm-stat-label {
@@ -934,17 +940,17 @@
 
         .hm-section-title {
             grid-column: 1 / -1;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
         }
         .hm-year-grid {
             grid-column: 1 / -1;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px 6px;
-            margin-bottom: 14px;
+            gap: 8px 5px;
+            margin-bottom: 10px;
         }
         .hm-month-block {}
         .hm-month-label {
@@ -963,13 +969,13 @@
             width: 100%;
             aspect-ratio: 1;
             border-radius: 3px;
-            background: var(--border);
+            background: #EDE8E6;
         }
-        .hm-cell.lvl-1 { background: var(--pink-200); opacity: 0.45; }
-        .hm-cell.lvl-2 { background: var(--pink-300); opacity: 0.65; }
-        .hm-cell.lvl-3 { background: var(--pink-400); opacity: 0.8; }
-        .hm-cell.lvl-4 { background: var(--pink-500); }
-        .hm-cell.today-ring { box-shadow: 0 0 0 1.5px var(--pink-500); }
+        .hm-cell.lvl-1 { background: #F2D5CE; }
+        .hm-cell.lvl-2 { background: #E4ADA2; }
+        .hm-cell.lvl-3 { background: #D48880; }
+        .hm-cell.lvl-4 { background: #BE6070; }
+        .hm-cell.today-ring { box-shadow: 0 0 0 1.5px #BE6070; }
 
         .hm-legend {
             grid-column: 1 / -1;
@@ -992,11 +998,11 @@
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .hm-dist-track {
-            flex: 1; height: 24px; background: var(--pink-50); border-radius: 8px;
+            flex: 1; height: 22px; background: #F5F0EE; border-radius: 6px;
             overflow: hidden;
         }
         .hm-dist-fill {
-            height: 100%; border-radius: 8px; background: var(--pink-400);
+            height: 100%; border-radius: 6px; background: #BE6070;
             display: flex; align-items: center; padding-left: 10px;
             font-size: 11px; color: white; font-weight: 600;
             transition: width 0.4s ease;
@@ -1519,15 +1525,17 @@
                             </div>
                             <div class="tw-mini-heat" id="tw-mini-heat"></div>
                         </div>
-                        <div class="training-widget" onclick="switchTrainingSub('course')">
-                            <div class="tw-widget-header">📋 课程</div>
-                            <div class="tw-widget-num" id="tw-course-num">0<span class="tw-widget-unit">节</span></div>
-                            <div class="tw-widget-sub" id="tw-course-sub">本月</div>
-                        </div>
-                        <div class="training-widget" onclick="switchTrainingSub('self')">
-                            <div class="tw-widget-header">🏃 自训</div>
-                            <div class="tw-widget-num" id="tw-self-num">0<span class="tw-widget-unit">次</span></div>
-                            <div class="tw-widget-sub" id="tw-self-sub">本月</div>
+                        <div class="tw-widget-row">
+                            <div class="training-widget" onclick="switchTrainingSub('course')">
+                                <div class="tw-widget-header">📋 课程</div>
+                                <div class="tw-widget-num" id="tw-course-num">0<span class="tw-widget-unit">节</span></div>
+                                <div class="tw-widget-sub" id="tw-course-sub">本月</div>
+                            </div>
+                            <div class="training-widget" onclick="switchTrainingSub('self')">
+                                <div class="tw-widget-header">🏃 自训</div>
+                                <div class="tw-widget-num" id="tw-self-num">0<span class="tw-widget-unit">次</span></div>
+                                <div class="tw-widget-sub" id="tw-self-sub">本月</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3720,7 +3728,7 @@
                     const ds = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
                     const cnt = allData.filter(r => r.date === ds).length;
                     const h = Math.max(6, Math.min(22, 6 + cnt * 6));
-                    const lvl = cnt === 0 ? 'var(--border)' : cnt === 1 ? 'var(--pink-200)' : cnt === 2 ? 'var(--pink-300)' : 'var(--pink-500)';
+                    const lvl = cnt === 0 ? '#E8E2E0' : cnt === 1 ? '#F2D5CE' : cnt === 2 ? '#E4ADA2' : '#BE6070';
                     heatHtml += '<div class="tw-mini-bar" style="height:'+h+'px;background:'+lvl+'"></div>';
                 }
                 heatEl.innerHTML = heatHtml;
