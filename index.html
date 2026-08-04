@@ -984,8 +984,8 @@
                 <div class="card">
                     <div class="card-title">💰 Expense Overview</div>
                     <div class="sub-tabs" style="margin-bottom:14px">
-                        <div class="sub-tab" onclick="switchExpensePeriod(this,'all')">All Time</div>
-                        <div class="sub-tab active" onclick="switchExpensePeriod(this,'week')">This Week</div>
+                        <div class="sub-tab active" onclick="switchExpensePeriod(this,'all')">All Time</div>
+                        <div class="sub-tab" onclick="switchExpensePeriod(this,'week')">This Week</div>
                         <div class="sub-tab" onclick="switchExpensePeriod(this,'month')">This Month</div>
                         <div class="sub-tab" onclick="switchExpensePeriod(this,'last-month')">Last Month</div>
                         <div class="sub-tab" onclick="switchExpensePeriod(this,'custom')">Custom</div>
@@ -1989,7 +1989,7 @@
             document.getElementById('expense-date').value = d.date || '';
             startEdit('expenses', index);
         }
-        let expensePeriod = 'week'; // all | week | month | last-month | custom
+        let expensePeriod = 'all'; // all | week | month | last-month | custom
         function switchExpensePeriod(el, period) {
             el.parentElement.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
