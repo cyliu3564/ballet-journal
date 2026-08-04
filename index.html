@@ -1195,26 +1195,31 @@
             const files = Array.from(e.target.files);
             if (!files.length) return;
             let processed = 0;
+            const total = files.length;
             files.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(ev) {
                     const img = new Image();
                     img.onload = function() {
-                        const c = document.createElement('canvas');
-                        const maxW = 400;
-                        let w = img.width, h = img.height;
-                        if (w > maxW) { h = h * maxW / w; w = maxW; }
-                        c.width = w; c.height = h;
-                        c.getContext('2d').drawImage(img, 0, 0, w, h);
-                        pendingPhotos.push(c.toDataURL('image/jpeg', 0.5));
+                        try {
+                            const c = document.createElement('canvas');
+                            const maxW = 180;
+                            let w = img.width, h = img.height;
+                            if (w > maxW) { h = h * maxW / w; w = maxW; }
+                            c.width = w; c.height = h;
+                            c.getContext('2d').drawImage(img, 0, 0, w, h);
+                            pendingPhotos.push(c.toDataURL('image/jpeg', 0.35));
+                        } catch(err) { /* skip bad image */ }
                         processed++;
-                        if (processed === files.length) {
-                            savePhotos(currentPhotoTarget, pendingPhotos);
+                        if (processed === total) {
+                            try { savePhotos(currentPhotoTarget, pendingPhotos); } catch(e) { alert('Photo storage full'); }
                             renderPhotoPreview(currentPhotoTarget);
                         }
                     };
+                    img.onerror = function() { processed++; };
                     img.src = ev.target.result;
                 };
+                reader.onerror = function() { processed++; };
                 reader.readAsDataURL(file);
             });
             e.target.value = '';
