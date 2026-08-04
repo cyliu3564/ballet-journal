@@ -588,115 +588,106 @@
         
         /* Training Home - Icon Grid */
         .training-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 8px;
-        }
-        .training-widget {
-            background: white;
-            border-radius: 16px;
-            padding: 16px 14px 14px;
-            cursor: pointer;
-            box-shadow: var(--card-shadow);
-            transition: all 0.2s;
-            position: relative;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
-            min-height: 110px;
+            gap: 12px;
+            margin-top: 8px;
         }
-        .training-widget:active { transform: scale(0.97); }
-        .training-widget::after {
-            content: '';
-            position: absolute;
-            top: -12px;
-            right: -12px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        /* --- Calendar Widget (full width, 3 stats + mini heat) --- */
+        .tw-calendar {
             background: var(--pink-100);
-            opacity: 0.3;
+            border-radius: 18px;
+            padding: 20px 16px 16px;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
         }
-        .tw-header {
+        .tw-calendar:active { opacity: 0.92; }
+        .tw-cal-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
             gap: 5px;
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 1;
         }
-        .tw-icon { font-size: 16px; }
-        .tw-title {
+        .tw-cal-stats {
+            display: flex;
+            gap: 0;
+            margin-bottom: 14px;
+        }
+        .tw-stat-block {
+            flex: 1;
+            text-align: center;
+        }
+        .tw-stat-num {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+        .tw-stat-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+            font-weight: 400;
+        }
+        .tw-mini-heat {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            align-items: flex-end;
+            height: 22px;
+        }
+        .tw-mini-bar {
+            width: 8px;
+            border-radius: 4px;
+            background: var(--pink-200);
+            min-height: 6px;
+            transition: all 0.3s;
+        }
+        
+        /* --- Course / Self Widgets (full width) --- */
+        .training-widget {
+            background: var(--pink-50);
+            border-radius: 18px;
+            padding: 22px 20px;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .training-widget:active { transform: scale(0.98); }
+        .tw-widget-header {
             font-size: 13px;
             font-weight: 600;
-            color: var(--text-primary);
-        }
-        .tw-main {
-            flex: 1;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
             display: flex;
-            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            position: relative;
-            z-index: 1;
+            gap: 5px;
         }
-        .tw-number {
-            font-size: 26px;
+        .tw-widget-num {
+            font-size: 36px;
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1.1;
         }
-        .tw-unit {
-            font-size: 13px;
+        .tw-widget-unit {
+            font-size: 16px;
             font-weight: 400;
             color: var(--text-secondary);
-            margin-left: 2px;
+            margin-left: 3px;
         }
-        .tw-sub {
-            font-size: 11px;
+        .tw-widget-sub {
+            font-size: 12px;
             color: var(--text-tertiary);
-            margin-top: 4px;
-            line-height: 1.3;
+            margin-top: 6px;
         }
-        .tw-sub b {
+        .tw-widget-sub b {
             color: var(--pink-500);
             font-weight: 600;
-        }
-        /* Calendar widget full width */
-        .tw-calendar {
-            grid-column: 1 / -1;
-            flex-direction: row;
-            align-items: center;
-            gap: 14px;
-            min-height: 72px;
-            padding: 14px 16px;
-        }
-        .tw-calendar .tw-header {
-            margin-bottom: 0;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 2px;
-            min-width: 52px;
-        }
-        .tw-calendar .tw-main {
-            flex: 1;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .tw-calendar .tw-number { font-size: 22px; }
-        .tw-calendar .tw-sub { margin-top: 0; }
-        .tw-mini-heat {
-            display: flex;
-            gap: 3px;
-            align-items: flex-end;
-        }
-        .tw-mini-bar {
-            width: 6px;
-            border-radius: 3px;
-            background: var(--pink-200);
-            min-height: 6px;
-            transition: height 0.3s;
         }
         
         /* Training Back Button */
@@ -868,67 +859,76 @@
         .cal-photo-count { position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.5); color: white; font-size: 8px; padding: 1px 4px; border-radius: 6px; z-index: 1; }
         
         /* ===== Heatmap (Density) View ===== */
-        .hm-stats-row { display: flex; gap: 10px; margin-bottom: 18px; }
+        .hm-stats-row { display: flex; gap: 10px; margin-bottom: 20px; }
         .hm-stat-card {
-            flex: 1; background: white; border-radius: 14px; padding: 14px 8px 10px;
-            text-align: center; box-shadow: var(--card-shadow);
+            flex: 1; background: white; border-radius: 14px;
+            padding: 18px 8px 14px; text-align: center;
+            box-shadow: 0 1px 4px rgba(160,72,96,0.06);
         }
-        .hm-stat-num { font-size: 28px; font-weight: 700; color: var(--text-primary); line-height: 1.1; }
-        .hm-stat-label { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; font-weight: 500; }
+        .hm-stat-num {
+            font-size: 28px; font-weight: 700;
+            color: var(--text-primary); line-height: 1.2;
+        }
+        .hm-stat-label {
+            font-size: 11px; color: var(--text-tertiary);
+            margin-top: 4px; font-weight: 400;
+        }
         
         .hm-year-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 12px 10px; margin-bottom: 18px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px 8px;
+            margin-bottom: 18px;
         }
-        @media (min-width: 380px) { .hm-year-grid { grid-template-columns: repeat(4, 1fr); } }
         .hm-month-block {}
         .hm-month-label {
-            font-size: 11px; color: var(--text-secondary); font-weight: 600;
-            margin-bottom: 6px; padding-left: 2px;
+            font-size: 11px; color: var(--text-secondary);
+            font-weight: 600; margin-bottom: 6px;
+            padding-left: 2px;
         }
         .hm-month-grid {
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 2.5px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
         }
         .hm-cell {
-            width: 100%; aspect-ratio: 1; border-radius: 3px;
-            background: var(--border); transition: background 0.15s;
-            cursor: pointer; position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 3px;
+            background: var(--border);
         }
         .hm-cell.lvl-1 { background: var(--pink-200); opacity: 0.5; }
         .hm-cell.lvl-2 { background: var(--pink-300); opacity: 0.7; }
         .hm-cell.lvl-3 { background: var(--pink-400); opacity: 0.85; }
-        .hm-cell.lvl-4 { background: var(--pink-500); opacity: 1; }
+        .hm-cell.lvl-4 { background: var(--pink-500); }
         .hm-cell.today-ring { box-shadow: 0 0 0 1.5px var(--pink-500); }
         
         .hm-legend {
             display: flex; align-items: center; justify-content: flex-end;
-            gap: 4px; margin-bottom: 16px; font-size: 10px; color: var(--text-tertiary);
+            gap: 3px; margin-bottom: 20px; font-size: 10px; color: var(--text-tertiary);
         }
         .hm-legend-cell { width: 10px; height: 10px; border-radius: 2px; }
         
         .hm-dist-title {
             font-size: 14px; font-weight: 600; color: var(--text-primary);
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
         .hm-dist-bar-row {
-            display: flex; align-items: center; margin-bottom: 8px; gap: 8px;
+            display: flex; align-items: center; margin-bottom: 10px; gap: 8px;
         }
         .hm-dist-label {
-            font-size: 12px; color: var(--text-secondary); min-width: 60px;
+            font-size: 12px; color: var(--text-secondary); min-width: 64px;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .hm-dist-track {
-            flex: 1; height: 22px; background: var(--pink-50); border-radius: 6px;
-            overflow: hidden; position: relative;
+            flex: 1; height: 24px; background: var(--pink-50); border-radius: 8px;
+            overflow: hidden;
         }
         .hm-dist-fill {
-            height: 100%; border-radius: 6px; background: var(--pink-400);
-            display: flex; align-items: center; padding-left: 8px;
+            height: 100%; border-radius: 8px; background: var(--pink-400);
+            display: flex; align-items: center; padding-left: 10px;
             font-size: 11px; color: white; font-weight: 600;
             transition: width 0.4s ease;
-        }
-        .hm-dist-hours {
-            font-size: 11px; color: var(--text-tertiary); min-width: 42px; text-align: right;
         }
         
         /* Photo Viewer */
@@ -1430,39 +1430,33 @@
                 <!-- Home: Widget Grid -->
                 <div class="training-sub active" id="sub-training-home">
                     <div class="training-grid">
-                        <div class="training-widget tw-calendar" onclick="switchTrainingSub('calendar')">
-                            <div class="tw-header">
-                                <div class="tw-icon">📅</div>
-                                <div class="tw-title">日历</div>
-                            </div>
-                            <div class="tw-main">
-                                <div>
-                                    <div class="tw-number" id="tw-cal-num">0</div>
-                                    <div class="tw-sub">本月训练次数</div>
+                        <div class="tw-calendar" onclick="switchTrainingSub('calendar')">
+                            <div class="tw-cal-title">📅 日历</div>
+                            <div class="tw-cal-stats">
+                                <div class="tw-stat-block">
+                                    <div class="tw-stat-num" id="tw-cal-num">0</div>
+                                    <div class="tw-stat-label">本月训练</div>
                                 </div>
-                                <div class="tw-mini-heat" id="tw-mini-heat"></div>
+                                <div class="tw-stat-block">
+                                    <div class="tw-stat-num" id="tw-cal-hours">0</div>
+                                    <div class="tw-stat-label">累计小时</div>
+                                </div>
+                                <div class="tw-stat-block">
+                                    <div class="tw-stat-num" id="tw-cal-streak">0</div>
+                                    <div class="tw-stat-label">连续打卡</div>
+                                </div>
                             </div>
-                            <div class="tw-sub" id="tw-cal-hours" style="min-width:60px;text-align:right"></div>
+                            <div class="tw-mini-heat" id="tw-mini-heat"></div>
                         </div>
                         <div class="training-widget" onclick="switchTrainingSub('course')">
-                            <div class="tw-header">
-                                <div class="tw-icon">📋</div>
-                                <div class="tw-title">课程</div>
-                            </div>
-                            <div class="tw-main">
-                                <div class="tw-number" id="tw-course-num">0<span class="tw-unit">节</span></div>
-                                <div class="tw-sub" id="tw-course-sub">本月</div>
-                            </div>
+                            <div class="tw-widget-header">📋 课程</div>
+                            <div class="tw-widget-num" id="tw-course-num">0<span class="tw-widget-unit">节</span></div>
+                            <div class="tw-widget-sub" id="tw-course-sub">本月</div>
                         </div>
                         <div class="training-widget" onclick="switchTrainingSub('self')">
-                            <div class="tw-header">
-                                <div class="tw-icon">🏃</div>
-                                <div class="tw-title">自训</div>
-                            </div>
-                            <div class="tw-main">
-                                <div class="tw-number" id="tw-self-num">0<span class="tw-unit">次</span></div>
-                                <div class="tw-sub" id="tw-self-sub">本月</div>
-                            </div>
+                            <div class="tw-widget-header">🏃 自训</div>
+                            <div class="tw-widget-num" id="tw-self-num">0<span class="tw-widget-unit">次</span></div>
+                            <div class="tw-widget-sub" id="tw-self-sub">本月</div>
                         </div>
                     </div>
                 </div>
@@ -3556,26 +3550,46 @@
             const year = now.getFullYear();
             const month = now.getMonth();
             const prefix = year + '-' + String(month+1).padStart(2,'0');
-            const todayStr = prefix + '-' + String(now.getDate()).padStart(2,'0');
             
             const courseData = loadData('coursePlans');
             const selfData = loadData('selfTrainingPlans');
-            const allData = [...courseData.map(r=>({...r,_s:'c'})), ...selfData.map(r=>({...r,_s:'s'}))];
+            const allData = [...courseData, ...selfData];
             
-            // This month data
+            // This month
             const mAll = allData.filter(r => (r.date||'').startsWith(prefix));
             const mCourse = courseData.filter(r => (r.date||'').startsWith(prefix));
             const mSelf = selfData.filter(r => (r.date||'').startsWith(prefix));
             
-            // Calendar widget: month count + hours + mini heatmap (last 7 days)
+            // Calendar: 3 stats
             const calNumEl = document.getElementById('tw-cal-num');
             if (calNumEl) calNumEl.textContent = mAll.length;
             
             const mHours = mAll.reduce((s,r) => s + (parseFloat(r.hours)||0), 0);
             const calHoursEl = document.getElementById('tw-cal-hours');
-            if (calHoursEl) calHoursEl.textContent = mHours > 0 ? mHours.toFixed(1) + 'h' : '';
+            if (calHoursEl) calHoursEl.textContent = mHours.toFixed(1);
             
-            // Mini heat: last 7 days
+            // Streak (consecutive training days ending today or most recent)
+            const uniqueDates = [...new Set(allData.map(r => r.date))].filter(Boolean).sort();
+            let streak = 0;
+            if (uniqueDates.length > 0) {
+                const todayStr = prefix + '-' + String(now.getDate()).padStart(2,'0');
+                let checkDate = new Date(todayStr);
+                // Check if today has training, if not start from yesterday
+                if (!uniqueDates.includes(todayStr)) {
+                    checkDate.setDate(checkDate.getDate() - 1);
+                }
+                while (true) {
+                    const ds = checkDate.getFullYear() + '-' + String(checkDate.getMonth()+1).padStart(2,'0') + '-' + String(checkDate.getDate()).padStart(2,'0');
+                    if (uniqueDates.includes(ds)) {
+                        streak++;
+                        checkDate.setDate(checkDate.getDate() - 1);
+                    } else break;
+                }
+            }
+            const streakEl = document.getElementById('tw-cal-streak');
+            if (streakEl) streakEl.textContent = streak;
+            
+            // Mini heat: last 7 days bars
             const heatEl = document.getElementById('tw-mini-heat');
             if (heatEl) {
                 let heatHtml = '';
@@ -3584,7 +3598,7 @@
                     d.setDate(d.getDate() - i);
                     const ds = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
                     const cnt = allData.filter(r => r.date === ds).length;
-                    const h = Math.max(6, Math.min(28, 6 + cnt * 8));
+                    const h = Math.max(6, Math.min(22, 6 + cnt * 6));
                     const lvl = cnt === 0 ? 'var(--border)' : cnt === 1 ? 'var(--pink-200)' : cnt === 2 ? 'var(--pink-300)' : 'var(--pink-500)';
                     heatHtml += '<div class="tw-mini-bar" style="height:'+h+'px;background:'+lvl+'"></div>';
                 }
@@ -3593,7 +3607,7 @@
             
             // Course widget
             const courseNumEl = document.getElementById('tw-course-num');
-            if (courseNumEl) courseNumEl.innerHTML = mCourse.length + '<span class="tw-unit">节</span>';
+            if (courseNumEl) courseNumEl.innerHTML = mCourse.length + '<span class="tw-widget-unit">节</span>';
             const courseSubEl = document.getElementById('tw-course-sub');
             if (courseSubEl) {
                 const cHours = mCourse.reduce((s,r) => s + (parseFloat(r.hours)||0), 0);
@@ -3602,7 +3616,7 @@
             
             // Self widget
             const selfNumEl = document.getElementById('tw-self-num');
-            if (selfNumEl) selfNumEl.innerHTML = mSelf.length + '<span class="tw-unit">次</span>';
+            if (selfNumEl) selfNumEl.innerHTML = mSelf.length + '<span class="tw-widget-unit">次</span>';
             const selfSubEl = document.getElementById('tw-self-sub');
             if (selfSubEl) {
                 const sHours = mSelf.reduce((s,r) => s + (parseFloat(r.hours)||0), 0);
