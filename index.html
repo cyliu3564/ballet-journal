@@ -1700,54 +1700,48 @@
             renderEquipList('all');
         }
         function syncFromLedger() {
-            const expenses = loadData('expenses');
             const equipData = loadData('equipment');
+            const expenses = loadData('expenses');
             
-            // Find equipment-sourced expenses
-            const equipExpenses = expenses.filter(e => e.source === 'equipment');
+            if (equipData.length === 0) {
+                alert('装备库为空，无需同步');
+                return;
+            }
             
-            // Check which ones are missing from equipment
-            const missing = equipExpenses.filter(exp => {
-                return !equipData.some(eq => {
-                    // Match by content (e.g. "Leotard - Pink bodysuit" matches category "Leotard" and name "Pink bodysuit")
-                    const parts = (exp.content || '').split(' - ');
-                    const matchCat = parts[0] === eq.category;
-                    const matchName = parts[1] === eq.name;
-                    return matchCat && matchName;
+            // Find equipment items that don't have a matching expense entry
+            const missing = equipData.filter(eq => {
+                return !expenses.some(exp => {
+                    if (exp.source !== 'equipment') return false;
+                    // Match by content format: "Category - Name"
+                    return exp.content === `${eq.category} - ${eq.name}`;
                 });
             });
             
             if (missing.length === 0) {
-                alert('✅ 账本与装备库数据一致，无需同步');
+                alert('✅ 装备库数据已全部同步到账本');
                 return;
             }
             
-            let msg = `发现 ${missing.length} 项账本记录在装备库中缺失：\n\n`;
-            missing.forEach((m, i) => {
-                msg += `${i+1}. ${m.content} (¥${m.amount}) - ${m.date}\n`;
+            let msg = `发现 ${missing.length} 项装备未同步到账本：\n\n`;
+            missing.forEach((eq, i) => {
+                msg += `${i+1}. ${eq.name} (¥${eq.price || 0})\n`;
             });
-            msg += '\n是否恢复这些项目到装备库？';
+            msg += '\n是否同步到账本？';
             
             if (confirm(msg)) {
-                missing.forEach(m => {
-                    const parts = (m.content || '').split(' - ');
-                    equipData.push({
-                        category: parts[0] || 'Other',
-                        name: parts[1] || m.content,
-                        price: m.amount || '0',
-                        date: m.date || '',
-                        brand: '',
-                        color: '',
-                        qty: '1',
-                        size: '',
-                        channel: '',
-                        photos: [],
-                        syncedFrom: 'ledger'
-                    });
+                missing.forEach(eq => {
+                    if (parseFloat(eq.price) > 0) {
+                        expenses.push({
+                            category: 'Gear',
+                            content: `${eq.category} - ${eq.name}`,
+                            amount: eq.price || '0',
+                            date: eq.date || '',
+                            source: 'equipment'
+                        });
+                    }
                 });
-                saveData('equipment', equipData);
-                renderEquipList('all');
-                alert(`✅ 已恢复 ${missing.length} 项装备数据`);
+                saveData('expenses', expenses);
+                alert(`✅ 已同步 ${missing.length} 项到账本`);
             }
         }
         
