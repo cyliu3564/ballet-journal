@@ -772,6 +772,20 @@
         .cal-tag-course { background: var(--pink-400); color: white; }
         .cal-tag-self { background: var(--pink-300); color: white; }
         .cal-cell.cal-photo-cell { padding: 0; overflow: hidden; }
+        
+        /* Calendar Timeline View (non-photo modes) */
+        .cal-timeline { display: flex; flex-direction: column; gap: 10px; }
+        .cal-timeline-day { display: flex; gap: 10px; align-items: flex-start; }
+        .cal-timeline-date {
+            width: 44px; text-align: center; flex-shrink: 0;
+            padding-top: 4px;
+        }
+        .cal-timeline-dow { font-size: 10px; color: var(--text-tertiary); font-weight: 500; }
+        .cal-timeline-num { font-size: 22px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+        .cal-timeline-records { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .cal-today-marker { color: var(--pink-500) !important; }
+        .cal-timeline-photos { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+        .cal-timeline-photos img { width: 36px; height: 36px; object-fit: cover; border-radius: 6px; cursor: pointer; }
         .cal-cell.cal-photo-cell img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; }
         .cal-cell.cal-photo-cell .cal-day-num { position: absolute; top: 2px; left: 4px; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.6); z-index: 1; font-size: 10px; }
         .cal-photo-count { position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.5); color: white; font-size: 8px; padding: 1px 4px; border-radius: 6px; z-index: 1; }
@@ -3112,6 +3126,10 @@
             const label = document.getElementById('cal-month-label');
             if (label) label.textContent = year + '年 ' + (month + 1) + '月';
             
+            // Show/hide weekday header
+            const weekRow = document.querySelector('.cal-weekday-row');
+            if (weekRow) weekRow.style.display = calMode === 'photo' ? 'grid' : 'none';
+            
             const firstDay = new Date(year, month, 1);
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const startWeekday = firstDay.getDay();
@@ -3129,51 +3147,109 @@
                 records = loadData('selfTrainingPlans').map(r => ({...r, _source: 'self'}));
             }
             
-            let html = '';
-            // Empty cells before first day
-            for (let i = 0; i < startWeekday; i++) {
-                html += '<div class="cal-cell empty"></div>';
-            }
+            // Filter to current month
+            const monthPrefix = year + '-' + String(month+1).padStart(2,'0');
+            const monthRecords = records.filter(r => (r.date||'').startsWith(monthPrefix));
             
-            for (let d = 1; d <= daysInMonth; d++) {
-                const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-                const dayRecords = records.filter(r => r.date === dateStr);
-                html += renderCalCell(d, dayRecords);
+            if (calMode === 'photo') {
+                // Photo wall grid
+                let html = '';
+                for (let i = 0; i < startWeekday; i++) {
+                    html += '<div class="cal-cell empty"></div>';
+                }
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr = monthPrefix + '-' + String(d).padStart(2,'0');
+                    const dayRecords = monthRecords.filter(r => r.date === dateStr);
+                    html += renderCalPhotoCell(d, dayRecords);
+                }
+                el.innerHTML = html;
+            } else {
+                // Timeline view for All/Course/Self
+                el.innerHTML = renderCalTimeline(monthRecords);
             }
-            
-            el.innerHTML = html;
         }
         
-        function renderCalCell(day, records) {
-            if (calMode === 'photo') {
-                const photos = records.flatMap(r => r.photos || []);
-                if (photos.length > 0) {
-                    const countBadge = photos.length > 1 ? '<div class="cal-photo-count">'+photos.length+'</div>' : '';
-                    return '<div class="cal-cell cal-photo-cell">' +
-                        '<div class="cal-day-num">'+day+'</div>' +
-                        '<img src="'+photos[0]+'" onclick="openPhotoViewer(\''+photos[0]+'\')">' +
-                        countBadge + '</div>';
-                }
-                return '<div class="cal-cell"><div class="cal-day-num">'+day+'</div></div>';
+        function renderCalPhotoCell(day, records) {
+            const photos = records.flatMap(r => r.photos || []);
+            if (photos.length > 0) {
+                const countBadge = photos.length > 1 ? '<div class="cal-photo-count">'+photos.length+'</div>' : '';
+                return '<div class="cal-cell cal-photo-cell">' +
+                    '<div class="cal-day-num">'+day+'</div>' +
+                    '<img src="'+photos[0]+'" onclick="openPhotoViewer(\''+photos[0]+'\')">' +
+                    countBadge + '</div>';
             }
+            return '<div class="cal-cell"><div class="cal-day-num">'+day+'</div></div>';
+        }
+        
+        function renderCalTimeline(records) {
+            const dowNames = ['日','一','二','三','四','五','六'];
+            const today = new Date();
+            const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
             
-            // All / Course / Self mode
-            let events = '';
+            // Group by date
+            let dateGroups = {};
             records.forEach(r => {
-                const typeLabel = r._source === 'course' ? '课' : '训';
-                const typeClass = r._source === 'course' ? 'cal-tag-course' : 'cal-tag-self';
-                const statusClass = r.type === 'done' ? 'cal-done' : 'cal-pending';
-                const typeName = r._source === 'course' ? (r.courseType || '') : (r.trainingType || '');
-                const hours = r.hours ? r.hours.replace('h','') + 'h' : '';
-                events += '<div class="cal-event ' + statusClass + '">' +
-                    '<span class="cal-tag ' + typeClass + '">' + typeLabel + '</span>' +
-                    hours + ' ' + typeName + '</div>';
+                const d = r.date || '无日期';
+                if (!dateGroups[d]) dateGroups[d] = [];
+                dateGroups[d].push(r);
             });
             
-            const hasEvent = records.length > 0 ? ' has-event' : '';
-            return '<div class="cal-cell' + hasEvent + '">' +
-                '<div class="cal-day-num">'+day+'</div>' +
-                events + '</div>';
+            const sortedDates = Object.keys(dateGroups).sort((a,b) => b.localeCompare(a));
+            
+            if (sortedDates.length === 0) {
+                return '<div class="empty" style="padding:40px 0;text-align:center;color:var(--text-tertiary)">本月暂无记录</div>';
+            }
+            
+            let html = '<div class="cal-timeline">';
+            sortedDates.forEach(dateStr => {
+                const dayRecords = dateGroups[dateStr];
+                const parts = dateStr.split('-');
+                const dayNum = parseInt(parts[2]);
+                const dow = new Date(parseInt(parts[0]), parseInt(parts[1])-1, dayNum).getDay();
+                const isToday = dateStr === todayStr;
+                
+                html += '<div class="cal-timeline-day">';
+                html += '<div class="cal-timeline-date">';
+                html += '<div class="cal-timeline-dow '+(isToday?'cal-today-marker':'')+'">' + (isToday?'今天':'周'+dowNames[dow]) + '</div>';
+                html += '<div class="cal-timeline-num '+(isToday?'cal-today-marker':'')+'">'+dayNum+'</div>';
+                html += '</div>';
+                
+                html += '<div class="cal-timeline-records">';
+                dayRecords.forEach(r => {
+                    const ri = r._source === 'course' 
+                        ? loadData('coursePlans').indexOf(loadData('coursePlans').find(x => x.date===r.date && x.startTime===r.startTime && x.institution===r.institution))
+                        : loadData('selfTrainingPlans').indexOf(loadData('selfTrainingPlans').find(x => x.date===r.date && x.startTime===r.startTime && x.location===r.location));
+                    const isDone = r.type === 'done';
+                    const typeName = r._source === 'course' ? (r.courseType||'—') : (r.trainingType||'—');
+                    const subInfo = r._source === 'course' 
+                        ? [r.hours, r.difficulty, r.institution].filter(x=>x).join(' · ')
+                        : [r.hours, r.location].filter(x=>x).join(' · ');
+                    
+                    let photosHtml = '';
+                    if (r.photos?.length) {
+                        photosHtml = '<div class="cal-timeline-photos">' + r.photos.map(p => 
+                            '<img src="'+p+'" onclick="openPhotoViewer(\''+p+'\')">'
+                        ).join('') + '</div>';
+                    }
+                    let noteHtml = r.notes ? '<div class="training-list-note">'+r.notes.substring(0,50)+(r.notes.length>50?'...':'')+'</div>' : '';
+                    
+                    const toggleFn = r._source === 'course' ? 'toggleCourseStatus' : 'toggleSelfStatus';
+                    const editFn = r._source === 'course' ? 'editCoursePlan' : 'editSelfTraining';
+                    
+                    html += '<div class="training-card '+(isDone?'done':'pending')+'">';
+                    html += '<div class="training-card-body">';
+                    html += '<div class="training-card-top"><div class="training-card-type">'+typeName+'</div><div class="training-card-institution">'+subInfo+'</div></div>';
+                    html += '<div class="training-card-meta">'+(r._source==='course'?'课程':'自训')+' · '+(r.hours||'')+'</div>';
+                    html += noteHtml + photosHtml;
+                    html += '</div>';
+                    html += '<div class="status-badge '+(isDone?'done':'pending')+'" onclick="'+toggleFn+'('+ri+')">'+(isDone?'已完成':'待完成')+'</div>';
+                    html += '</div>';
+                });
+                html += '</div>';
+                html += '</div>';
+            });
+            html += '</div>';
+            return html;
         }
         
         // ===== Photo Viewer =====
