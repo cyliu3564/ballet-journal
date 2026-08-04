@@ -581,7 +581,199 @@
         
         /* Empty state */
         .empty { color: var(--text-tertiary); font-size: 13px; text-align: center; padding: 20px 0; }
-        .empty::before { content: '🩰'; display: block; font-size: 20px; margin-bottom: 6px; opacity: 0.4; }
+
+        /* ===== Training Module ===== */
+        .training-sub { display: none; }
+        .training-sub.active { display: block; }
+        
+        /* Training Home - Icon Grid */
+        .training-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .training-icon-card {
+            background: white;
+            border-radius: 20px;
+            padding: 28px 16px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .training-icon-card:active { transform: scale(0.96); }
+        .training-icon-card::after {
+            content: '';
+            position: absolute;
+            top: -16px;
+            right: -16px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--pink-100);
+            opacity: 0.4;
+        }
+        .training-icon { font-size: 36px; margin-bottom: 10px; position: relative; z-index: 1; }
+        .training-icon-label { font-size: 14px; font-weight: 500; color: var(--text-primary); position: relative; z-index: 1; }
+        
+        /* Training Back Button */
+        .training-back {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--pink-400);
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+        .training-back:active { opacity: 0.6; }
+        
+        /* Status Toggle */
+        .status-toggle {
+            display: flex;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1.5px solid var(--border);
+        }
+        .status-toggle-btn {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            background: var(--pink-50);
+            color: var(--text-secondary);
+            border: none;
+            transition: all 0.2s;
+        }
+        .status-toggle-btn.active { background: var(--pink-400); color: white; }
+        .status-toggle-btn:first-child { border-radius: 12px 0 0 12px; }
+        .status-toggle-btn:last-child { border-radius: 0 12px 12px 0; }
+        
+        /* Select with custom add */
+        .select-with-add { display: flex; gap: 8px; align-items: center; }
+        .select-with-add select {
+            flex: 1;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            background: var(--pink-50);
+            color: var(--text-primary);
+            -webkit-appearance: none;
+            transition: border-color 0.2s;
+        }
+        .select-with-add select:focus { outline: none; border-color: var(--pink-300); background: white; }
+        .custom-add-btn {
+            width: 44px;
+            height: 44px;
+            border: 1.5px solid var(--pink-200);
+            border-radius: 12px;
+            background: var(--pink-50);
+            color: var(--pink-400);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .custom-add-btn:active { background: var(--pink-100); transform: scale(0.95); }
+        
+        /* Training List Item */
+        .training-list-item {
+            background: var(--pink-50);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            position: relative;
+        }
+        .training-list-info { flex: 1; min-width: 0; cursor: pointer; }
+        .training-list-date { font-size: 11px; color: var(--text-tertiary); font-weight: 500; }
+        .training-list-detail { font-size: 14px; color: var(--text-primary); margin-top: 3px; font-weight: 500; }
+        .training-list-note { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .training-list-photos { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+        .training-list-photos img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; cursor: pointer; }
+        .training-list-status {
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; cursor: pointer; margin-top: 2px;
+        }
+        .training-list-status svg { width: 16px; height: 16px; }
+        .training-list-status.done { background: var(--pink-400); color: white; }
+        .training-list-status.pending { background: white; color: var(--pink-300); border: 2px solid var(--pink-200); }
+        
+        /* Calendar */
+        .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .cal-nav-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 1.5px solid var(--border); background: white;
+            color: var(--pink-400); font-size: 16px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cal-nav-btn:active { background: var(--pink-50); }
+        .cal-month-label { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+        .cal-mode-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+        .cal-mode-tab {
+            flex: 1; padding: 8px 4px; text-align: center;
+            background: white; border: 1px solid var(--border); border-radius: 10px;
+            font-size: 12px; font-weight: 500; cursor: pointer;
+            color: var(--text-secondary); transition: all 0.2s;
+        }
+        .cal-mode-tab.active { background: var(--text-primary); color: white; border-color: var(--text-primary); }
+        .cal-weekday-row { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
+        .cal-weekday { text-align: center; font-size: 11px; color: var(--text-tertiary); font-weight: 500; padding: 4px 0; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+        .cal-cell {
+            min-height: 56px; background: var(--pink-50); border-radius: 8px;
+            padding: 3px; font-size: 10px; overflow: hidden; position: relative;
+        }
+        .cal-cell.empty { background: transparent; }
+        .cal-day-num { font-size: 10px; color: var(--text-tertiary); font-weight: 500; }
+        .cal-cell.has-event { background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+        .cal-event {
+            font-size: 8px; margin-top: 2px; padding: 1px 3px; border-radius: 3px;
+            line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .cal-event.cal-done { background: rgba(192,104,120,0.12); color: var(--pink-500); }
+        .cal-event.cal-pending { background: rgba(180,170,160,0.12); color: var(--text-secondary); border: 1px dashed var(--border); }
+        .cal-tag { font-size: 7px; padding: 0 2px; border-radius: 2px; margin-right: 2px; font-weight: 600; }
+        .cal-tag-course { background: var(--pink-400); color: white; }
+        .cal-tag-self { background: var(--pink-300); color: white; }
+        .cal-cell.cal-photo-cell { padding: 0; overflow: hidden; }
+        .cal-cell.cal-photo-cell img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; }
+        .cal-cell.cal-photo-cell .cal-day-num { position: absolute; top: 2px; left: 4px; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.6); z-index: 1; font-size: 10px; }
+        .cal-photo-count { position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.5); color: white; font-size: 8px; padding: 1px 4px; border-radius: 6px; z-index: 1; }
+        
+        /* Photo Viewer */
+        .photo-viewer {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.92); z-index: 2000;
+            align-items: center; justify-content: center; flex-direction: column;
+        }
+        .photo-viewer.active { display: flex; }
+        .photo-viewer img { max-width: 92%; max-height: 75vh; border-radius: 8px; }
+        .photo-viewer-close {
+            position: absolute; top: 16px; right: 16px; width: 40px; height: 40px;
+            border-radius: 50%; background: rgba(255,255,255,0.2); color: white;
+            border: none; font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .photo-viewer-download {
+            margin-top: 16px; padding: 10px 28px; background: var(--pink-400);
+            color: white; border: none; border-radius: 24px; font-size: 14px;
+            cursor: pointer; text-decoration: none;
+        }
+        .photo-viewer-download:active { background: var(--pink-500); }
     </style>
 </head>
 <body>
@@ -1055,6 +1247,235 @@
                     <div class="scroll-list" id="expense-list"></div>
                 </div>
             </div>
+            
+            <!-- ===== 训练日记 ===== -->
+            <div class="module" id="module-training">
+                <!-- Home: Icon Grid -->
+                <div class="training-sub active" id="sub-training-home">
+                    <div class="training-grid">
+                        <div class="training-icon-card" onclick="switchTrainingSub('course')">
+                            <div class="training-icon">📋</div>
+                            <div class="training-icon-label">课程计划</div>
+                        </div>
+                        <div class="training-icon-card" onclick="switchTrainingSub('self')">
+                            <div class="training-icon">🏃</div>
+                            <div class="training-icon-label">自训计划</div>
+                        </div>
+                        <div class="training-icon-card" onclick="switchTrainingSub('calendar')">
+                            <div class="training-icon">📅</div>
+                            <div class="training-icon-label">日历</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Course Plan -->
+                <div class="training-sub" id="sub-training-course" style="display:none;">
+                    <div class="training-back" onclick="switchTrainingSub('home')">← 返回</div>
+                    <div class="card modal-form" data-modal="training-course" style="display:none;">
+                        <div class="card-title">课程计划</div>
+                        <div class="form-group">
+                            <label>状态</label>
+                            <div class="status-toggle">
+                                <button type="button" class="status-toggle-btn" id="course-status-pending" onclick="setCourseStatus('pending')">待完成</button>
+                                <button type="button" class="status-toggle-btn active" id="course-status-done" onclick="setCourseStatus('done')">已完成</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>日期</label>
+                            <input type="date" id="course-date">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>开始时间</label>
+                                <input type="time" id="course-start" onchange="calcHours('course')">
+                            </div>
+                            <div class="form-group">
+                                <label>结束时间</label>
+                                <input type="time" id="course-end" onchange="calcHours('course')">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>时长</label>
+                            <input type="text" id="course-hours" placeholder="自动计算" readonly style="background:var(--border);border-color:transparent">
+                        </div>
+                        <div class="form-group">
+                            <label>机构</label>
+                            <div class="select-with-add">
+                                <select id="course-institution">
+                                    <option value="享芭蕾">享芭蕾</option>
+                                    <option value="月球芭蕾">月球芭蕾</option>
+                                    <option value="德莱西芭蕾">德莱西芭蕾</option>
+                                    <option value="U-turn">U-turn</option>
+                                    <option value="糖芭蕾">糖芭蕾</option>
+                                    <option value="清冉艺术">清冉艺术</option>
+                                </select>
+                                <button type="button" class="custom-add-btn" onclick="addCustomOption('course-institution','customInstitutions')">+</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>课程类型</label>
+                            <div class="select-with-add">
+                                <select id="course-type" onchange="updateDifficultyVisibility()">
+                                    <option value="基训">基训</option>
+                                    <option value="软开">软开</option>
+                                    <option value="PBT">PBT</option>
+                                    <option value="瓦岗">瓦岗</option>
+                                    <option value="足尖">足尖</option>
+                                    <option value="舞姿舞步">舞姿舞步</option>
+                                    <option value="变奏">变奏</option>
+                                </select>
+                                <button type="button" class="custom-add-btn" onclick="addCustomOption('course-type','customCourseTypes')">+</button>
+                            </div>
+                        </div>
+                        <div class="form-group" id="course-difficulty-group" style="display:none;">
+                            <label>课程难度</label>
+                            <div class="select-with-add">
+                                <select id="course-difficulty">
+                                    <option value="L1">L1</option>
+                                    <option value="L1.5">L1.5</option>
+                                    <option value="L2">L2</option>
+                                    <option value="L3">L3</option>
+                                </select>
+                                <button type="button" class="custom-add-btn" onclick="addCustomOption('course-difficulty','customDifficulties')">+</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>价格</label>
+                            <input type="number" id="course-price" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>打卡照</label>
+                            <div class="photo-upload" id="course-photos">
+                                <div class="photo-add-btn" onclick="addPhoto('course')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>学习笔记</label>
+                            <textarea id="course-notes" rows="4" placeholder="笔记内容"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>笔记照片</label>
+                            <div class="photo-upload" id="course-notes-photos">
+                                <div class="photo-add-btn" onclick="addPhoto('course-notes')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="addCoursePlan()">Save</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">📋 课程计划</div>
+                        <div class="scroll-list" id="course-list"></div>
+                    </div>
+                </div>
+                
+                <!-- Self Training -->
+                <div class="training-sub" id="sub-training-self" style="display:none;">
+                    <div class="training-back" onclick="switchTrainingSub('home')">← 返回</div>
+                    <div class="card modal-form" data-modal="training-self" style="display:none;">
+                        <div class="card-title">自训计划</div>
+                        <div class="form-group">
+                            <label>状态</label>
+                            <div class="status-toggle">
+                                <button type="button" class="status-toggle-btn" id="self-status-pending" onclick="setSelfStatus('pending')">待完成</button>
+                                <button type="button" class="status-toggle-btn active" id="self-status-done" onclick="setSelfStatus('done')">已完成</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>日期</label>
+                            <input type="date" id="self-date">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>开始时间</label>
+                                <input type="time" id="self-start" onchange="calcHours('self')">
+                            </div>
+                            <div class="form-group">
+                                <label>结束时间</label>
+                                <input type="time" id="self-end" onchange="calcHours('self')">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>时长</label>
+                            <input type="text" id="self-hours" placeholder="自动计算" readonly style="background:var(--border);border-color:transparent">
+                        </div>
+                        <div class="form-group">
+                            <label>地点</label>
+                            <div class="select-with-add">
+                                <select id="self-location">
+                                    <option value="家">家</option>
+                                    <option value="公司">公司</option>
+                                </select>
+                                <button type="button" class="custom-add-btn" onclick="addCustomOption('self-location','customLocations')">+</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>训练类型</label>
+                            <div class="select-with-add">
+                                <select id="self-type">
+                                    <option value="综合">综合</option>
+                                    <option value="基训">基训</option>
+                                    <option value="软开">软开</option>
+                                    <option value="PBT">PBT</option>
+                                    <option value="瓦岗">瓦岗</option>
+                                    <option value="足尖">足尖</option>
+                                    <option value="舞姿舞步">舞姿舞步</option>
+                                    <option value="变奏">变奏</option>
+                                </select>
+                                <button type="button" class="custom-add-btn" onclick="addCustomOption('self-type','customTrainingTypes')">+</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>打卡照</label>
+                            <div class="photo-upload" id="self-photos">
+                                <div class="photo-add-btn" onclick="addPhoto('self')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>训练笔记</label>
+                            <textarea id="self-notes" rows="4" placeholder="笔记内容"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>笔记照片</label>
+                            <div class="photo-upload" id="self-notes-photos">
+                                <div class="photo-add-btn" onclick="addPhoto('self-notes')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="addSelfTraining()">Save</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🏃 自训计划</div>
+                        <div class="scroll-list" id="selftraining-list"></div>
+                    </div>
+                </div>
+                
+                <!-- Calendar -->
+                <div class="training-sub" id="sub-training-calendar" style="display:none;">
+                    <div class="training-back" onclick="switchTrainingSub('home')">← 返回</div>
+                    <div class="card">
+                        <div class="cal-nav">
+                            <button class="cal-nav-btn" onclick="changeCalMonth(-1)">‹</button>
+                            <div class="cal-month-label" id="cal-month-label"></div>
+                            <button class="cal-nav-btn" onclick="changeCalMonth(1)">›</button>
+                        </div>
+                        <div class="cal-mode-tabs">
+                            <div class="cal-mode-tab active" onclick="switchCalMode('photo',this)">照片墙</div>
+                            <div class="cal-mode-tab" onclick="switchCalMode('all',this)">全部</div>
+                            <div class="cal-mode-tab" onclick="switchCalMode('course',this)">课程</div>
+                            <div class="cal-mode-tab" onclick="switchCalMode('self',this)">自训</div>
+                        </div>
+                        <div class="cal-weekday-row">
+                            <div class="cal-weekday">日</div>
+                            <div class="cal-weekday">一</div>
+                            <div class="cal-weekday">二</div>
+                            <div class="cal-weekday">三</div>
+                            <div class="cal-weekday">四</div>
+                            <div class="cal-weekday">五</div>
+                            <div class="cal-weekday">六</div>
+                        </div>
+                        <div class="cal-grid" id="cal-grid"></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
         
         <!-- Mini Player -->
@@ -1127,6 +1548,13 @@
         <!-- Floating Add Button -->
         <button class="add-float-btn" id="fab-add" onclick="openModal()">+</button>
         
+        <!-- Photo Viewer -->
+        <div class="photo-viewer" id="photo-viewer" onclick="closePhotoViewer(event)">
+            <button class="photo-viewer-close" onclick="closePhotoViewer()">✕</button>
+            <img id="photo-viewer-img" src="">
+            <a class="photo-viewer-download" id="photo-viewer-download" download="ballet-photo.jpg">⬇ 下载</a>
+        </div>
+        
         <!-- Modal -->
         <div class="modal-overlay" id="modal-overlay" onclick="closeModalOverlay(event)">
             <div class="modal-sheet" id="modal-sheet">
@@ -1159,6 +1587,7 @@
             const wI = document.getElementById('body-weight-input');
             if (hI && wI) { hI.addEventListener('input', calcBMI); wI.addEventListener('input', calcBMI); }
             
+            initTrainingForms();
             renderAll();
             
             // Restore last active module
@@ -1270,6 +1699,7 @@
         
         // ===== Navigation =====
         const moduleNames = {
+            training: 'Training',
             body: 'Body',
             equip: 'Wardrobe',
             music: 'Music',
@@ -1278,7 +1708,6 @@
         function switchModule(name, skipSave) {
             document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            if (name === 'training') { alert('Coming soon'); return; }
             document.getElementById('module-' + name).classList.add('active');
             // Find and activate the correct tab
             const tabs = document.querySelectorAll('.tab-item');
@@ -1287,6 +1716,7 @@
             if (idx >= 0 && tabs[idx]) tabs[idx].classList.add('active');
             if (name === 'account') updateExpenseStat();
             if (name === 'body') renderOverview();
+            if (name === 'training') { currentTrainingSub = 'home'; switchTrainingSub('home', true); }
             document.getElementById('header-module').textContent = moduleNames[name] || '';
             if (!skipSave) localStorage.setItem('activeModule', name);
             updateFabVisibility();
@@ -1333,6 +1763,11 @@
             if (moduleId === 'module-equip') return 'equip';
             if (moduleId === 'module-music') return 'music';
             if (moduleId === 'module-account') return 'account';
+            if (moduleId === 'module-training') {
+                if (currentTrainingSub === 'course') return 'training-course';
+                if (currentTrainingSub === 'self') return 'training-self';
+                return null;
+            }
             return null;
         }
         
@@ -1366,13 +1801,19 @@
                 'body-injury': 'Injury',
                 'equip': 'New Item',
                 'music': 'New Music',
-                'account': 'New Expense'
+                'account': 'New Expense',
+                'training-course': '课程计划',
+                'training-self': '自训计划'
             };
             modalTitle.textContent = titleMap[key] || 'Add';
             
             // Show form
             formEl.style.display = 'block';
             modalBody.appendChild(formEl);
+            
+            // Training form reset for new records
+            if (key === 'training-course' && editState.module !== 'coursePlans') { resetCourseForm(); }
+            if (key === 'training-self' && editState.module !== 'selfTrainingPlans') { resetSelfForm(); }
             
             // Show modal
             document.getElementById('modal-overlay').classList.add('active');
@@ -1395,6 +1836,7 @@
             currentFormEl = null;
             formParentBackup = null;
             formNextSiblingBackup = null;
+            cancelEdit();
         }
         
         function closeModalOverlay(e) {
@@ -2100,7 +2542,9 @@
                 'injuryData': 'body-injury',
                 'equipment': 'equip',
                 'music': 'music',
-                'expenses': 'account'
+                'expenses': 'account',
+                'coursePlans': 'training-course',
+                'selfTrainingPlans': 'training-self'
             }[module];
             if (modalKey) openModal(modalKey);
         }
@@ -2215,6 +2659,416 @@
             document.getElementById('total-expense').textContent = '¥' + t.toFixed(0);
         }
         
+
+        // ===== Training Module =====
+        let currentTrainingSub = 'home';
+        let courseFormStatus = 'done';
+        let selfFormStatus = 'done';
+        let calCurrentMonth = new Date();
+        let calMode = 'photo';
+        
+        function switchTrainingSub(name, skipUpdate) {
+            currentTrainingSub = name;
+            document.querySelectorAll('.training-sub').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
+            const el = document.getElementById('sub-training-' + name);
+            if (el) { el.classList.add('active'); el.style.display = 'block'; }
+            if (name === 'course') renderCourseList();
+            if (name === 'self') renderSelfTrainingList();
+            if (name === 'calendar') renderCalendar();
+            if (!skipUpdate) updateFabVisibility();
+        }
+        
+        function setCourseStatus(status) {
+            courseFormStatus = status;
+            document.getElementById('course-status-pending').classList.toggle('active', status === 'pending');
+            document.getElementById('course-status-done').classList.toggle('active', status === 'done');
+        }
+        function setSelfStatus(status) {
+            selfFormStatus = status;
+            document.getElementById('self-status-pending').classList.toggle('active', status === 'pending');
+            document.getElementById('self-status-done').classList.toggle('active', status === 'done');
+        }
+        
+        function calcHours(prefix) {
+            const start = document.getElementById(prefix + '-start').value;
+            const end = document.getElementById(prefix + '-end').value;
+            const hoursEl = document.getElementById(prefix + '-hours');
+            if (start && end) {
+                const [sh, sm] = start.split(':').map(Number);
+                const [eh, em] = end.split(':').map(Number);
+                let mins = (eh * 60 + em) - (sh * 60 + sm);
+                if (mins < 0) mins += 24 * 60;
+                hoursEl.value = (mins / 60).toFixed(1) + 'h';
+            } else {
+                hoursEl.value = '';
+            }
+        }
+        
+        function updateDifficultyVisibility() {
+            const ct = document.getElementById('course-type').value;
+            const grp = document.getElementById('course-difficulty-group');
+            if (ct === '基训' || ct === '瓦岗') { grp.style.display = ''; }
+            else { grp.style.display = 'none'; document.getElementById('course-difficulty').value = ''; }
+        }
+        
+        function populateCustomOptions(selectId, storageKey) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            const customs = loadData(storageKey);
+            customs.forEach(opt => {
+                if (![...select.options].some(o => o.value === opt)) {
+                    const o = document.createElement('option');
+                    o.value = opt; o.textContent = opt;
+                    select.appendChild(o);
+                }
+            });
+        }
+        
+        function addCustomOption(selectId, storageKey) {
+            const name = prompt('请输入新选项名称:');
+            if (!name || !name.trim()) return;
+            const trimmed = name.trim();
+            const customs = loadData(storageKey);
+            if (!customs.includes(trimmed)) { customs.push(trimmed); saveData(storageKey, customs); }
+            const select = document.getElementById(selectId);
+            if (![...select.options].some(o => o.value === trimmed)) {
+                const o = document.createElement('option');
+                o.value = trimmed; o.textContent = trimmed;
+                select.appendChild(o);
+            }
+            select.value = trimmed;
+        }
+        
+        function initTrainingForms() {
+            populateCustomOptions('course-institution', 'customInstitutions');
+            populateCustomOptions('course-type', 'customCourseTypes');
+            populateCustomOptions('course-difficulty', 'customDifficulties');
+            populateCustomOptions('self-location', 'customLocations');
+            populateCustomOptions('self-type', 'customTrainingTypes');
+            // Allow future dates for training plans
+            const cd = document.getElementById('course-date');
+            const sd = document.getElementById('self-date');
+            if (cd) cd.max = '';
+            if (sd) sd.max = '';
+        }
+        
+        function resetCourseForm() {
+            setCourseStatus('done');
+            document.getElementById('course-date').value = today;
+            document.getElementById('course-start').value = '';
+            document.getElementById('course-end').value = '';
+            document.getElementById('course-hours').value = '';
+            document.getElementById('course-institution').selectedIndex = 0;
+            document.getElementById('course-type').selectedIndex = 0;
+            document.getElementById('course-difficulty').selectedIndex = 0;
+            document.getElementById('course-price').value = '';
+            document.getElementById('course-notes').value = '';
+            savePhotos('course', []); savePhotos('course-notes', []);
+            renderPhotoPreview('course'); renderPhotoPreview('course-notes');
+            updateDifficultyVisibility();
+        }
+        
+        function resetSelfForm() {
+            setSelfStatus('done');
+            document.getElementById('self-date').value = today;
+            document.getElementById('self-start').value = '';
+            document.getElementById('self-end').value = '';
+            document.getElementById('self-hours').value = '';
+            document.getElementById('self-location').selectedIndex = 0;
+            document.getElementById('self-type').selectedIndex = 0;
+            document.getElementById('self-notes').value = '';
+            savePhotos('self', []); savePhotos('self-notes', []);
+            renderPhotoPreview('self'); renderPhotoPreview('self-notes');
+        }
+        
+        // ===== Course Plan CRUD =====
+        function addCoursePlan() {
+            const data = loadData('coursePlans');
+            const record = {
+                type: courseFormStatus,
+                date: document.getElementById('course-date').value,
+                startTime: document.getElementById('course-start').value,
+                endTime: document.getElementById('course-end').value,
+                hours: document.getElementById('course-hours').value,
+                institution: document.getElementById('course-institution').value,
+                courseType: document.getElementById('course-type').value,
+                difficulty: document.getElementById('course-difficulty').value,
+                price: document.getElementById('course-price').value,
+                photos: getPhotos('course'),
+                notes: document.getElementById('course-notes').value,
+                notePhotos: getPhotos('course-notes')
+            };
+            if (editState.module === 'coursePlans' && editState.index >= 0) {
+                data[editState.index] = record;
+            } else {
+                data.push(record);
+            }
+            saveData('coursePlans', data);
+            savePhotos('course', []); savePhotos('course-notes', []);
+            cancelEdit();
+            renderCourseList(); renderCalendar();
+            resetCourseForm();
+            closeModal();
+        }
+        
+        function editCoursePlan(index) {
+            const data = loadData('coursePlans');
+            const d = data[index];
+            if (!d) return;
+            setCourseStatus(d.type || 'done');
+            document.getElementById('course-date').value = d.date || '';
+            document.getElementById('course-start').value = d.startTime || '';
+            document.getElementById('course-end').value = d.endTime || '';
+            document.getElementById('course-hours').value = d.hours || '';
+            document.getElementById('course-institution').value = d.institution || '';
+            document.getElementById('course-type').value = d.courseType || '';
+            document.getElementById('course-difficulty').value = d.difficulty || '';
+            document.getElementById('course-price').value = d.price || '';
+            document.getElementById('course-notes').value = d.notes || '';
+            if (d.photos?.length) { savePhotos('course', [...d.photos]); renderPhotoPreview('course'); }
+            else { savePhotos('course', []); renderPhotoPreview('course'); }
+            if (d.notePhotos?.length) { savePhotos('course-notes', [...d.notePhotos]); renderPhotoPreview('course-notes'); }
+            else { savePhotos('course-notes', []); renderPhotoPreview('course-notes'); }
+            updateDifficultyVisibility();
+            startEdit('coursePlans', index);
+        }
+        
+        function deleteCoursePlan(index) {
+            if (!confirm('删除这条课程计划?')) return;
+            const data = loadData('coursePlans');
+            data.splice(index, 1);
+            saveData('coursePlans', data);
+            renderCourseList(); renderCalendar();
+        }
+        
+        function toggleCourseStatus(index) {
+            const data = loadData('coursePlans');
+            if (!data[index]) return;
+            data[index].type = data[index].type === 'done' ? 'pending' : 'done';
+            saveData('coursePlans', data);
+            renderCourseList(); renderCalendar();
+        }
+        
+        function renderCourseList() {
+            const data = loadData('coursePlans');
+            const sorted = data.slice().sort((a,b) => (b.date||'').localeCompare(a.date||''));
+            const el = document.getElementById('course-list');
+            if (!el) return;
+            el.innerHTML = sorted.map(d => {
+                const ri = data.indexOf(d);
+                const statusIcon = d.type === 'done'
+                    ? '<div class="training-list-status done" onclick="toggleCourseStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>'
+                    : '<div class="training-list-status pending" onclick="toggleCourseStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>';
+                let detail = [d.hours, d.courseType, d.difficulty, d.institution].filter(x => x).join(' · ');
+                let photosHtml = '';
+                if (d.photos?.length) {
+                    photosHtml = '<div class="training-list-photos">' + d.photos.map(p =>
+                        '<img src="'+p+'" onclick="openPhotoViewer(\''+p+'\');event.stopPropagation();">'
+                    ).join('') + '</div>';
+                }
+                let noteHtml = d.notes ? '<div class="training-list-note">'+d.notes+'</div>' : '';
+                return '<div class="training-list-item">' +
+                    '<div class="training-list-info" onclick="editCoursePlan('+ri+')">' +
+                    '<div class="training-list-date">'+(d.date||'')+'</div>' +
+                    '<div class="training-list-detail">'+detail+'</div>' +
+                    noteHtml + photosHtml +
+                    '</div>' + statusIcon +
+                    '<div class="edit-btn" onclick="editCoursePlan('+ri+')">Edit</div>' +
+                    '<div class="delete-btn" onclick="deleteCoursePlan('+ri+')">Delete</div>' +
+                    '</div>';
+            }).join('') || '<div class="empty">暂无课程计划</div>';
+        }
+        
+        // ===== Self Training CRUD =====
+        function addSelfTraining() {
+            const data = loadData('selfTrainingPlans');
+            const record = {
+                type: selfFormStatus,
+                date: document.getElementById('self-date').value,
+                startTime: document.getElementById('self-start').value,
+                endTime: document.getElementById('self-end').value,
+                hours: document.getElementById('self-hours').value,
+                location: document.getElementById('self-location').value,
+                trainingType: document.getElementById('self-type').value,
+                photos: getPhotos('self'),
+                notes: document.getElementById('self-notes').value,
+                notePhotos: getPhotos('self-notes')
+            };
+            if (editState.module === 'selfTrainingPlans' && editState.index >= 0) {
+                data[editState.index] = record;
+            } else {
+                data.push(record);
+            }
+            saveData('selfTrainingPlans', data);
+            savePhotos('self', []); savePhotos('self-notes', []);
+            cancelEdit();
+            renderSelfTrainingList(); renderCalendar();
+            resetSelfForm();
+            closeModal();
+        }
+        
+        function editSelfTraining(index) {
+            const data = loadData('selfTrainingPlans');
+            const d = data[index];
+            if (!d) return;
+            setSelfStatus(d.type || 'done');
+            document.getElementById('self-date').value = d.date || '';
+            document.getElementById('self-start').value = d.startTime || '';
+            document.getElementById('self-end').value = d.endTime || '';
+            document.getElementById('self-hours').value = d.hours || '';
+            document.getElementById('self-location').value = d.location || '';
+            document.getElementById('self-type').value = d.trainingType || '';
+            document.getElementById('self-notes').value = d.notes || '';
+            if (d.photos?.length) { savePhotos('self', [...d.photos]); renderPhotoPreview('self'); }
+            else { savePhotos('self', []); renderPhotoPreview('self'); }
+            if (d.notePhotos?.length) { savePhotos('self-notes', [...d.notePhotos]); renderPhotoPreview('self-notes'); }
+            else { savePhotos('self-notes', []); renderPhotoPreview('self-notes'); }
+            startEdit('selfTrainingPlans', index);
+        }
+        
+        function deleteSelfTraining(index) {
+            if (!confirm('删除这条自训计划?')) return;
+            const data = loadData('selfTrainingPlans');
+            data.splice(index, 1);
+            saveData('selfTrainingPlans', data);
+            renderSelfTrainingList(); renderCalendar();
+        }
+        
+        function toggleSelfStatus(index) {
+            const data = loadData('selfTrainingPlans');
+            if (!data[index]) return;
+            data[index].type = data[index].type === 'done' ? 'pending' : 'done';
+            saveData('selfTrainingPlans', data);
+            renderSelfTrainingList(); renderCalendar();
+        }
+        
+        function renderSelfTrainingList() {
+            const data = loadData('selfTrainingPlans');
+            const sorted = data.slice().sort((a,b) => (b.date||'').localeCompare(a.date||''));
+            const el = document.getElementById('selftraining-list');
+            if (!el) return;
+            el.innerHTML = sorted.map(d => {
+                const ri = data.indexOf(d);
+                const statusIcon = d.type === 'done'
+                    ? '<div class="training-list-status done" onclick="toggleSelfStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>'
+                    : '<div class="training-list-status pending" onclick="toggleSelfStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>';
+                let detail = [d.hours, d.trainingType, d.location].filter(x => x).join(' · ');
+                let photosHtml = '';
+                if (d.photos?.length) {
+                    photosHtml = '<div class="training-list-photos">' + d.photos.map(p =>
+                        '<img src="'+p+'" onclick="openPhotoViewer(\''+p+'\');event.stopPropagation();">'
+                    ).join('') + '</div>';
+                }
+                let noteHtml = d.notes ? '<div class="training-list-note">'+d.notes+'</div>' : '';
+                return '<div class="training-list-item">' +
+                    '<div class="training-list-info" onclick="editSelfTraining('+ri+')">' +
+                    '<div class="training-list-date">'+(d.date||'')+'</div>' +
+                    '<div class="training-list-detail">'+detail+'</div>' +
+                    noteHtml + photosHtml +
+                    '</div>' + statusIcon +
+                    '<div class="edit-btn" onclick="editSelfTraining('+ri+')">Edit</div>' +
+                    '<div class="delete-btn" onclick="deleteSelfTraining('+ri+')">Delete</div>' +
+                    '</div>';
+            }).join('') || '<div class="empty">暂无自训计划</div>';
+        }
+        
+        // ===== Calendar =====
+        function switchCalMode(mode, el) {
+            calMode = mode;
+            el.parentElement.querySelectorAll('.cal-mode-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            renderCalendar();
+        }
+        
+        function changeCalMonth(delta) {
+            calCurrentMonth.setMonth(calCurrentMonth.getMonth() + delta);
+            renderCalendar();
+        }
+        
+        function renderCalendar() {
+            const el = document.getElementById('cal-grid');
+            if (!el) return;
+            const year = calCurrentMonth.getFullYear();
+            const month = calCurrentMonth.getMonth();
+            
+            const label = document.getElementById('cal-month-label');
+            if (label) label.textContent = year + '年 ' + (month + 1) + '月';
+            
+            const firstDay = new Date(year, month, 1);
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const startWeekday = firstDay.getDay();
+            
+            // Gather data
+            let records = [];
+            if (calMode === 'all' || calMode === 'photo') {
+                records = [
+                    ...loadData('coursePlans').map(r => ({...r, _source: 'course'})),
+                    ...loadData('selfTrainingPlans').map(r => ({...r, _source: 'self'}))
+                ];
+            } else if (calMode === 'course') {
+                records = loadData('coursePlans').map(r => ({...r, _source: 'course'}));
+            } else if (calMode === 'self') {
+                records = loadData('selfTrainingPlans').map(r => ({...r, _source: 'self'}));
+            }
+            
+            let html = '';
+            // Empty cells before first day
+            for (let i = 0; i < startWeekday; i++) {
+                html += '<div class="cal-cell empty"></div>';
+            }
+            
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+                const dayRecords = records.filter(r => r.date === dateStr);
+                html += renderCalCell(d, dayRecords);
+            }
+            
+            el.innerHTML = html;
+        }
+        
+        function renderCalCell(day, records) {
+            if (calMode === 'photo') {
+                const photos = records.flatMap(r => r.photos || []);
+                if (photos.length > 0) {
+                    const countBadge = photos.length > 1 ? '<div class="cal-photo-count">'+photos.length+'</div>' : '';
+                    return '<div class="cal-cell cal-photo-cell">' +
+                        '<div class="cal-day-num">'+day+'</div>' +
+                        '<img src="'+photos[0]+'" onclick="openPhotoViewer(\''+photos[0]+'\')">' +
+                        countBadge + '</div>';
+                }
+                return '<div class="cal-cell"><div class="cal-day-num">'+day+'</div></div>';
+            }
+            
+            // All / Course / Self mode
+            let events = '';
+            records.forEach(r => {
+                const typeLabel = r._source === 'course' ? '课' : '训';
+                const typeClass = r._source === 'course' ? 'cal-tag-course' : 'cal-tag-self';
+                const statusClass = r.type === 'done' ? 'cal-done' : 'cal-pending';
+                const typeName = r._source === 'course' ? (r.courseType || '') : (r.trainingType || '');
+                const hours = r.hours ? r.hours.replace('h','') + 'h' : '';
+                events += '<div class="cal-event ' + statusClass + '">' +
+                    '<span class="cal-tag ' + typeClass + '">' + typeLabel + '</span>' +
+                    hours + ' ' + typeName + '</div>';
+            });
+            
+            const hasEvent = records.length > 0 ? ' has-event' : '';
+            return '<div class="cal-cell' + hasEvent + '">' +
+                '<div class="cal-day-num">'+day+'</div>' +
+                events + '</div>';
+        }
+        
+        // ===== Photo Viewer =====
+        function openPhotoViewer(src) {
+            document.getElementById('photo-viewer-img').src = src;
+            document.getElementById('photo-viewer-download').href = src;
+            document.getElementById('photo-viewer').classList.add('active');
+        }
+        function closePhotoViewer(e) {
+            if (e && e.target !== document.getElementById('photo-viewer')) return;
+            document.getElementById('photo-viewer').classList.remove('active');
+        }
+        
         // ===== Common =====
         function deleteRecord(key, idx) {
             if (!confirm('Delete this record?')) return;
@@ -2226,6 +3080,7 @@
             renderFlexRecords(); updateFlexFilter(); renderFlexTrend();
             renderInjuryRecords(); renderEquipList('all'); renderMusicList();
             renderExpenseList(); updateTotalExpense(); updateExpenseStat();
+            renderCourseList(); renderSelfTrainingList(); renderCalendar();
         }
         
         // ===== Chart (SVG) =====
