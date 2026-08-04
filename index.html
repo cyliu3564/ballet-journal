@@ -984,6 +984,7 @@
                 <div class="card">
                     <div class="card-title">💰 Expense Overview</div>
                     <div class="sub-tabs" style="margin-bottom:14px">
+                        <div class="sub-tab" onclick="switchExpensePeriod(this,'all')">All Time</div>
                         <div class="sub-tab active" onclick="switchExpensePeriod(this,'week')">This Week</div>
                         <div class="sub-tab" onclick="switchExpensePeriod(this,'month')">This Month</div>
                         <div class="sub-tab" onclick="switchExpensePeriod(this,'last-month')">Last Month</div>
@@ -1988,7 +1989,7 @@
             document.getElementById('expense-date').value = d.date || '';
             startEdit('expenses', index);
         }
-        let expensePeriod = 'month'; // week | month | last-month | custom
+        let expensePeriod = 'week'; // all | week | month | last-month | custom
         function switchExpensePeriod(el, period) {
             el.parentElement.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
@@ -1999,7 +2000,18 @@
         function getExpenseDateRange() {
             const now = new Date();
             let from, to, label;
-            if (expensePeriod === 'week') {
+            if (expensePeriod === 'all') {
+                // Get all records - find earliest date
+                const data = loadData('expenses');
+                if (data.length > 0) {
+                    const sorted = data.map(d => d.date).filter(d => d).sort();
+                    from = new Date(sorted[0]);
+                } else {
+                    from = new Date(2020, 0, 1);
+                }
+                to = now;
+                label = 'All Time';
+            } else if (expensePeriod === 'week') {
                 const day = now.getDay() || 7;
                 from = new Date(now); from.setDate(now.getDate() - day + 1);
                 to = now;
