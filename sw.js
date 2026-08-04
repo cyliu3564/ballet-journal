@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ballet-app-v36';
+const CACHE_NAME = 'ballet-app-v37';
 const urlsToCache = [
   '/',
   '/index.html',

@@ -861,8 +861,8 @@
         /* ===== Heatmap (Density) View ===== */
         .hm-achievement-card {
             grid-column: 1 / -1;
-            padding: 4px 0 8px;
-            margin-bottom: 8px;
+            padding: 0;
+            margin-bottom: 4px;
         }
         .hm-filter-tabs {
             grid-column: 1 / -1;
@@ -910,41 +910,41 @@
             grid-column: 1 / -1;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
+            gap: 8px;
+            margin-bottom: 12px;
         }
         .hm-stat-card {
             background: var(--pink-50);
-            border-radius: 16px;
-            padding: 20px 8px 16px;
+            border-radius: 14px;
+            padding: 14px 8px 12px;
             text-align: center;
         }
         .hm-stat-num {
-            font-size: 40px;
+            font-size: 32px;
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1.1;
         }
         .hm-stat-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-tertiary);
-            margin-top: 6px;
+            margin-top: 4px;
             font-weight: 400;
         }
 
         .hm-section-title {
             grid-column: 1 / -1;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 16px;
+            margin-bottom: 10px;
         }
         .hm-year-grid {
             grid-column: 1 / -1;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px 10px;
-            margin-bottom: 24px;
+            gap: 10px 6px;
+            margin-bottom: 14px;
         }
         .hm-month-block {}
         .hm-month-label {
@@ -974,14 +974,14 @@
         .hm-legend {
             grid-column: 1 / -1;
             display: flex; align-items: center; justify-content: flex-end;
-            gap: 3px; margin-bottom: 24px; font-size: 10px; color: var(--text-tertiary);
+            gap: 3px; margin-bottom: 14px; font-size: 10px; color: var(--text-tertiary);
         }
         .hm-legend-cell { width: 10px; height: 10px; border-radius: 2px; }
 
         .hm-dist-title {
             grid-column: 1 / -1;
-            font-size: 16px; font-weight: 700; color: var(--text-primary);
-            margin-bottom: 14px;
+            font-size: 14px; font-weight: 700; color: var(--text-primary);
+            margin-bottom: 10px;
         }
         .hm-dist-bar-row {
             grid-column: 1 / -1;
@@ -3347,6 +3347,7 @@
         
         function changeCalYear(delta) {
             calCurrentYear += delta;
+            calCurrentMonth = new Date(calCurrentYear, calCurrentMonth.getMonth(), 1);
             renderCalendar();
         }
         
@@ -3454,7 +3455,6 @@
             
             // Achievement card container
             html += '<div class="hm-achievement-card">';
-            html += '<div class="hm-achievement-title">来芭 · 芭蕾训练日记</div>';
             html += '<div style="text-align:center"><div class="hm-year-badge">'+year+'年</div></div>';
             // Stats row
             html += '<div class="hm-stats-row">';
@@ -3514,22 +3514,45 @@
             html += '<span>多</span>';
             html += '</div>';
             
-            // Type distribution
-            const typeMap = {};
+            // Type distribution - split by course type and training type
+            const courseTypeMap = {};
+            const trainingTypeMap = {};
             yearRecords.forEach(r => {
-                const t = r._source === 'course' ? (r.courseType||'其他') : (r.trainingType||'其他');
-                if (!typeMap[t]) typeMap[t] = {count: 0, hours: 0};
-                typeMap[t].count++;
-                typeMap[t].hours += (parseFloat(r.hours)||0);
+                if (r._source === 'course') {
+                    const t = r.courseType||'其他';
+                    if (!courseTypeMap[t]) courseTypeMap[t] = {count: 0, hours: 0};
+                    courseTypeMap[t].count++;
+                    courseTypeMap[t].hours += (parseFloat(r.hours)||0);
+                } else {
+                    const t = r.trainingType||'其他';
+                    if (!trainingTypeMap[t]) trainingTypeMap[t] = {count: 0, hours: 0};
+                    trainingTypeMap[t].count++;
+                    trainingTypeMap[t].hours += (parseFloat(r.hours)||0);
+                }
             });
             
-            const sortedTypes = Object.entries(typeMap).sort((a,b) => b[1].hours - a[1].hours);
-            const maxHours = sortedTypes.length > 0 ? sortedTypes[0][1].hours : 1;
+            const showCourse = calHeatFilter !== 'self';
+            const showSelf = calHeatFilter !== 'course';
             
-            if (sortedTypes.length > 0) {
-                html += '<div class="hm-dist-title">课程分布</div>';
-                sortedTypes.forEach(([name, data]) => {
-                    const pct = (data.hours / maxHours * 100).toFixed(0);
+            if (showCourse && Object.keys(courseTypeMap).length > 0) {
+                html += '<div class="hm-dist-title">课程类型</div>';
+                const sortedCourse = Object.entries(courseTypeMap).sort((a,b) => b[1].hours - a[1].hours);
+                const maxCourseHours = sortedCourse.length > 0 ? sortedCourse[0][1].hours : 1;
+                sortedCourse.forEach(([name, data]) => {
+                    const pct = (data.hours / maxCourseHours * 100).toFixed(0);
+                    html += '<div class="hm-dist-bar-row">';
+                    html += '<div class="hm-dist-label">'+name+'</div>';
+                    html += '<div class="hm-dist-track"><div class="hm-dist-fill" style="width:'+pct+'%">'+data.hours.toFixed(1)+'h</div></div>';
+                    html += '</div>';
+                });
+            }
+            
+            if (showSelf && Object.keys(trainingTypeMap).length > 0) {
+                html += '<div class="hm-dist-title">训练类型</div>';
+                const sortedSelf = Object.entries(trainingTypeMap).sort((a,b) => b[1].hours - a[1].hours);
+                const maxSelfHours = sortedSelf.length > 0 ? sortedSelf[0][1].hours : 1;
+                sortedSelf.forEach(([name, data]) => {
+                    const pct = (data.hours / maxSelfHours * 100).toFixed(0);
                     html += '<div class="hm-dist-bar-row">';
                     html += '<div class="hm-dist-label">'+name+'</div>';
                     html += '<div class="hm-dist-track"><div class="hm-dist-fill" style="width:'+pct+'%">'+data.hours.toFixed(1)+'h</div></div>';
