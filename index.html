@@ -773,13 +773,10 @@
         .cal-tag-self { background: var(--pink-300); color: white; }
         .cal-cell.cal-photo-cell { padding: 0; overflow: hidden; }
         
-        /* Calendar Timeline View (non-photo modes) */
+        /* Calendar Timeline View */
         .cal-timeline { display: flex; flex-direction: column; gap: 10px; }
         .cal-timeline-day { display: flex; gap: 10px; align-items: flex-start; }
-        .cal-timeline-date {
-            width: 44px; text-align: center; flex-shrink: 0;
-            padding-top: 4px;
-        }
+        .cal-timeline-date { width: 44px; text-align: center; flex-shrink: 0; padding-top: 4px; }
         .cal-timeline-dow { font-size: 10px; color: var(--text-tertiary); font-weight: 500; }
         .cal-timeline-num { font-size: 22px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
         .cal-timeline-records { flex: 1; display: flex; flex-direction: column; gap: 6px; }
@@ -789,6 +786,70 @@
         .cal-cell.cal-photo-cell img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; }
         .cal-cell.cal-photo-cell .cal-day-num { position: absolute; top: 2px; left: 4px; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.6); z-index: 1; font-size: 10px; }
         .cal-photo-count { position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.5); color: white; font-size: 8px; padding: 1px 4px; border-radius: 6px; z-index: 1; }
+        
+        /* ===== Heatmap (Density) View ===== */
+        .hm-stats-row { display: flex; gap: 10px; margin-bottom: 18px; }
+        .hm-stat-card {
+            flex: 1; background: white; border-radius: 14px; padding: 14px 8px 10px;
+            text-align: center; box-shadow: var(--card-shadow);
+        }
+        .hm-stat-num { font-size: 28px; font-weight: 700; color: var(--text-primary); line-height: 1.1; }
+        .hm-stat-label { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; font-weight: 500; }
+        
+        .hm-year-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 12px 10px; margin-bottom: 18px;
+        }
+        @media (min-width: 380px) { .hm-year-grid { grid-template-columns: repeat(4, 1fr); } }
+        .hm-month-block {}
+        .hm-month-label {
+            font-size: 11px; color: var(--text-secondary); font-weight: 600;
+            margin-bottom: 6px; padding-left: 2px;
+        }
+        .hm-month-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 2.5px;
+        }
+        .hm-cell {
+            width: 100%; aspect-ratio: 1; border-radius: 3px;
+            background: var(--border); transition: background 0.15s;
+            cursor: pointer; position: relative;
+        }
+        .hm-cell.lvl-1 { background: var(--pink-200); opacity: 0.5; }
+        .hm-cell.lvl-2 { background: var(--pink-300); opacity: 0.7; }
+        .hm-cell.lvl-3 { background: var(--pink-400); opacity: 0.85; }
+        .hm-cell.lvl-4 { background: var(--pink-500); opacity: 1; }
+        .hm-cell.today-ring { box-shadow: 0 0 0 1.5px var(--pink-500); }
+        
+        .hm-legend {
+            display: flex; align-items: center; justify-content: flex-end;
+            gap: 4px; margin-bottom: 16px; font-size: 10px; color: var(--text-tertiary);
+        }
+        .hm-legend-cell { width: 10px; height: 10px; border-radius: 2px; }
+        
+        .hm-dist-title {
+            font-size: 14px; font-weight: 600; color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        .hm-dist-bar-row {
+            display: flex; align-items: center; margin-bottom: 8px; gap: 8px;
+        }
+        .hm-dist-label {
+            font-size: 12px; color: var(--text-secondary); min-width: 60px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .hm-dist-track {
+            flex: 1; height: 22px; background: var(--pink-50); border-radius: 6px;
+            overflow: hidden; position: relative;
+        }
+        .hm-dist-fill {
+            height: 100%; border-radius: 6px; background: var(--pink-400);
+            display: flex; align-items: center; padding-left: 8px;
+            font-size: 11px; color: white; font-weight: 600;
+            transition: width 0.4s ease;
+        }
+        .hm-dist-hours {
+            font-size: 11px; color: var(--text-tertiary); min-width: 42px; text-align: right;
+        }
         
         /* Photo Viewer */
         .photo-viewer {
@@ -1488,13 +1549,13 @@
                     <div class="training-back" onclick="switchTrainingSub('home')">← 返回</div>
                     <div class="card">
                         <div class="cal-nav">
-                            <button class="cal-nav-btn" onclick="changeCalMonth(-1)">‹</button>
+                            <button class="cal-nav-btn" onclick="changeCalYear(-1)">‹</button>
                             <div class="cal-month-label" id="cal-month-label"></div>
-                            <button class="cal-nav-btn" onclick="changeCalMonth(1)">›</button>
+                            <button class="cal-nav-btn" onclick="changeCalYear(1)">›</button>
                         </div>
                         <div class="cal-mode-tabs">
-                            <div class="cal-mode-tab active" onclick="switchCalMode('photo',this)">照片墙</div>
-                            <div class="cal-mode-tab" onclick="switchCalMode('all',this)">全部</div>
+                            <div class="cal-mode-tab" onclick="switchCalMode('photo',this)">照片墙</div>
+                            <div class="cal-mode-tab active" onclick="switchCalMode('heatmap',this)">热力图</div>
                             <div class="cal-mode-tab" onclick="switchCalMode('course',this)">课程</div>
                             <div class="cal-mode-tab" onclick="switchCalMode('self',this)">自训</div>
                         </div>
@@ -2701,7 +2762,8 @@
         let courseFormStatus = 'done';
         let selfFormStatus = 'done';
         let calCurrentMonth = new Date();
-        let calMode = 'photo';
+        let calCurrentYear = new Date().getFullYear();
+        let calMode = 'heatmap';
         
         function switchTrainingSub(name, skipUpdate) {
             currentTrainingSub = name;
@@ -3112,31 +3174,19 @@
             renderCalendar();
         }
         
-        function changeCalMonth(delta) {
-            calCurrentMonth.setMonth(calCurrentMonth.getMonth() + delta);
+        function changeCalYear(delta) {
+            calCurrentYear += delta;
             renderCalendar();
         }
         
         function renderCalendar() {
             const el = document.getElementById('cal-grid');
             if (!el) return;
-            const year = calCurrentMonth.getFullYear();
-            const month = calCurrentMonth.getMonth();
-            
             const label = document.getElementById('cal-month-label');
-            if (label) label.textContent = year + '年 ' + (month + 1) + '月';
             
-            // Show/hide weekday header
-            const weekRow = document.querySelector('.cal-weekday-row');
-            if (weekRow) weekRow.style.display = calMode === 'photo' ? 'grid' : 'none';
-            
-            const firstDay = new Date(year, month, 1);
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const startWeekday = firstDay.getDay();
-            
-            // Gather data
+            // Gather all data
             let records = [];
-            if (calMode === 'all' || calMode === 'photo') {
+            if (calMode === 'photo' || calMode === 'heatmap') {
                 records = [
                     ...loadData('coursePlans').map(r => ({...r, _source: 'course'})),
                     ...loadData('selfTrainingPlans').map(r => ({...r, _source: 'self'}))
@@ -3147,24 +3197,41 @@
                 records = loadData('selfTrainingPlans').map(r => ({...r, _source: 'self'}));
             }
             
-            // Filter to current month
-            const monthPrefix = year + '-' + String(month+1).padStart(2,'0');
-            const monthRecords = records.filter(r => (r.date||'').startsWith(monthPrefix));
-            
             if (calMode === 'photo') {
-                // Photo wall grid
+                // Monthly photo wall
+                if (label) label.textContent = calCurrentYear + '年 ' + (calCurrentMonth.getMonth()+1) + '月';
+                document.querySelector('.cal-weekday-row').style.display = 'grid';
+                
+                const year = calCurrentMonth.getFullYear();
+                const month = calCurrentMonth.getMonth();
+                const firstDay = new Date(year, month, 1);
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const startWeekday = firstDay.getDay();
+                const monthPrefix = year + '-' + String(month+1).padStart(2,'0');
+                const monthRecords = records.filter(r => (r.date||'').startsWith(monthPrefix));
+                
                 let html = '';
-                for (let i = 0; i < startWeekday; i++) {
-                    html += '<div class="cal-cell empty"></div>';
-                }
+                for (let i = 0; i < startWeekday; i++) html += '<div class="cal-cell empty"></div>';
                 for (let d = 1; d <= daysInMonth; d++) {
                     const dateStr = monthPrefix + '-' + String(d).padStart(2,'0');
                     const dayRecords = monthRecords.filter(r => r.date === dateStr);
                     html += renderCalPhotoCell(d, dayRecords);
                 }
                 el.innerHTML = html;
+            } else if (calMode === 'heatmap') {
+                // Year heatmap view
+                if (label) label.textContent = calCurrentYear + '年';
+                document.querySelector('.cal-weekday-row').style.display = 'none';
+                el.innerHTML = renderHeatmap(records);
             } else {
-                // Timeline view for All/Course/Self
+                // Monthly timeline for course/self
+                if (label) label.textContent = calCurrentYear + '年 ' + (calCurrentMonth.getMonth()+1) + '月';
+                document.querySelector('.cal-weekday-row').style.display = 'none';
+                
+                const year = calCurrentMonth.getFullYear();
+                const month = calCurrentMonth.getMonth();
+                const monthPrefix = year + '-' + String(month+1).padStart(2,'0');
+                const monthRecords = records.filter(r => (r.date||'').startsWith(monthPrefix));
                 el.innerHTML = renderCalTimeline(monthRecords);
             }
         }
@@ -3179,6 +3246,120 @@
                     countBadge + '</div>';
             }
             return '<div class="cal-cell"><div class="cal-day-num">'+day+'</div></div>';
+        }
+        
+        function renderHeatmap(records) {
+            const year = calCurrentYear;
+            const today = new Date();
+            const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+            
+            // Filter to current year
+            const yearRecords = records.filter(r => (r.date||'').startsWith(year + '-'));
+            
+            // Calculate stats
+            const totalCount = yearRecords.length;
+            const totalHours = yearRecords.reduce((sum, r) => sum + (parseFloat(r.hours) || 0), 0);
+            
+            // Calculate consecutive days (streak)
+            const uniqueDates = [...new Set(yearRecords.map(r => r.date))].sort();
+            let maxStreak = 0, currentStreak = 0;
+            let prevDate = null;
+            uniqueDates.forEach(d => {
+                const dt = new Date(d);
+                if (prevDate) {
+                    const diff = (dt - new Date(prevDate)) / 86400000;
+                    if (diff === 1) { currentStreak++; } else { currentStreak = 1; }
+                } else { currentStreak = 1; }
+                maxStreak = Math.max(maxStreak, currentStreak);
+                prevDate = d;
+            });
+            
+            // Build per-day count map
+            const dayCount = {};
+            yearRecords.forEach(r => { dayCount[r.date] = (dayCount[r.date]||0) + 1; });
+            const maxDayCount = Math.max(...Object.values(dayCount), 1);
+            
+            // Build month grids
+            let html = '';
+            // Stats row
+            html += '<div class="hm-stats-row">';
+            html += '<div class="hm-stat-card"><div class="hm-stat-num">'+totalCount+'</div><div class="hm-stat-label">训练次数</div></div>';
+            html += '<div class="hm-stat-card"><div class="hm-stat-num">'+totalHours.toFixed(1)+'</div><div class="hm-stat-label">累计小时</div></div>';
+            html += '<div class="hm-stat-card"><div class="hm-stat-num">'+maxStreak+'</div><div class="hm-stat-label">连续打卡</div></div>';
+            html += '</div>';
+            
+            // Year grid: 12 months
+            html += '<div class="hm-year-grid">';
+            const monthNames = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+            for (let m = 0; m < 12; m++) {
+                const monthPrefix = year + '-' + String(m+1).padStart(2,'0');
+                const firstDay = new Date(year, m, 1);
+                const daysInMonth = new Date(year, m+1, 0).getDate();
+                const startDow = firstDay.getDay();
+                
+                html += '<div class="hm-month-block">';
+                html += '<div class="hm-month-label">'+monthNames[m]+'</div>';
+                html += '<div class="hm-month-grid">';
+                
+                // Empty cells before 1st
+                for (let i = 0; i < startDow; i++) {
+                    html += '<div class="hm-cell" style="background:transparent"></div>';
+                }
+                // Day cells
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr = monthPrefix + '-' + String(d).padStart(2,'0');
+                    const count = dayCount[dateStr] || 0;
+                    let lvl = 0;
+                    if (count > 0) {
+                        const ratio = count / maxDayCount;
+                        if (ratio <= 0.25) lvl = 1;
+                        else if (ratio <= 0.5) lvl = 2;
+                        else if (ratio <= 0.75) lvl = 3;
+                        else lvl = 4;
+                    }
+                    const isToday = dateStr === todayStr ? ' today-ring' : '';
+                    html += '<div class="hm-cell lvl-'+lvl+isToday+'" title="'+dateStr+' ('+count+'次)"></div>';
+                }
+                
+                html += '</div></div>';
+            }
+            html += '</div>';
+            
+            // Legend
+            html += '<div class="hm-legend">';
+            html += '<span>少</span>';
+            html += '<div class="hm-legend-cell" style="background:var(--border)"></div>';
+            html += '<div class="hm-legend-cell" style="background:var(--pink-200);opacity:0.5"></div>';
+            html += '<div class="hm-legend-cell" style="background:var(--pink-300);opacity:0.7"></div>';
+            html += '<div class="hm-legend-cell" style="background:var(--pink-400);opacity:0.85"></div>';
+            html += '<div class="hm-legend-cell" style="background:var(--pink-500)"></div>';
+            html += '<span>多</span>';
+            html += '</div>';
+            
+            // Type distribution
+            const typeMap = {};
+            yearRecords.forEach(r => {
+                const t = r._source === 'course' ? (r.courseType||'其他') : (r.trainingType||'其他');
+                if (!typeMap[t]) typeMap[t] = {count: 0, hours: 0};
+                typeMap[t].count++;
+                typeMap[t].hours += (parseFloat(r.hours)||0);
+            });
+            
+            const sortedTypes = Object.entries(typeMap).sort((a,b) => b[1].hours - a[1].hours);
+            const maxHours = sortedTypes.length > 0 ? sortedTypes[0][1].hours : 1;
+            
+            if (sortedTypes.length > 0) {
+                html += '<div class="hm-dist-title">训练分布</div>';
+                sortedTypes.forEach(([name, data]) => {
+                    const pct = (data.hours / maxHours * 100).toFixed(0);
+                    html += '<div class="hm-dist-bar-row">';
+                    html += '<div class="hm-dist-label">'+name+'</div>';
+                    html += '<div class="hm-dist-track"><div class="hm-dist-fill" style="width:'+pct+'%">'+data.hours.toFixed(1)+'h</div></div>';
+                    html += '</div>';
+                });
+            }
+            
+            return html;
         }
         
         function renderCalTimeline(records) {
