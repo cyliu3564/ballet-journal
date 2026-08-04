@@ -1682,6 +1682,7 @@
             const allData = loadData('equipment');
             let data = allData;
             if (filter && filter !== 'all') data = data.filter(d=>d.category===filter);
+            data = data.slice().sort((a,b) => (b.date||'').localeCompare(a.date||''));
             
             let html = '';
             data.forEach((d) => {
@@ -2043,8 +2044,9 @@
         }
         function renderExpenseList() {
             const data = loadData('expenses');
-            document.getElementById('expense-list').innerHTML = data.slice().reverse().map((d,i) => {
-                const ri = data.length - 1 - i;
+            const sorted = data.slice().sort((a,b) => (b.date||'').localeCompare(a.date||''));
+            document.getElementById('expense-list').innerHTML = sorted.map((d) => {
+                const ri = data.indexOf(d);
                 const sourceTag = d.source === 'equipment' ? ' 🩰' : '';
                 return `<div class="record-item"><div class="value">${d.content}</div><div class="date" style="margin-top:2px">${d.category}${sourceTag} · ¥${d.amount} · ${d.date}</div><div class="edit-btn" onclick="editExpense(${ri})">Edit</div><div class="delete-btn" onclick="deleteRecord('expenses',${ri})">Delete</div></div>`;
             }).join('') || '<div class="empty">No records</div>';
