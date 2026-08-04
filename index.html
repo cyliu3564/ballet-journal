@@ -687,32 +687,52 @@
         .custom-add-btn:active { background: var(--pink-100); transform: scale(0.95); }
         
         /* Training List Item */
-        .training-list-item {
-            background: var(--pink-50);
-            border-radius: 14px;
-            padding: 14px 16px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            position: relative;
+        /* Training Stats */
+        .training-stats-row { display: flex; gap: 10px; margin-bottom: 18px; }
+        .training-stat-card {
+            flex: 1; background: white; border-radius: 14px; padding: 12px 8px;
+            text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
         }
-        .training-list-info { flex: 1; min-width: 0; cursor: pointer; }
-        .training-list-date { font-size: 11px; color: var(--text-tertiary); font-weight: 500; }
-        .training-list-detail { font-size: 14px; color: var(--text-primary); margin-top: 3px; font-weight: 500; }
-        .training-list-note { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
-        .training-list-photos { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
-        .training-list-photos img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; cursor: pointer; }
-        .training-list-item.done { background: rgba(192,104,120,0.08); border-left: 3px solid var(--pink-400); }
-        .training-list-item.pending { background: white; border-left: 3px solid var(--border); opacity: 0.85; }
-        .training-list-status {
-            padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
-            display: flex; align-items: center; justify-content: center; gap: 4px;
-            flex-shrink: 0; cursor: pointer; margin-top: 2px; white-space: nowrap;
+        .training-stat-num { font-size: 24px; font-weight: 700; color: var(--pink-500); }
+        .training-stat-label { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+        
+        /* Type Distribution */
+        .type-dist-section { margin-bottom: 18px; }
+        .type-dist-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+        .type-dist-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .type-dist-icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
+        .type-dist-name { font-size: 12px; color: var(--text-secondary); width: 60px; flex-shrink: 0; }
+        .type-dist-bar-bg { flex: 1; height: 6px; background: var(--pink-50); border-radius: 3px; overflow: hidden; }
+        .type-dist-bar { height: 100%; background: var(--pink-400); border-radius: 3px; }
+        .type-dist-val { font-size: 12px; font-weight: 600; color: var(--text-primary); width: 48px; text-align: right; flex-shrink: 0; }
+        
+        /* Month Group */
+        .training-month-group { margin-bottom: 16px; }
+        .training-month-header { font-size: 12px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 8px; padding-left: 2px; }
+        
+        /* Training Card */
+        .training-card {
+            background: white; border-radius: 14px; padding: 12px 14px;
+            margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            display: flex; align-items: center; gap: 10px;
+            border-left: 3px solid var(--border);
         }
-        .training-list-status svg { width: 14px; height: 14px; }
-        .training-list-status.done { background: var(--pink-400); color: white; }
-        .training-list-status.pending { background: white; color: var(--text-tertiary); border: 1.5px solid var(--border); }
+        .training-card.done { border-left-color: var(--pink-400); background: rgba(192,104,120,0.04); }
+        .training-card.pending { border-left-color: var(--border); opacity: 0.8; }
+        .training-card-body { flex: 1; min-width: 0; cursor: pointer; }
+        .training-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .training-card-type { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .training-card-institution { font-size: 11px; color: var(--text-tertiary); }
+        .training-card-meta { font-size: 12px; color: var(--text-secondary); }
+        .training-card-date { font-size: 11px; color: var(--text-tertiary); flex-shrink: 0; }
+        
+        /* Status Badge */
+        .status-badge {
+            padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;
+            flex-shrink: 0; cursor: pointer; white-space: nowrap;
+        }
+        .status-badge.done { background: var(--pink-400); color: white; }
+        .status-badge.pending { background: var(--pink-50); color: var(--text-tertiary); }
         
         /* Calendar */
         .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
@@ -2856,30 +2876,77 @@
             const sorted = data.slice().sort((a,b) => (b.date||'').localeCompare(a.date||''));
             const el = document.getElementById('course-list');
             if (!el) return;
-            el.innerHTML = sorted.map(d => {
-                const ri = data.indexOf(d);
-                const isDone = d.type === 'done';
-                const statusBtn = isDone
-                    ? '<div class="training-list-status done" onclick="toggleCourseStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>已完成</div>'
-                    : '<div class="training-list-status pending" onclick="toggleCourseStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>待完成</div>';
-                let detail = [d.hours, d.courseType, d.difficulty, d.institution].filter(x => x).join(' · ');
-                let photosHtml = '';
-                if (d.photos?.length) {
-                    photosHtml = '<div class="training-list-photos">' + d.photos.map(p =>
-                        '<img src="'+p+'" onclick="openPhotoViewer(\''+p+'\');event.stopPropagation();">'
-                    ).join('') + '</div>';
-                }
-                let noteHtml = d.notes ? '<div class="training-list-note">'+d.notes+'</div>' : '';
-                return '<div class="training-list-item '+(isDone?'done':'pending')+'">' +
-                    '<div class="training-list-info" onclick="editCoursePlan('+ri+')">' +
-                    '<div class="training-list-date">'+(d.date||'')+'</div>' +
-                    '<div class="training-list-detail">'+detail+'</div>' +
-                    noteHtml + photosHtml +
-                    '</div>' + statusBtn +
-                    '<div class="edit-btn" onclick="editCoursePlan('+ri+')">Edit</div>' +
-                    '<div class="delete-btn" onclick="deleteCoursePlan('+ri+')">Delete</div>' +
-                    '</div>';
-            }).join('') || '<div class="empty">暂无课程计划</div>';
+            
+            // Stats
+            const now = new Date();
+            const curMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+            const monthRecs = sorted.filter(r => (r.date||'').startsWith(curMonth));
+            const monthHours = monthRecs.reduce((s,r) => s + parseFloat(r.hours||'0'), 0);
+            const monthCost = monthRecs.reduce((s,r) => s + parseFloat(r.price||'0'), 0);
+            const totalHours = sorted.reduce((s,r) => s + parseFloat(r.hours||'0'), 0);
+            
+            let statsHtml = '<div class="training-stats-row">' +
+                '<div class="training-stat-card"><div class="training-stat-num">'+monthRecs.length+'</div><div class="training-stat-label">本月课时</div></div>' +
+                '<div class="training-stat-card"><div class="training-stat-num">'+monthHours.toFixed(1)+'h</div><div class="training-stat-label">本月时长</div></div>' +
+                '<div class="training-stat-card"><div class="training-stat-num">¥'+Math.round(monthCost)+'</div><div class="training-stat-label">本月花费</div></div>' +
+                '</div>';
+            
+            // Type distribution
+            const typeMap = {};
+            sorted.forEach(r => {
+                const t = r.courseType || '其他';
+                if (!typeMap[t]) typeMap[t] = { count: 0, hours: 0 };
+                typeMap[t].count++;
+                typeMap[t].hours += parseFloat(r.hours||'0');
+            });
+            const typeEntries = Object.entries(typeMap).sort((a,b) => b[1].hours - a[1].hours);
+            const maxHours = typeEntries.length ? typeEntries[0][1].hours : 1;
+            let distHtml = '';
+            if (typeEntries.length) {
+                distHtml = '<div class="type-dist-section"><div class="type-dist-title">课程类型</div>';
+                typeEntries.forEach(([name, v]) => {
+                    const pct = (v.hours / maxHours * 100).toFixed(0);
+                    distHtml += '<div class="type-dist-row">' +
+                        '<div class="type-dist-icon"></div>' +
+                        '<div class="type-dist-name">'+name+'</div>' +
+                        '<div class="type-dist-bar-bg"><div class="type-dist-bar" style="width:'+pct+'%"></div></div>' +
+                        '<div class="type-dist-val">'+v.hours.toFixed(1)+'h</div>' +
+                        '</div>';
+                });
+                distHtml += '</div>';
+            }
+            
+            // Records grouped by month
+            let monthGroups = {};
+            sorted.forEach(d => {
+                const m = (d.date||'').substring(0, 7) || '无日期';
+                if (!monthGroups[m]) monthGroups[m] = [];
+                monthGroups[m].push(d);
+            });
+            
+            let listHtml = '';
+            Object.keys(monthGroups).sort((a,b) => b.localeCompare(a)).forEach(month => {
+                listHtml += '<div class="training-month-group"><div class="training-month-header">'+month+'</div>';
+                monthGroups[month].forEach(d => {
+                    const ri = data.indexOf(d);
+                    const isDone = d.type === 'done';
+                    const detail = [d.hours, d.courseType, d.difficulty, d.institution].filter(x => x).join(' · ');
+                    listHtml += '<div class="training-card '+(isDone?'done':'pending')+'">' +
+                        '<div class="training-card-body" onclick="editCoursePlan('+ri+')">' +
+                        '<div class="training-card-top">' +
+                        '<div class="training-card-type">'+(d.courseType||'—')+'</div>' +
+                        '<div class="training-card-institution">'+(d.institution||'')+'</div>' +
+                        '</div>' +
+                        '<div class="training-card-meta">'+detail+'</div>' +
+                        '</div>' +
+                        '<div class="training-card-date">'+(d.date||'')+'</div>' +
+                        '<div class="status-badge '+(isDone?'done':'pending')+'" onclick="toggleCourseStatus('+ri+')">'+(isDone?'已完成':'待完成')+'</div>' +
+                        '</div>';
+                });
+                listHtml += '</div>';
+            });
+            
+            el.innerHTML = statsHtml + distHtml + listHtml || '<div class="empty">暂无课程计划</div>';
         }
         
         // ===== Self Training CRUD =====
@@ -2950,30 +3017,77 @@
             const sorted = data.slice().sort((a,b) => (b.date||'').localeCompare(a.date||''));
             const el = document.getElementById('selftraining-list');
             if (!el) return;
-            el.innerHTML = sorted.map(d => {
-                const ri = data.indexOf(d);
-                const isDone = d.type === 'done';
-                const statusBtn = isDone
-                    ? '<div class="training-list-status done" onclick="toggleSelfStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>已完成</div>'
-                    : '<div class="training-list-status pending" onclick="toggleSelfStatus('+ri+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>待完成</div>';
-                let detail = [d.hours, d.trainingType, d.location].filter(x => x).join(' · ');
-                let photosHtml = '';
-                if (d.photos?.length) {
-                    photosHtml = '<div class="training-list-photos">' + d.photos.map(p =>
-                        '<img src="'+p+'" onclick="openPhotoViewer(\''+p+'\');event.stopPropagation();">'
-                    ).join('') + '</div>';
-                }
-                let noteHtml = d.notes ? '<div class="training-list-note">'+d.notes+'</div>' : '';
-                return '<div class="training-list-item '+(isDone?'done':'pending')+'">' +
-                    '<div class="training-list-info" onclick="editSelfTraining('+ri+')">' +
-                    '<div class="training-list-date">'+(d.date||'')+'</div>' +
-                    '<div class="training-list-detail">'+detail+'</div>' +
-                    noteHtml + photosHtml +
-                    '</div>' + statusBtn +
-                    '<div class="edit-btn" onclick="editSelfTraining('+ri+')">Edit</div>' +
-                    '<div class="delete-btn" onclick="deleteSelfTraining('+ri+')">Delete</div>' +
-                    '</div>';
-            }).join('') || '<div class="empty">暂无自训计划</div>';
+            
+            // Stats
+            const now = new Date();
+            const curMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+            const monthRecs = sorted.filter(r => (r.date||'').startsWith(curMonth));
+            const monthHours = monthRecs.reduce((s,r) => s + parseFloat(r.hours||'0'), 0);
+            // Count unique training days
+            const trainDays = new Set(monthRecs.map(r => r.date).filter(Boolean));
+            
+            let statsHtml = '<div class="training-stats-row">' +
+                '<div class="training-stat-card"><div class="training-stat-num">'+monthRecs.length+'</div><div class="training-stat-label">本月次数</div></div>' +
+                '<div class="training-stat-card"><div class="training-stat-num">'+monthHours.toFixed(1)+'h</div><div class="training-stat-label">本月时长</div></div>' +
+                '<div class="training-stat-card"><div class="training-stat-num">'+trainDays.size+'</div><div class="training-stat-label">本月天数</div></div>' +
+                '</div>';
+            
+            // Type distribution
+            const typeMap = {};
+            sorted.forEach(r => {
+                const t = r.trainingType || '其他';
+                if (!typeMap[t]) typeMap[t] = { count: 0, hours: 0 };
+                typeMap[t].count++;
+                typeMap[t].hours += parseFloat(r.hours||'0');
+            });
+            const typeEntries = Object.entries(typeMap).sort((a,b) => b[1].hours - a[1].hours);
+            const maxHours = typeEntries.length ? typeEntries[0][1].hours : 1;
+            let distHtml = '';
+            if (typeEntries.length) {
+                distHtml = '<div class="type-dist-section"><div class="type-dist-title">训练类型</div>';
+                typeEntries.forEach(([name, v]) => {
+                    const pct = (v.hours / maxHours * 100).toFixed(0);
+                    distHtml += '<div class="type-dist-row">' +
+                        '<div class="type-dist-icon"></div>' +
+                        '<div class="type-dist-name">'+name+'</div>' +
+                        '<div class="type-dist-bar-bg"><div class="type-dist-bar" style="width:'+pct+'%"></div></div>' +
+                        '<div class="type-dist-val">'+v.hours.toFixed(1)+'h</div>' +
+                        '</div>';
+                });
+                distHtml += '</div>';
+            }
+            
+            // Records grouped by month
+            let monthGroups = {};
+            sorted.forEach(d => {
+                const m = (d.date||'').substring(0, 7) || '无日期';
+                if (!monthGroups[m]) monthGroups[m] = [];
+                monthGroups[m].push(d);
+            });
+            
+            let listHtml = '';
+            Object.keys(monthGroups).sort((a,b) => b.localeCompare(a)).forEach(month => {
+                listHtml += '<div class="training-month-group"><div class="training-month-header">'+month+'</div>';
+                monthGroups[month].forEach(d => {
+                    const ri = data.indexOf(d);
+                    const isDone = d.type === 'done';
+                    const detail = [d.hours, d.trainingType, d.location].filter(x => x).join(' · ');
+                    listHtml += '<div class="training-card '+(isDone?'done':'pending')+'">' +
+                        '<div class="training-card-body" onclick="editSelfTraining('+ri+')">' +
+                        '<div class="training-card-top">' +
+                        '<div class="training-card-type">'+(d.trainingType||'—')+'</div>' +
+                        '<div class="training-card-institution">'+(d.location||'')+'</div>' +
+                        '</div>' +
+                        '<div class="training-card-meta">'+detail+'</div>' +
+                        '</div>' +
+                        '<div class="training-card-date">'+(d.date||'')+'</div>' +
+                        '<div class="status-badge '+(isDone?'done':'pending')+'" onclick="toggleSelfStatus('+ri+')">'+(isDone?'已完成':'待完成')+'</div>' +
+                        '</div>';
+                });
+                listHtml += '</div>';
+            });
+            
+            el.innerHTML = statsHtml + distHtml + listHtml || '<div class="empty">暂无自训计划</div>';
         }
         
         // ===== Calendar =====
