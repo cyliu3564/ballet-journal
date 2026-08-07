@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ballet-app-v47';
+const CACHE_NAME = 'ballet-app-v48';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -24,19 +24,33 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Always fetch from network first, then cache
+  const request = event.request;
+  // Skip non-GET requests
+  if (request.method !== 'GET') return;
+
   event.respondWith(
-    fetch(event.request)
+    fetch(request)
       .then(response => {
-        if (response.ok) {
+        if (response && response.ok) {
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseClone);
+            cache.put(request, responseClone);
           });
         }
         return response;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() => {
+        // Network failed, try cache
+        return caches.match(request).then(cached => {
+          if (cached) return cached;
+          // For navigation requests, fall back to cached index.html
+          if (request.mode === 'navigate') {
+            return caches.match('/index.html');
+          }
+          // Last resort: return a basic offline response
+          return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
+        });
+      })
   );
 });
 
