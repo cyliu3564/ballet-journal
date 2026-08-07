@@ -2942,7 +2942,7 @@
             saveData('bodyData', data);
             savePhotos('body', []);
             cancelEdit();
-            renderBodyRecords(); renderBodyTrend();
+            renderBodyRecords(); renderBodyTrend(); renderOverview(); renderTrainingWidgets();
             ['body-height','body-weight-input','body-fat','body-note','body-bmi'].forEach(id => document.getElementById(id).value = '');
             renderPhotoPreview('body');
             closeModal();
@@ -2996,7 +2996,7 @@
             }
             saveData('muscleData', data); savePhotos('muscle', []);
             cancelEdit();
-            renderMuscleRecords(); renderMuscleTrend(); updateMuscleFilter();
+            renderMuscleRecords(); renderOverview(); renderTrainingWidgets(); renderMuscleTrend(); updateMuscleFilter();
             document.getElementById('muscle-note').value = '';
             renderPhotoPreview('muscle');
             closeModal();
@@ -3051,7 +3051,7 @@
             }
             saveData('flexData', data); savePhotos('flex', []);
             cancelEdit();
-            renderFlexRecords(); renderFlexTrend(); updateFlexFilter();
+            renderFlexRecords(); renderOverview(); renderTrainingWidgets(); renderFlexTrend(); updateFlexFilter();
             document.getElementById('flex-level').value = ''; document.getElementById('flex-note').value = '';
             renderPhotoPreview('flex');
             closeModal();
@@ -3105,7 +3105,7 @@
             }
             saveData('injuryData', data); savePhotos('injury', []);
             cancelEdit();
-            renderInjuryRecords();
+            renderInjuryRecords(); renderOverview(); renderTrainingWidgets();
             document.getElementById('injury-part').value = ''; document.getElementById('injury-desc').value = '';
             renderPhotoPreview('injury');
             closeModal();
@@ -3168,7 +3168,7 @@
             
             saveData('equipment', equipData); savePhotos('equip', []);
             cancelEdit();
-            renderEquipList('all');
+            renderEquipList('all'); renderOverview(); renderTrainingWidgets();
             
             document.getElementById('equip-name').value = '';
             document.getElementById('equip-brand').value = '';
@@ -3509,7 +3509,7 @@
             } else {
                 data.push(record);
             }
-            saveData('expenses', data); renderExpenseList(); updateTotalExpense(); updateExpenseStat();
+            saveData('expenses', data); renderExpenseList(); updateTotalExpense(); updateExpenseStat(); renderOverview(); renderTrainingWidgets();
             cancelEdit();
             document.getElementById('expense-content').value = ''; document.getElementById('expense-amount').value = '';
             closeModal();
@@ -4197,6 +4197,7 @@
             closeAddMovementModal();
             renderMovementList();
             renderTrainingWidgets();
+            renderOverview();
         }
 
         // ===== Movement Picker (for course/self linking) =====
@@ -4664,7 +4665,7 @@
             setNoteItems('course', [{ text: '', movementIds: [] }]);
             renderNoteItemList('course');
             cancelEdit();
-            renderCourseList(); renderCalendar();
+            renderCourseList(); renderCalendar(); renderOverview(); renderTrainingWidgets();
             resetCourseForm();
             closeModal();
         }
@@ -4698,7 +4699,7 @@
             const data = loadData('coursePlans');
             data.splice(index, 1);
             saveData('coursePlans', data);
-            renderCourseList(); renderCalendar();
+            renderCourseList(); renderCalendar(); renderOverview(); renderTrainingWidgets();
         }
         
         function toggleCourseStatus(index) {
@@ -4706,7 +4707,7 @@
             if (!data[index]) return;
             data[index].type = data[index].type === 'done' ? 'pending' : 'done';
             saveData('coursePlans', data);
-            renderCourseList(); renderCalendar();
+            renderCourseList(); renderCalendar(); renderOverview(); renderTrainingWidgets();
         }
         
         function syncCourseToExpenses() {
@@ -4831,7 +4832,7 @@
             setNoteItems('self', [{ text: '', movementIds: [] }]);
             renderNoteItemList('self');
             cancelEdit();
-            renderSelfTrainingList(); renderCalendar();
+            renderSelfTrainingList(); renderCalendar(); renderOverview(); renderTrainingWidgets();
             resetSelfForm();
             closeModal();
         }
@@ -4862,7 +4863,7 @@
             const data = loadData('selfTrainingPlans');
             data.splice(index, 1);
             saveData('selfTrainingPlans', data);
-            renderSelfTrainingList(); renderCalendar();
+            renderSelfTrainingList(); renderCalendar(); renderOverview(); renderTrainingWidgets();
         }
         
         function toggleSelfStatus(index) {
@@ -4870,7 +4871,7 @@
             if (!data[index]) return;
             data[index].type = data[index].type === 'done' ? 'pending' : 'done';
             saveData('selfTrainingPlans', data);
-            renderSelfTrainingList(); renderCalendar();
+            renderSelfTrainingList(); renderCalendar(); renderOverview(); renderTrainingWidgets();
         }
         
         function renderSelfTrainingList() {
