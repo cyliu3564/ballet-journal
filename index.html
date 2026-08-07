@@ -1072,30 +1072,6 @@
             border-color: var(--pink-500);
             color: white;
         }
-        .mv-picker-note {
-            margin-top: 14px;
-            padding-top: 12px;
-            border-top: 0.5px solid var(--border);
-        }
-        .mv-picker-note label {
-            display: block;
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-            font-weight: 500;
-        }
-        .mv-picker-note textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            font-size: 13px;
-            background: var(--pink-50);
-            min-height: 60px;
-            resize: vertical;
-            font-family: inherit;
-        }
-        .mv-picker-note textarea:focus { outline: none; border-color: var(--pink-300); background: white; }
         .mv-picker-done {
             margin-top: 14px;
             background: var(--pink-500);
@@ -1109,6 +1085,110 @@
             cursor: pointer;
         }
         .mv-picker-done:active { opacity: 0.8; }
+
+        /* Note item list (for course / self training notes) */
+        .note-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .note-item {
+            background: var(--pink-50);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px;
+            position: relative;
+        }
+        .note-item textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            background: white;
+            min-height: 60px;
+            resize: vertical;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        .note-item textarea:focus { outline: none; border-color: var(--pink-300); }
+        .note-item-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+        .note-item-pick {
+            font-size: 12px;
+            color: var(--pink-500);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: white;
+            border: 1px dashed var(--pink-300);
+        }
+        .note-item-del {
+            font-size: 12px;
+            color: #D4888A;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+        .note-item-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 6px;
+        }
+        .note-item-tag {
+            padding: 2px 6px;
+            background: var(--pink-100);
+            color: var(--pink-600);
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .note-item-tag .remove {
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        .note-add-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: var(--pink-100);
+            color: var(--pink-600);
+            border: 1px dashed var(--pink-300);
+            border-radius: 10px;
+            font-size: 13px;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .note-add-btn:active { opacity: 0.8; }
+
+        /* Movement picker overlay sits above main modal */
+        #mv-picker-overlay { z-index: 2500; }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.75);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .toast.show { opacity: 1; }
 
         /* Add movement modal form */
         .mv-add-photo-row {
@@ -2119,18 +2199,13 @@
                         </div>
                         <div class="form-group">
                             <label>学习笔记</label>
-                            <textarea id="course-notes" rows="4" placeholder="笔记内容"></textarea>
+                            <div class="note-list" id="course-notes-list"></div>
+                            <button type="button" class="note-add-btn" onclick="addNoteItem('course')">+ 添加一条笔记</button>
                         </div>
                         <div class="form-group">
                             <label>笔记照片</label>
                             <div class="photo-upload" id="course-notes-photos">
                                 <label class="photo-add-btn" for="photo-input-course-notes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>关联动作</label>
-                            <div class="mv-picker-trigger" id="course-mv-trigger" onclick="openMovementPicker('course')">
-                                <span id="course-mv-placeholder">点击选择关联动作...</span>
                             </div>
                         </div>
                         <button class="btn" onclick="addCoursePlan()">Save</button>
@@ -2205,18 +2280,13 @@
                         </div>
                         <div class="form-group">
                             <label>训练笔记</label>
-                            <textarea id="self-notes" rows="4" placeholder="笔记内容"></textarea>
+                            <div class="note-list" id="self-notes-list"></div>
+                            <button type="button" class="note-add-btn" onclick="addNoteItem('self')">+ 添加一条笔记</button>
                         </div>
                         <div class="form-group">
                             <label>笔记照片</label>
                             <div class="photo-upload" id="self-notes-photos">
                                 <label class="photo-add-btn" for="photo-input-self-notes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>关联动作</label>
-                            <div class="mv-picker-trigger" id="self-mv-trigger" onclick="openMovementPicker('self')">
-                                <span id="self-mv-placeholder">点击选择关联动作...</span>
                             </div>
                         </div>
                         <button class="btn" onclick="addSelfTraining()">Save</button>
@@ -2317,6 +2387,9 @@
             <span class="close-hint" onclick="closeHint()">✕</span>
         </div>
         
+        <!-- Toast -->
+        <div class="toast" id="global-toast"></div>
+
         <!-- Movement Picker Modal -->
         <div class="modal-overlay" id="mv-picker-overlay" onclick="closeMovementPickerOverlay(event)">
             <div class="modal-sheet">
@@ -2338,10 +2411,6 @@
                     <div class="mv-picker-tab" data-cat="combination" onclick="switchPickerTab('combination')">组合动作</div>
                 </div>
                 <div class="mv-picker-list" id="mv-picker-list"></div>
-                <div class="mv-picker-note">
-                    <label>要点笔记（将追加到动作的要点列表）</label>
-                    <textarea id="mv-picker-note" placeholder="记录本节课关于所选动作的要点..."></textarea>
-                </div>
                 <button class="mv-picker-done" onclick="confirmMovementPicker()">确定</button>
             </div>
         </div>
@@ -2515,6 +2584,7 @@
             if (hI && wI) { hI.addEventListener('input', calcBMI); wI.addEventListener('input', calcBMI); }
             
             initTrainingForms();
+            initNoteForms();
             renderAll();
             
             // Restore last active module
@@ -3612,6 +3682,7 @@
         let mvPickerContext = null; // 'course' or 'self'
         let mvPickerSelectedIds = [];
         let mvPickerCategory = 'posture';
+        let mvPickerActiveNoteIdx = -1;
         let mvEditingId = null; // for edit movement demo
         let mvTrainingEditIndex = -1;
 
@@ -4061,17 +4132,22 @@
         }
 
         // ===== Movement Picker (for course/self linking) =====
-        function openMovementPicker(context) {
+        function openMovementPicker(context, noteIdx) {
             mvPickerContext = context;
             mvPickerCategory = 'posture';
             mvPickerSelectedIds = [];
-            // Load already linked movements from form state
-            const key = context === 'course' ? 'course' : 'self';
-            const existing = getLinkedMovements(key);
-            mvPickerSelectedIds = existing.map(m => m.id);
+            mvPickerActiveNoteIdx = (typeof noteIdx === 'number') ? noteIdx : -1;
+
+            // Load already linked movements from the target note (if editing a note)
+            if (mvPickerActiveNoteIdx >= 0) {
+                const notes = getNoteItems(context);
+                const target = notes[mvPickerActiveNoteIdx];
+                if (target && target.movementIds) {
+                    mvPickerSelectedIds = [...target.movementIds];
+                }
+            }
 
             document.getElementById('mv-picker-search').value = '';
-            document.getElementById('mv-picker-note').value = '';
             document.querySelectorAll('.mv-picker-tab').forEach(t => {
                 t.classList.toggle('active', t.dataset.cat === 'posture');
             });
@@ -4143,71 +4219,165 @@
             renderPickerList();
         }
 
-        // We store linked movements in sessionStorage for each form
+        // ===== Note Items =====
+        // Stored in sessionStorage: noteItems_course, noteItems_self
+        // Structure: [{ text: '', movementIds: [] }]
+        function getNoteItems(context) {
+            const raw = sessionStorage.getItem('noteItems_' + context);
+            if (raw) {
+                try { return JSON.parse(raw); } catch (e) {}
+            }
+            return [{ text: '', movementIds: [] }];
+        }
+        function setNoteItems(context, arr) {
+            sessionStorage.setItem('noteItems_' + context, JSON.stringify(arr));
+        }
+        function addNoteItem(context) {
+            const notes = getNoteItems(context);
+            notes.push({ text: '', movementIds: [] });
+            setNoteItems(context, notes);
+            renderNoteItemList(context);
+        }
+        function removeNoteItem(context, idx) {
+            const notes = getNoteItems(context);
+            notes.splice(idx, 1);
+            // Ensure at least one empty note exists
+            if (notes.length === 0) notes.push({ text: '', movementIds: [] });
+            setNoteItems(context, notes);
+            renderNoteItemList(context);
+        }
+        function updateNoteText(context, idx, text) {
+            const notes = getNoteItems(context);
+            if (!notes[idx]) return;
+            notes[idx].text = text;
+            setNoteItems(context, notes);
+            // don't re-render (would break focus)
+        }
+        function removeNoteMovement(context, noteIdx, mvId) {
+            const notes = getNoteItems(context);
+            if (!notes[noteIdx]) return;
+            notes[noteIdx].movementIds = (notes[noteIdx].movementIds || []).filter(id => id !== mvId);
+            setNoteItems(context, notes);
+            renderNoteItemList(context);
+        }
+        function renderNoteItemList(context) {
+            const notes = getNoteItems(context);
+            const el = document.getElementById(context + '-notes-list');
+            if (!el) return;
+            const lib = getMovementLibrary();
+
+            el.innerHTML = notes.map((n, i) => {
+                const tags = (n.movementIds || []).map(mvId => {
+                    const m = lib.movements.find(x => x.id === mvId);
+                    const name = m ? m.nameFr : mvId;
+                    return `<span class="note-item-tag">${name}<span class="remove" onclick="event.stopPropagation();removeNoteMovement('${context}',${i},'${mvId}')">×</span></span>`;
+                }).join('');
+                const textEscaped = escapeHtml(n.text || '');
+                return `
+                <div class="note-item">
+                    <textarea rows="3" placeholder="笔记内容..." oninput="updateNoteText('${context}',${i},this.value)">${textEscaped}</textarea>
+                    ${tags ? `<div class="note-item-tags">${tags}</div>` : ''}
+                    <div class="note-item-actions">
+                        <span class="note-item-pick" onclick="openMovementPicker('${context}', ${i})">+ 关联动作</span>
+                        <span class="note-item-del" onclick="removeNoteItem('${context}',${i})">删除</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // Legacy getLinkedMovements / setLinkedMovements / renderLinkedMovementsTrigger
+        // These now operate on ALL movements across all notes (used for detail display / history)
         function getLinkedMovements(context) {
-            return JSON.parse(sessionStorage.getItem('linkedMv_' + context) || '[]');
+            const notes = getNoteItems(context);
+            const ids = new Set();
+            notes.forEach(n => (n.movementIds || []).forEach(id => ids.add(id)));
+            const lib = getMovementLibrary();
+            return Array.from(ids).map(id => {
+                const m = lib.movements.find(x => x.id === id);
+                return { id, note: '' };
+            });
         }
         function setLinkedMovements(context, arr) {
-            sessionStorage.setItem('linkedMv_' + context, JSON.stringify(arr));
+            // Legacy compatibility: replaces all linked movements across notes
+            // We assign them to the first note (or create one)
+            const notes = getNoteItems(context);
+            if (notes.length === 0) notes.push({ text: '', movementIds: [] });
+            notes[0].movementIds = arr.map(a => a.id);
+            setNoteItems(context, notes);
+        }
+        function renderLinkedMovementsTrigger(context) {
+            // Legacy: no longer a single trigger since each note has its own picker
+            // Kept for backward compatibility with reset forms etc.
+            renderNoteItemList(context);
+        }
+        function removeLinkedMovement(context, id) {
+            const notes = getNoteItems(context);
+            notes.forEach(n => {
+                n.movementIds = (n.movementIds || []).filter(mid => mid !== id);
+            });
+            setNoteItems(context, notes);
+            renderNoteItemList(context);
         }
 
         function confirmMovementPicker() {
-            const note = document.getElementById('mv-picker-note').value.trim();
-            const linked = mvPickerSelectedIds.map(id => ({ id, note }));
-            setLinkedMovements(mvPickerContext, linked);
-            renderLinkedMovementsTrigger(mvPickerContext);
-            closeMovementPicker();
-        }
-
-        function renderLinkedMovementsTrigger(context) {
-            const linked = getLinkedMovements(context);
-            const triggerId = context + '-mv-trigger';
-            const el = document.getElementById(triggerId);
-            if (!el) return;
-
-            if (linked.length === 0) {
-                el.innerHTML = '<span id="' + context + '-mv-placeholder">点击选择关联动作...</span>';
-                el.classList.remove('has-items');
-            } else {
-                const lib = getMovementLibrary();
-                const tags = linked.map(l => {
-                    const m = lib.movements.find(x => x.id === l.id);
-                    const name = m ? m.nameFr : l.id;
-                    return `<span class="mv-picker-tag">${name}<span class="remove" onclick="event.stopPropagation();removeLinkedMovement('${context}','${l.id}')">×</span></span>`;
-                }).join('');
-                el.innerHTML = `<div class="mv-picker-tags">${tags}</div>`;
-                el.classList.add('has-items');
+            const context = mvPickerContext;
+            const noteIdx = mvPickerActiveNoteIdx;
+            if (noteIdx >= 0) {
+                const notes = getNoteItems(context);
+                if (!notes[noteIdx]) {
+                    closeMovementPicker();
+                    return;
+                }
+                notes[noteIdx].movementIds = [...mvPickerSelectedIds];
+                setNoteItems(context, notes);
+                renderNoteItemList(context);
             }
-        }
-
-        function removeLinkedMovement(context, id) {
-            const linked = getLinkedMovements(context).filter(m => m.id !== id);
-            setLinkedMovements(context, linked);
-            renderLinkedMovementsTrigger(context);
+            closeMovementPicker();
         }
 
         // Sync linked movement key points to movement library (called on save of course/self)
         function syncLinkedKeyPoints(context, record) {
-            const linked = getLinkedMovements(context);
-            if (!linked.length) return;
+            const notes = getNoteItems(context);
+            if (!notes || !notes.length) return 0;
             const lib = getMovementLibrary();
             const sourceLabel = buildMovementSourceLabel(context, record);
+            let synced = 0;
 
-            linked.forEach(link => {
-                if (!link.note || !link.note.trim()) return;
-                const m = lib.movements.find(x => x.id === link.id);
-                if (!m) return;
-                if (!m.keyPoints) m.keyPoints = [];
-                // Avoid exact duplicate (same text + same source)
-                const dup = m.keyPoints.some(kp => kp.text === link.note.trim() && kp.source === sourceLabel);
-                if (!dup) {
-                    m.keyPoints.push({
-                        text: link.note.trim(),
-                        source: sourceLabel,
-                    });
-                }
+            notes.forEach(note => {
+                const text = (note.text || '').trim();
+                if (!text) return;
+                const mids = note.movementIds || [];
+                if (!mids.length) return;
+                mids.forEach(mvId => {
+                    const m = lib.movements.find(x => x.id === mvId);
+                    if (!m) return;
+                    if (!m.keyPoints) m.keyPoints = [];
+                    const dup = m.keyPoints.some(kp => kp.text === text && kp.source === sourceLabel);
+                    if (!dup) {
+                        m.keyPoints.push({ text, source: sourceLabel });
+                        synced++;
+                    }
+                });
             });
-            saveMovementLibrary(lib);
+            if (synced > 0) {
+                saveMovementLibrary(lib);
+            }
+            return synced;
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('global-toast');
+            if (!t) return;
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove('show'), 1800);
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, c => ({
+                '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+            })[c]);
         }
 
         function buildMovementSourceLabel(context, record) {
@@ -4221,6 +4391,61 @@
                 const type = record.selfType || record.trainingType || '';
                 return `来自自训${type ? '·' + type : ''} / ${date}`;
             }
+        }
+
+        // Normalize legacy plain-text notes or old linkedMovements to new notes array format
+        function normalizeNotes(notesField) {
+            if (Array.isArray(notesField) && notesField.length > 0) {
+                // Ensure each item has movementIds
+                return notesField.map(n => ({
+                    text: n.text || '',
+                    movementIds: Array.isArray(n.movementIds) ? n.movementIds : []
+                }));
+            }
+            if (typeof notesField === 'string' && notesField.trim()) {
+                return [{ text: notesField, movementIds: [] }];
+            }
+            return [{ text: '', movementIds: [] }];
+        }
+
+        // Get a flat text preview (first non-empty note) for list display
+        function getNotesPreview(notesField, maxLen) {
+            maxLen = maxLen || 50;
+            if (Array.isArray(notesField)) {
+                const firstText = notesField.find(n => n.text && n.text.trim());
+                return firstText ? firstText.text.substring(0, maxLen) + (firstText.text.length > maxLen ? '...' : '') : '';
+            }
+            if (typeof notesField === 'string' && notesField.trim()) {
+                return notesField.substring(0, maxLen) + (notesField.length > maxLen ? '...' : '');
+            }
+            return '';
+        }
+
+        // Render notes array as HTML for detail views (card body)
+        function renderNotesDetailHtml(notesField) {
+            const lib = getMovementLibrary();
+            if (Array.isArray(notesField) && notesField.length > 0) {
+                return notesField.map(n => {
+                    const text = escapeHtml(n.text || '');
+                    if (!text && (!n.movementIds || !n.movementIds.length)) return '';
+                    let tags = '';
+                    if (n.movementIds && n.movementIds.length) {
+                        tags = '<div class="note-item-tags">';
+                        n.movementIds.forEach(mvId => {
+                            const m = lib.movements.find(x => x.id === mvId);
+                            const name = m ? m.nameFr : mvId;
+                            tags += '<span class="note-item-tag">' + name + '</span>';
+                        });
+                        tags += '</div>';
+                    }
+                    return '<div class="note-item">' + (text ? '<div style="font-size:13px;color:var(--text-primary);white-space:pre-wrap;">' + text + '</div>' : '') + tags + '</div>';
+                }).filter(Boolean).join('');
+            }
+            // Legacy plain text
+            if (typeof notesField === 'string' && notesField.trim()) {
+                return '<div class="note-item"><div style="font-size:13px;color:var(--text-primary);white-space:pre-wrap;">' + escapeHtml(notesField) + '</div></div>';
+            }
+            return '';
         }
 
         
@@ -4320,12 +4545,11 @@
             document.getElementById('course-type').selectedIndex = 0;
             document.getElementById('course-difficulty').selectedIndex = 0;
             document.getElementById('course-price').value = '';
-            document.getElementById('course-notes').value = '';
+            setNoteItems('course', [{ text: '', movementIds: [] }]);
+            renderNoteItemList('course');
             savePhotos('course', []); savePhotos('course-notes', []);
             renderPhotoPreview('course'); renderPhotoPreview('course-notes');
             updateDifficultyVisibility();
-            setLinkedMovements('course', []);
-            renderLinkedMovementsTrigger('course');
         }
         
         function resetSelfForm() {
@@ -4336,11 +4560,10 @@
             document.getElementById('self-hours').value = '';
             document.getElementById('self-location').selectedIndex = 0;
             document.getElementById('self-type').selectedIndex = 0;
-            document.getElementById('self-notes').value = '';
+            setNoteItems('self', [{ text: '', movementIds: [] }]);
+            renderNoteItemList('self');
             savePhotos('self', []); savePhotos('self-notes', []);
             renderPhotoPreview('self'); renderPhotoPreview('self-notes');
-            setLinkedMovements('self', []);
-            renderLinkedMovementsTrigger('self');
         }
         
         // ===== Course Plan CRUD =====
@@ -4357,9 +4580,8 @@
                 difficulty: document.getElementById('course-difficulty').value,
                 price: document.getElementById('course-price').value,
                 photos: getPhotos('course'),
-                notes: document.getElementById('course-notes').value,
-                notePhotos: getPhotos('course-notes'),
-                linkedMovements: getLinkedMovements('course')
+                notes: getNoteItems('course'),
+                notePhotos: getPhotos('course-notes')
             };
             if (editState.module === 'coursePlans' && editState.index >= 0) {
                 data[editState.index] = record;
@@ -4369,9 +4591,10 @@
             saveData('coursePlans', data);
             savePhotos('course', []); savePhotos('course-notes', []);
             syncCourseToExpenses();
-            syncLinkedKeyPoints('course', record);
-            setLinkedMovements('course', []);
-            renderLinkedMovementsTrigger('course');
+            const syncedCount = syncLinkedKeyPoints('course', record);
+            if (syncedCount > 0) showToast('已同步' + syncedCount + '条要点到动作库');
+            setNoteItems('course', [{ text: '', movementIds: [] }]);
+            renderNoteItemList('course');
             cancelEdit();
             renderCourseList(); renderCalendar();
             resetCourseForm();
@@ -4391,13 +4614,13 @@
             document.getElementById('course-type').value = d.courseType || '';
             document.getElementById('course-difficulty').value = d.difficulty || '';
             document.getElementById('course-price').value = d.price || '';
-            document.getElementById('course-notes').value = d.notes || '';
+            const courseNotes = normalizeNotes(d.notes);
+            setNoteItems('course', courseNotes);
+            renderNoteItemList('course');
             if (d.photos?.length) { savePhotos('course', [...d.photos]); renderPhotoPreview('course'); }
             else { savePhotos('course', []); renderPhotoPreview('course'); }
             if (d.notePhotos?.length) { savePhotos('course-notes', [...d.notePhotos]); renderPhotoPreview('course-notes'); }
             else { savePhotos('course-notes', []); renderPhotoPreview('course-notes'); }
-            if (d.linkedMovements?.length) { setLinkedMovements('course', [...d.linkedMovements]); renderLinkedMovementsTrigger('course'); }
-            else { setLinkedMovements('course', []); renderLinkedMovementsTrigger('course'); }
             updateDifficultyVisibility();
             startEdit('coursePlans', index);
         }
@@ -4525,9 +4748,8 @@
                 location: document.getElementById('self-location').value,
                 trainingType: document.getElementById('self-type').value,
                 photos: getPhotos('self'),
-                notes: document.getElementById('self-notes').value,
-                notePhotos: getPhotos('self-notes'),
-                linkedMovements: getLinkedMovements('self')
+                notes: getNoteItems('self'),
+                notePhotos: getPhotos('self-notes')
             };
             if (editState.module === 'selfTrainingPlans' && editState.index >= 0) {
                 data[editState.index] = record;
@@ -4536,9 +4758,10 @@
             }
             saveData('selfTrainingPlans', data);
             savePhotos('self', []); savePhotos('self-notes', []);
-            syncLinkedKeyPoints('self', record);
-            setLinkedMovements('self', []);
-            renderLinkedMovementsTrigger('self');
+            const syncedCount = syncLinkedKeyPoints('self', record);
+            if (syncedCount > 0) showToast('已同步' + syncedCount + '条要点到动作库');
+            setNoteItems('self', [{ text: '', movementIds: [] }]);
+            renderNoteItemList('self');
             cancelEdit();
             renderSelfTrainingList(); renderCalendar();
             resetSelfForm();
@@ -4556,13 +4779,13 @@
             document.getElementById('self-hours').value = d.hours || '';
             document.getElementById('self-location').value = d.location || '';
             document.getElementById('self-type').value = d.trainingType || '';
-            document.getElementById('self-notes').value = d.notes || '';
+            const selfNotes = normalizeNotes(d.notes);
+            setNoteItems('self', selfNotes);
+            renderNoteItemList('self');
             if (d.photos?.length) { savePhotos('self', [...d.photos]); renderPhotoPreview('self'); }
             else { savePhotos('self', []); renderPhotoPreview('self'); }
             if (d.notePhotos?.length) { savePhotos('self-notes', [...d.notePhotos]); renderPhotoPreview('self-notes'); }
             else { savePhotos('self-notes', []); renderPhotoPreview('self-notes'); }
-            if (d.linkedMovements?.length) { setLinkedMovements('self', [...d.linkedMovements]); renderLinkedMovementsTrigger('self'); }
-            else { setLinkedMovements('self', []); renderLinkedMovementsTrigger('self'); }
             startEdit('selfTrainingPlans', index);
         }
         
@@ -4948,7 +5171,8 @@
                             '<img src="'+p+'" onclick="openPhotoViewer(\''+p+'\')">'
                         ).join('') + '</div>';
                     }
-                    let noteHtml = r.notes ? '<div class="training-list-note">'+r.notes.substring(0,50)+(r.notes.length>50?'...':'')+'</div>' : '';
+                    const notePreview = getNotesPreview(r.notes, 50);
+                    let noteHtml = notePreview ? '<div class="training-list-note">'+notePreview+'</div>' : '';
                     
                     const toggleFn = r._source === 'course' ? 'toggleCourseStatus' : 'toggleSelfStatus';
                     const editFn = r._source === 'course' ? 'editCoursePlan' : 'editSelfTraining';
@@ -5072,6 +5296,13 @@
             }
         }
         
+        function initNoteForms() {
+            setNoteItems('course', [{ text: '', movementIds: [] }]);
+            setNoteItems('self', [{ text: '', movementIds: [] }]);
+            renderNoteItemList('course');
+            renderNoteItemList('self');
+        }
+
         function renderAll() {
             syncCourseToExpenses();
             renderOverview(); renderBodyRecords(); renderBodyTrend();
