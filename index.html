@@ -2453,6 +2453,11 @@
 
         <input type="file" id="photo-input
         <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event)">
+        <!-- Debug: visible file input for testing -->
+        <div style="position:fixed;bottom:10px;right:10px;z-index:9999;background:white;padding:8px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.2);font-size:12px;">
+            <div>调试：直接点👇</div>
+            <input type="file" id="photo-input-debug" accept="image/*" multiple onchange="handlePhotoSelect(event)">
+        </div>
         
         <!-- Pull to Refresh -->
         <div class="pull-indicator" id="pull-indicator">
