@@ -522,6 +522,7 @@
             background: var(--pink-50);
             transition: all 0.2s;
         }
+        .photo-add-btn svg { pointer-events: none; }
         .photo-add-btn:active { background: var(--pink-100); }
         
         /* Chart */
@@ -1548,7 +1549,7 @@
                         <div class="form-group">
                             <label>Photo</label>
                             <div class="photo-upload" id="body-photos">
-                                <div class="photo-add-btn" onclick="addPhoto('body')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                                <label class="photo-add-btn" for="photo-input-body"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
                             </div>
                         </div>
                         <button class="btn" onclick="addBodyData()">Save</button>
@@ -1625,7 +1626,7 @@
                         <div class="form-group">
                             <label>Photo</label>
                             <div class="photo-upload" id="muscle-photos">
-                                <div class="photo-add-btn" onclick="addPhoto('muscle')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                                <label class="photo-add-btn" for="photo-input-muscle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
                             </div>
                         </div>
                         <button class="btn" onclick="addMuscleData()">Save</button>
@@ -1681,7 +1682,7 @@
                         <div class="form-group">
                             <label>Photo</label>
                             <div class="photo-upload" id="flex-photos">
-                                <div class="photo-add-btn" onclick="addPhoto('flex')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                                <label class="photo-add-btn" for="photo-input-flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
                             </div>
                         </div>
                         <button class="btn" onclick="addFlexData()">Save</button>
@@ -1733,7 +1734,7 @@
                         <div class="form-group">
                             <label>Photo</label>
                             <div class="photo-upload" id="injury-photos">
-                                <div class="photo-add-btn" onclick="addPhoto('injury')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                                <label class="photo-add-btn" for="photo-input-injury"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
                             </div>
                         </div>
                         <button class="btn" onclick="addInjuryData()">Save</button>
@@ -1815,7 +1816,7 @@
                     <div class="form-group">
                         <label>Photo</label>
                         <div class="photo-upload" id="equip-photos">
-                            <div class="photo-add-btn" onclick="addPhoto('equip')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                            <label class="photo-add-btn" for="photo-input-equip"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
                         </div>
                     </div>
                     <button class="btn" onclick="addEquipment()">Save</button>
@@ -2113,7 +2114,7 @@
                         <div class="form-group">
                             <label>打卡照</label>
                             <div class="photo-upload" id="course-photos">
-                                <div class="photo-add-btn" onclick="addPhoto('course')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                                <label class="photo-add-btn" for="photo-input-course"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
                             </div>
                         </div>
                         <div class="form-group">
@@ -2123,7 +2124,7 @@
                         <div class="form-group">
                             <label>笔记照片</label>
                             <div class="photo-upload" id="course-notes-photos">
-                                <div class="photo-add-btn" onclick="addPhoto('course-notes')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                                <label class="photo-add-btn" for="photo-input-course-notes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
                             </div>
                         </div>
                         <div class="form-group">
@@ -2199,7 +2200,7 @@
                         <div class="form-group">
                             <label>打卡照</label>
                             <div class="photo-upload" id="self-photos">
-                                <div class="photo-add-btn" onclick="addPhoto('self')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                                <label class="photo-add-btn" for="photo-input-self"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
                             </div>
                         </div>
                         <div class="form-group">
@@ -2209,7 +2210,7 @@
                         <div class="form-group">
                             <label>笔记照片</label>
                             <div class="photo-upload" id="self-notes-photos">
-                                <div class="photo-add-btn" onclick="addPhoto('self-notes')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                                <label class="photo-add-btn" for="photo-input-self-notes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
                             </div>
                         </div>
                         <div class="form-group">
@@ -2371,7 +2372,7 @@
                 <div class="form-group">
                     <label>示范图片</label>
                     <div class="photo-upload" id="mv-add-photos">
-                        <div class="photo-add-btn" onclick="addPhoto('mv-add')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                        <label class="photo-add-btn" for="photo-input-mv-add"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
                     </div>
                 </div>
                 <div class="form-group">
@@ -2419,7 +2420,7 @@
                 <div class="form-group">
                     <label>照片</label>
                     <div class="photo-upload" id="mv-training-photos">
-                        <div class="photo-add-btn" onclick="addPhoto('mv-training')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                        <label class="photo-add-btn" for="photo-input-mv-training"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
                     </div>
                 </div>
                 <div class="form-group">
@@ -2440,7 +2441,7 @@
                 <div class="form-group">
                     <label>示范图片</label>
                     <div class="photo-upload" id="mv-demo-photos">
-                        <div class="photo-add-btn" onclick="addPhoto('mv-demo')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                        <label class="photo-add-btn" for="photo-input-mv-demo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
                     </div>
                 </div>
                 <div class="form-group">
@@ -2452,7 +2453,18 @@
         </div>
 
         <input type="file" id="photo-input
-        <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event)">
+        <input type="file" id="photo-input-body" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'body')">
+        <input type="file" id="photo-input-muscle" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'muscle')">
+        <input type="file" id="photo-input-flex" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'flex')">
+        <input type="file" id="photo-input-injury" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'injury')">
+        <input type="file" id="photo-input-equip" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'equip')">
+        <input type="file" id="photo-input-course" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'course')">
+        <input type="file" id="photo-input-course-notes" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'course-notes')">
+        <input type="file" id="photo-input-self" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'self')">
+        <input type="file" id="photo-input-self-notes" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'self-notes')">
+        <input type="file" id="photo-input-mv-add" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'mv-add')">
+        <input type="file" id="photo-input-mv-training" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'mv-training')">
+        <input type="file" id="photo-input-mv-demo" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'mv-demo')">
         <!-- Debug: visible file input for testing -->
         <div style="position:fixed;bottom:10px;right:10px;z-index:9999;background:white;padding:8px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.2);font-size:12px;">
             <div>调试：直接点👇</div>
@@ -2568,9 +2580,18 @@
         function addPhoto(target) {
             currentPhotoTarget = target;
             pendingPhotos = getPhotos(target);
-            document.getElementById('photo-input').click();
+            const input = document.getElementById('photo-input-' + target);
+            if (input) input.click();
         }
-        function handlePhotoSelect(e) {
+        function handlePhotoSelect(e, target) {
+            // If target not passed, derive from input id
+            if (!target && e.target && e.target.id && e.target.id.startsWith('photo-input-')) {
+                target = e.target.id.replace('photo-input-', '');
+            }
+            if (target) {
+                currentPhotoTarget = target;
+                pendingPhotos = getPhotos(target);
+            }
             const files = Array.from(e.target.files);
             if (!files.length) return;
             let processed = 0;
