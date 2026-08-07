@@ -1,15 +1,15 @@
-const CACHE_NAME = 'ballet-app-v48';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json'
-];
+const CACHE_NAME = 'ballet-app-v49';
+
+// No-op service worker - does NOT intercept fetch requests
+// Only exists for PWA installability and version tracking
+// Prevents cache-related white screen issues
 
 self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {
+  // Clean up old caches from previous versions
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -23,38 +23,9 @@ self.addEventListener('activate', event => {
   );
 });
 
-self.addEventListener('fetch', event => {
-  const request = event.request;
-  // Skip non-GET requests
-  if (request.method !== 'GET') return;
+// No fetch handler - all requests go directly to the network
+// This avoids the "Returned response is null" error entirely
 
-  event.respondWith(
-    fetch(request)
-      .then(response => {
-        if (response && response.ok) {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(request, responseClone);
-          });
-        }
-        return response;
-      })
-      .catch(() => {
-        // Network failed, try cache
-        return caches.match(request).then(cached => {
-          if (cached) return cached;
-          // For navigation requests, fall back to cached index.html
-          if (request.mode === 'navigate') {
-            return caches.match('/index.html');
-          }
-          // Last resort: return a basic offline response
-          return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
-        });
-      })
-  );
-});
-
-// Listen for message from client to force update
 self.addEventListener('message', event => {
   if (event.data === 'SKIP_WAITING') {
     self.skipWaiting();
