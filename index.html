@@ -744,6 +744,10 @@
             color: white;
             font-weight: 600;
         }
+        .mv-tab-star {
+            flex: 0 0 44px;
+            font-size: 16px;
+        }
         .mv-list {
             display: flex;
             flex-direction: column;
@@ -761,6 +765,15 @@
             transition: all 0.15s;
         }
         .mv-card:active { transform: scale(0.98); }
+        .mv-card-star {
+            font-size: 18px;
+            margin-right: 8px;
+            cursor: pointer;
+            flex-shrink: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .mv-card-star.empty { opacity: 0.25; }
         .mv-card-fr {
             font-size: 15px;
             font-weight: 600;
@@ -790,6 +803,7 @@
             margin-bottom: 12px;
             box-shadow: var(--card-shadow);
             text-align: center;
+            position: relative;
         }
         .mv-detail-fr {
             font-size: 22px;
@@ -811,6 +825,16 @@
             font-weight: 500;
             border-radius: 10px;
         }
+        .mv-detail-star {
+            position: absolute;
+            right: 16px;
+            top: 16px;
+            font-size: 22px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .mv-detail-star.empty { opacity: 0.25; }
         .mv-section {
             background: white;
             border-radius: 18px;
@@ -2070,6 +2094,7 @@
                         <div class="mv-tab active" data-cat="posture" onclick="switchMovementTab('posture')">姿态</div>
                         <div class="mv-tab" data-cat="single" onclick="switchMovementTab('single')">单一动作</div>
                         <div class="mv-tab" data-cat="combination" onclick="switchMovementTab('combination')">组合动作</div>
+                        <div class="mv-tab mv-tab-star" data-cat="favorite" onclick="switchMovementTab('favorite')">⭐</div>
                     </div>
                     <div class="mv-list" id="mv-list"></div>
                     <button class="add-float-btn" id="mv-add-btn" onclick="openAddMovementModal()" style="display:flex;">+</button>
@@ -2082,6 +2107,7 @@
                         <div class="mv-detail-fr" id="mv-detail-fr"></div>
                         <div class="mv-detail-zh" id="mv-detail-zh"></div>
                         <span class="mv-detail-cat" id="mv-detail-cat"></span>
+                        <span class="mv-detail-star" id="mv-detail-star" onclick="toggleFavorite(currentMovementId)">⭐</span>
                     </div>
 
                     <div class="mv-section">
@@ -3701,6 +3727,7 @@
                         customTypes: [], // [{key, label}]
                     },
                     custom: false,
+                    favorite: false,
                 }));
                 localStorage.setItem('movementLibrary', JSON.stringify({ movements, customTypes: [] }));
             }
@@ -3717,6 +3744,7 @@
                 }
                 if (!m.training.customTypes) m.training.customTypes = [];
                 if (!m.keyPoints) m.keyPoints = [];
+                if (typeof m.favorite !== 'boolean') m.favorite = false;
                 return m;
             });
             return data;
@@ -3742,6 +3770,19 @@
             }
         }
 
+        function toggleFavorite(id) {
+            const m = getMovementById(id);
+            if (!m) return;
+            updateMovement(id, { favorite: !m.favorite });
+            renderMovementList();
+            // Update detail star if open
+            const starEl = document.getElementById('mv-detail-star');
+            if (starEl && currentMovementId === id) {
+                const updated = getMovementById(id);
+                starEl.classList.toggle('empty', !updated.favorite);
+            }
+        }
+
         function switchMovementTab(cat) {
             currentMovementCategory = cat;
             document.querySelectorAll('.mv-tab').forEach(t => {
@@ -3757,25 +3798,30 @@
         function renderMovementList() {
             const lib = getMovementLibrary();
             const search = (document.getElementById('mv-search-input')?.value || '').toLowerCase().trim();
+            const isFavTab = currentMovementCategory === 'favorite';
             const filtered = lib.movements
-                .filter(m => m.category === currentMovementCategory)
+                .filter(m => isFavTab ? m.favorite : m.category === currentMovementCategory)
                 .filter(m => {
                     if (!search) return true;
                     return m.nameFr.toLowerCase().includes(search) || m.nameZh.includes(search);
                 })
-                .sort((a,b) => a.nameFr.localeCompare(b.nameFr, 'fr'));
+                .sort((a,b) => {
+                    if (a.favorite !== b.favorite) return a.favorite ? -1 : 1;
+                    return a.nameFr.localeCompare(b.nameFr, 'fr');
+                });
 
             const el = document.getElementById('mv-list');
             if (!el) return;
 
             if (filtered.length === 0) {
-                el.innerHTML = '<div class="mv-empty">暂无匹配的动作</div>';
+                el.innerHTML = '<div class="mv-empty">' + (isFavTab ? '还没有收藏的动作，点击动作旁的⭐收藏' : '暂无匹配的动作') + '</div>';
                 return;
             }
 
             el.innerHTML = filtered.map(m => `
                 <div class="mv-card" onclick="openMovementDetail('${m.id}')">
-                    <div>
+                    <span class="mv-card-star ${m.favorite ? '' : 'empty'}" onclick="event.stopPropagation(); toggleFavorite('${m.id}')">⭐</span>
+                    <div style="flex:1; min-width:0;">
                         <div class="mv-card-fr">${m.nameFr}</div>
                         <div class="mv-card-zh">${m.nameZh}</div>
                     </div>
@@ -3809,6 +3855,10 @@
             document.getElementById('mv-detail-zh').textContent = m.nameZh;
             const catLabels = { posture: '姿态', single: '单一动作', combination: '组合动作' };
             document.getElementById('mv-detail-cat').textContent = catLabels[m.category] || '';
+
+            // Favorite star
+            const starEl = document.getElementById('mv-detail-star');
+            if (starEl) starEl.classList.toggle('empty', !m.favorite);
 
             // Demo image
             const imgEl = document.getElementById('mv-demo-image');
@@ -4123,6 +4173,7 @@
                 keyPoints: [],
                 training: { ground: [], barre: [], center: [], pbt: [], customTypes: [] },
                 custom: true,
+                favorite: false,
             };
             lib.movements.push(newMv);
             saveMovementLibrary(lib);
