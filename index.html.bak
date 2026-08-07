@@ -245,6 +245,50 @@
         .pull-indicator.refreshing svg { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
+        /* Mini Player */
+        .mini-player {
+            position: fixed;
+            bottom: 62px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: rgba(255,245,240,0.96);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 0.5px solid rgba(192,104,120,0.15);
+            padding: 10px 16px 6px;
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 99;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.04);
+        }
+        .mini-player.active { display: flex; }
+        .mini-player .mp-info { flex: 1; min-width: 0; }
+        .mini-player .mp-title { font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-player .mp-artist { font-size: 11px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-player .mp-time { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
+        .mp-top-row { display: flex; align-items: center; gap: 8px; width: 100%; }
+        .mini-player .mp-controls { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        .mini-player .mp-btn { width: 32px; height: 32px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; background: transparent; color: var(--text-secondary); }
+        .mini-player .mp-prev-btn:active, .mini-player .mp-next-btn:active { background: var(--pink-100); }
+        .mini-player .mp-close-btn { color: var(--text-tertiary); font-size: 18px; }
+        /* Music list play button */
+        .music-play-btn { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--pink-400); background: transparent; color: var(--pink-400); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; margin-left: 8px; flex-shrink: 0; }
+        .music-play-btn:active { background: var(--pink-50); }
+        .music-play-btn.playing { background: var(--pink-400); color: white; }
+        
+        /* Music Modal (iframe player) */
+        .music-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; }
+        .music-modal-content { width: 100%; max-width: 430px; background: white; border-radius: 20px 20px 0 0; box-shadow: 0 -4px 24px rgba(0,0,0,0.12); max-height: 80vh; display: flex; flex-direction: column; }
+        .music-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--pink-100); }
+        .music-modal-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+        .music-modal-close { width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--pink-50); color: var(--text-secondary); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .music-modal-close:active { background: var(--pink-100); }
+        .music-modal-body { flex: 1; overflow: hidden; min-height: 360px; }
+        .music-modal-body iframe { width: 100%; height: 100%; min-height: 360px; border: none; }
+        
         /* Tab Bar */
         .tab-bar {
             position: fixed;
@@ -477,27 +521,9 @@
             color: var(--pink-300);
             background: var(--pink-50);
             transition: all 0.2s;
-            margin: 0;
-            padding: 0;
-            font-size: 0;
-            line-height: 1;
         }
         .photo-add-btn svg { pointer-events: none; }
         .photo-add-btn:active { background: var(--pink-100); }
-        .form-group .photo-add-btn {
-            /* override form-group label styles for upload button */
-            display: flex;
-            width: 56px;
-            height: 56px;
-            margin: 0;
-            padding: 0;
-            font-size: 0;
-            font-weight: normal;
-            color: var(--pink-300);
-            text-align: left;
-            margin-bottom: 0;
-            border-radius: 10px;
-        }
         
         /* Chart */
         .trend-chart { width: 100%; background: var(--pink-50); border-radius: 12px; overflow: hidden; padding: 8px; }
@@ -718,10 +744,6 @@
             color: white;
             font-weight: 600;
         }
-        .mv-tab-star {
-            flex: 0 0 44px;
-            font-size: 16px;
-        }
         .mv-list {
             display: flex;
             flex-direction: column;
@@ -739,15 +761,6 @@
             transition: all 0.15s;
         }
         .mv-card:active { transform: scale(0.98); }
-        .mv-card-star {
-            font-size: 18px;
-            margin-right: 8px;
-            cursor: pointer;
-            flex-shrink: 0;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .mv-card-star.empty { opacity: 0.25; }
         .mv-card-fr {
             font-size: 15px;
             font-weight: 600;
@@ -777,7 +790,6 @@
             margin-bottom: 12px;
             box-shadow: var(--card-shadow);
             text-align: center;
-            position: relative;
         }
         .mv-detail-fr {
             font-size: 22px;
@@ -799,16 +811,6 @@
             font-weight: 500;
             border-radius: 10px;
         }
-        .mv-detail-star {
-            position: absolute;
-            right: 16px;
-            top: 16px;
-            font-size: 22px;
-            cursor: pointer;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .mv-detail-star.empty { opacity: 0.25; }
         .mv-section {
             background: white;
             border-radius: 18px;
@@ -1070,6 +1072,30 @@
             border-color: var(--pink-500);
             color: white;
         }
+        .mv-picker-note {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 0.5px solid var(--border);
+        }
+        .mv-picker-note label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .mv-picker-note textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 13px;
+            background: var(--pink-50);
+            min-height: 60px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .mv-picker-note textarea:focus { outline: none; border-color: var(--pink-300); background: white; }
         .mv-picker-done {
             margin-top: 14px;
             background: var(--pink-500);
@@ -1083,110 +1109,6 @@
             cursor: pointer;
         }
         .mv-picker-done:active { opacity: 0.8; }
-
-        /* Note item list (for course / self training notes) */
-        .note-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .note-item {
-            background: var(--pink-50);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px;
-            position: relative;
-        }
-        .note-item textarea {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 13px;
-            background: white;
-            min-height: 60px;
-            resize: vertical;
-            font-family: inherit;
-            box-sizing: border-box;
-        }
-        .note-item textarea:focus { outline: none; border-color: var(--pink-300); }
-        .note-item-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 8px;
-        }
-        .note-item-pick {
-            font-size: 12px;
-            color: var(--pink-500);
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 6px;
-            background: white;
-            border: 1px dashed var(--pink-300);
-        }
-        .note-item-del {
-            font-size: 12px;
-            color: #D4888A;
-            cursor: pointer;
-            padding: 4px 8px;
-        }
-        .note-item-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-top: 6px;
-        }
-        .note-item-tag {
-            padding: 2px 6px;
-            background: var(--pink-100);
-            color: var(--pink-600);
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-        }
-        .note-item-tag .remove {
-            cursor: pointer;
-            opacity: 0.6;
-        }
-        .note-add-btn {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background: var(--pink-100);
-            color: var(--pink-600);
-            border: 1px dashed var(--pink-300);
-            border-radius: 10px;
-            font-size: 13px;
-            text-align: center;
-            cursor: pointer;
-            margin-top: 8px;
-        }
-        .note-add-btn:active { opacity: 0.8; }
-
-        /* Movement picker overlay sits above main modal */
-        #mv-picker-overlay { z-index: 2500; }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.75);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            z-index: 9999;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .toast.show { opacity: 1; }
 
         /* Add movement modal form */
         .mv-add-photo-row {
@@ -1914,35 +1836,32 @@
                 </div>
             </div>
             
-            <!-- ===== 跟练库 ===== -->
-            <div class="module" id="module-videos">
-                <div class="card modal-form" data-modal="videos" style="display:none;">
-                    <div class="card-title">New Video</div>
+            <!-- ===== 音乐库 ===== -->
+            <div class="module" id="module-music">
+                <div class="card modal-form" data-modal="music" style="display:none;">
+                    <div class="card-title">Add Music</div>
                     <div class="form-group">
-                        <label>分类</label>
-                        <input type="text" id="video-category" placeholder="如：把杆 / 中间 / 初级 / 提高">
+                        <label>Category</label>
+                        <input type="text" id="music-category" placeholder="如：Adagio / Allegro">
                     </div>
                     <div class="form-group">
-                        <label>标题</label>
-                        <input type="text" id="video-title" placeholder="视频名称">
+                        <label>Title</label>
+                        <input type="text" id="music-name" placeholder="歌曲名">
                     </div>
                     <div class="form-group">
-                        <label>时长</label>
-                        <input type="text" id="video-duration" placeholder="如：45分钟（可选）">
+                        <label>Artist</label>
+                        <input type="text" id="music-artist" placeholder="艺术家（可选）">
                     </div>
                     <div class="form-group">
-                        <label>视频链接</label>
-                        <input type="text" id="video-link" placeholder="B站/YouTube/小红书等完整链接">
+                        <label>Netease Link or ID</label>
+                        <input type="text" id="music-link" placeholder="网易云链接或歌曲ID">
+                        <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">支持：歌曲数字ID、完整链接、163cn.tv短链接。短链接如无法自动解析，请打开链接后从地址栏复制含id=的完整URL</div>
                     </div>
-                    <div class="form-group">
-                        <label>备注</label>
-                        <textarea id="video-note" rows="2" placeholder="难度、老师、适合场景等（可选）"></textarea>
-                    </div>
-                    <button class="btn" onclick="addVideo()">Save</button>
+                    <button class="btn" onclick="addMusic()">Save</button>
                 </div>
                 <div class="card">
-                    <div class="card-title">🎬 Practice Videos</div>
-                    <div class="scroll-list" id="video-list"></div>
+                    <div class="card-title">🎵 Playlist</div>
+                    <div class="scroll-list" id="music-list"></div>
                 </div>
             </div>
             
@@ -2011,18 +1930,6 @@
                     <div class="card-title">🩰 History</div>
                     <div class="scroll-list" id="expense-list"></div>
                 </div>
-                <div class="card">
-                    <div class="card-title">⚙️ 数据管理</div>
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <button class="btn" style="flex:1; background:var(--pink-100); color:var(--pink-600);" onclick="exportAllData()">📤 导出数据</button>
-                        <label class="btn" style="flex:1; background:var(--pink-50); color:var(--pink-500); text-align:center; cursor:pointer;" for="import-file-input">📥 导入数据</label>
-                        <input type="file" id="import-file-input" accept=".json" style="display:none;" onchange="importAllData(event)">
-                    </div>
-                    <div style="font-size:12px; color:var(--text-tertiary); margin-top:10px; line-height:1.6;">
-                        导出文件包含所有记录和照片（Base64格式），请妥善保存。<br>
-                        导入会覆盖当前所有数据，建议先导出备份。
-                    </div>
-                </div>
             </div>
             
             <!-- ===== 训练日记 ===== -->
@@ -2083,7 +1990,6 @@
                         <div class="mv-tab active" data-cat="posture" onclick="switchMovementTab('posture')">姿态</div>
                         <div class="mv-tab" data-cat="single" onclick="switchMovementTab('single')">单一动作</div>
                         <div class="mv-tab" data-cat="combination" onclick="switchMovementTab('combination')">组合动作</div>
-                        <div class="mv-tab mv-tab-star" data-cat="favorite" onclick="switchMovementTab('favorite')">⭐</div>
                     </div>
                     <div class="mv-list" id="mv-list"></div>
                     <button class="add-float-btn" id="mv-add-btn" onclick="openAddMovementModal()" style="display:flex;">+</button>
@@ -2096,7 +2002,6 @@
                         <div class="mv-detail-fr" id="mv-detail-fr"></div>
                         <div class="mv-detail-zh" id="mv-detail-zh"></div>
                         <span class="mv-detail-cat" id="mv-detail-cat"></span>
-                        <span class="mv-detail-star" id="mv-detail-star" onclick="toggleFavorite(currentMovementId)">⭐</span>
                     </div>
 
                     <div class="mv-section">
@@ -2214,13 +2119,18 @@
                         </div>
                         <div class="form-group">
                             <label>学习笔记</label>
-                            <div class="note-list" id="course-notes-list"></div>
-                            <button type="button" class="note-add-btn" onclick="addNoteItem('course')">+ 添加一条笔记</button>
+                            <textarea id="course-notes" rows="4" placeholder="笔记内容"></textarea>
                         </div>
                         <div class="form-group">
                             <label>笔记照片</label>
                             <div class="photo-upload" id="course-notes-photos">
                                 <label class="photo-add-btn" for="photo-input-course-notes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>关联动作</label>
+                            <div class="mv-picker-trigger" id="course-mv-trigger" onclick="openMovementPicker('course')">
+                                <span id="course-mv-placeholder">点击选择关联动作...</span>
                             </div>
                         </div>
                         <button class="btn" onclick="addCoursePlan()">Save</button>
@@ -2295,13 +2205,18 @@
                         </div>
                         <div class="form-group">
                             <label>训练笔记</label>
-                            <div class="note-list" id="self-notes-list"></div>
-                            <button type="button" class="note-add-btn" onclick="addNoteItem('self')">+ 添加一条笔记</button>
+                            <textarea id="self-notes" rows="4" placeholder="笔记内容"></textarea>
                         </div>
                         <div class="form-group">
                             <label>笔记照片</label>
                             <div class="photo-upload" id="self-notes-photos">
                                 <label class="photo-add-btn" for="photo-input-self-notes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>关联动作</label>
+                            <div class="mv-picker-trigger" id="self-mv-trigger" onclick="openMovementPicker('self')">
+                                <span id="self-mv-placeholder">点击选择关联动作...</span>
                             </div>
                         </div>
                         <button class="btn" onclick="addSelfTraining()">Save</button>
@@ -2341,6 +2256,38 @@
 
         </div>
         
+        <!-- Mini Player -->
+        <div class="mini-player" id="mini-player">
+            <div class="mp-top-row" onclick="expandMusicPlayer()">
+                <div class="mp-info">
+                    <div class="mp-title" id="mp-title">--</div>
+                    <div class="mp-artist" id="mp-artist">--</div>
+                </div>
+                <div class="mp-controls" onclick="event.stopPropagation()">
+                    <button class="mp-btn mp-prev-btn" onclick="playPrevTrack()" title="上一首">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                    </button>
+                    <button class="mp-btn mp-next-btn" onclick="playNextTrack()" title="下一首">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                    </button>
+                    <button class="mp-btn mp-close-btn" onclick="closePlayer()">×</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Music Player Modal (iframe) -->
+        <div class="music-modal" id="music-modal" style="display:none">
+            <div class="music-modal-content">
+                <div class="music-modal-header">
+                    <div class="music-modal-title" id="mm-title">--</div>
+                    <button class="music-modal-close" onclick="collapseMusicPlayer()">×</button>
+                </div>
+                <div class="music-modal-body">
+                    <iframe id="music-iframe" frameborder="0" allow="autoplay; encrypted-media"></iframe>
+                </div>
+            </div>
+        </div>
+        
         <!-- Tab Bar -->
         <div class="tab-bar">
             <div class="tab-item" onclick="switchModule('training')">
@@ -2355,9 +2302,9 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7l-8-4-8 4v10l8 4 8-4V7z"/><path d="M12 3v18M4 7l8 4 8-4"/></svg>
                 <div class="label">Wardrobe</div>
             </div>
-            <div class="tab-item" onclick="switchModule('videos')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-                <div class="label">Videos</div>
+            <div class="tab-item" onclick="switchModule('music')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                <div class="label">Music</div>
             </div>
             <div class="tab-item" onclick="switchModule('account')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><path d="M6 16h4"/></svg>
@@ -2370,9 +2317,6 @@
             <span class="close-hint" onclick="closeHint()">✕</span>
         </div>
         
-        <!-- Toast -->
-        <div class="toast" id="global-toast"></div>
-
         <!-- Movement Picker Modal -->
         <div class="modal-overlay" id="mv-picker-overlay" onclick="closeMovementPickerOverlay(event)">
             <div class="modal-sheet">
@@ -2394,6 +2338,10 @@
                     <div class="mv-picker-tab" data-cat="combination" onclick="switchPickerTab('combination')">组合动作</div>
                 </div>
                 <div class="mv-picker-list" id="mv-picker-list"></div>
+                <div class="mv-picker-note">
+                    <label>要点笔记（将追加到动作的要点列表）</label>
+                    <textarea id="mv-picker-note" placeholder="记录本节课关于所选动作的要点..."></textarea>
+                </div>
                 <button class="mv-picker-done" onclick="confirmMovementPicker()">确定</button>
             </div>
         </div>
@@ -2503,6 +2451,21 @@
                 <button class="btn" onclick="saveDemoEdit()">保存</button>
             </div>
         </div>
+
+        <input type="file" id="photo-input
+        <input type="file" id="photo-input-body" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'body')">
+        <input type="file" id="photo-input-muscle" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'muscle')">
+        <input type="file" id="photo-input-flex" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'flex')">
+        <input type="file" id="photo-input-injury" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'injury')">
+        <input type="file" id="photo-input-equip" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'equip')">
+        <input type="file" id="photo-input-course" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'course')">
+        <input type="file" id="photo-input-course-notes" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'course-notes')">
+        <input type="file" id="photo-input-self" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'self')">
+        <input type="file" id="photo-input-self-notes" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'self-notes')">
+        <input type="file" id="photo-input-mv-add" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'mv-add')">
+        <input type="file" id="photo-input-mv-training" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'mv-training')">
+        <input type="file" id="photo-input-mv-demo" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event, 'mv-demo')">
+        
         <!-- Pull to Refresh -->
         <div class="pull-indicator" id="pull-indicator">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
@@ -2526,20 +2489,6 @@
                     <button class="modal-close" onclick="closeModal()">✕</button>
                 </div>
                 <div id="modal-body"></div>
-                <div style="display:none;">
-                    <input type="file" id="photo-input-body" accept="image/*" multiple onchange="handlePhotoSelect(event, 'body')">
-                    <input type="file" id="photo-input-muscle" accept="image/*" multiple onchange="handlePhotoSelect(event, 'muscle')">
-                    <input type="file" id="photo-input-flex" accept="image/*" multiple onchange="handlePhotoSelect(event, 'flex')">
-                    <input type="file" id="photo-input-injury" accept="image/*" multiple onchange="handlePhotoSelect(event, 'injury')">
-                    <input type="file" id="photo-input-equip" accept="image/*" multiple onchange="handlePhotoSelect(event, 'equip')">
-                    <input type="file" id="photo-input-course" accept="image/*" multiple onchange="handlePhotoSelect(event, 'course')">
-                    <input type="file" id="photo-input-course-notes" accept="image/*" multiple onchange="handlePhotoSelect(event, 'course-notes')">
-                    <input type="file" id="photo-input-self" accept="image/*" multiple onchange="handlePhotoSelect(event, 'self')">
-                    <input type="file" id="photo-input-self-notes" accept="image/*" multiple onchange="handlePhotoSelect(event, 'self-notes')">
-                    <input type="file" id="photo-input-mv-add" accept="image/*" multiple onchange="handlePhotoSelect(event, 'mv-add')">
-                    <input type="file" id="photo-input-mv-training" accept="image/*" multiple onchange="handlePhotoSelect(event, 'mv-training')">
-                    <input type="file" id="photo-input-mv-demo" accept="image/*" multiple onchange="handlePhotoSelect(event, 'mv-demo')">
-                </div>
             </div>
         </div>
     </div>
@@ -2566,7 +2515,6 @@
             if (hI && wI) { hI.addEventListener('input', calcBMI); wI.addEventListener('input', calcBMI); }
             
             initTrainingForms();
-            initNoteForms();
             renderAll();
             
             // Restore last active module
@@ -2690,7 +2638,7 @@
             training: 'Training',
             body: 'Body',
             equip: 'Wardrobe',
-            videos: 'Videos',
+            music: 'Music',
             account: 'Ledger'
         };
         function switchModule(name, skipSave) {
@@ -2699,7 +2647,7 @@
             document.getElementById('module-' + name).classList.add('active');
             // Find and activate the correct tab
             const tabs = document.querySelectorAll('.tab-item');
-            const moduleKeys = ['training','body','equip','videos','account'];
+            const moduleKeys = ['training','body','equip','music','account'];
             const idx = moduleKeys.indexOf(name);
             if (idx >= 0 && tabs[idx]) tabs[idx].classList.add('active');
             if (name === 'account') updateExpenseStat();
@@ -2749,7 +2697,7 @@
                 return null; // overview has no form
             }
             if (moduleId === 'module-equip') return 'equip';
-            if (moduleId === 'module-videos') return 'videos';
+            if (moduleId === 'module-music') return 'music';
             if (moduleId === 'module-account') return 'account';
             if (moduleId === 'module-training') {
                 if (currentTrainingSub === 'course') return 'training-course';
@@ -2788,7 +2736,7 @@
                 'body-flex': 'Flexibility',
                 'body-injury': 'Injury',
                 'equip': 'New Item',
-                'videos': 'New Video',
+                'music': 'New Music',
                 'account': 'New Expense',
                 'training-course': '课程计划',
                 'training-self': '自训计划'
@@ -2881,7 +2829,7 @@
             saveData('bodyData', data);
             savePhotos('body', []);
             cancelEdit();
-            renderBodyRecords(); renderBodyTrend(); renderOverview(); renderTrainingWidgets();
+            renderBodyRecords(); renderBodyTrend();
             ['body-height','body-weight-input','body-fat','body-note','body-bmi'].forEach(id => document.getElementById(id).value = '');
             renderPhotoPreview('body');
             closeModal();
@@ -2935,7 +2883,7 @@
             }
             saveData('muscleData', data); savePhotos('muscle', []);
             cancelEdit();
-            renderMuscleRecords(); renderOverview(); renderTrainingWidgets(); renderMuscleTrend(); updateMuscleFilter();
+            renderMuscleRecords(); renderMuscleTrend(); updateMuscleFilter();
             document.getElementById('muscle-note').value = '';
             renderPhotoPreview('muscle');
             closeModal();
@@ -2990,7 +2938,7 @@
             }
             saveData('flexData', data); savePhotos('flex', []);
             cancelEdit();
-            renderFlexRecords(); renderOverview(); renderTrainingWidgets(); renderFlexTrend(); updateFlexFilter();
+            renderFlexRecords(); renderFlexTrend(); updateFlexFilter();
             document.getElementById('flex-level').value = ''; document.getElementById('flex-note').value = '';
             renderPhotoPreview('flex');
             closeModal();
@@ -3044,7 +2992,7 @@
             }
             saveData('injuryData', data); savePhotos('injury', []);
             cancelEdit();
-            renderInjuryRecords(); renderOverview(); renderTrainingWidgets();
+            renderInjuryRecords();
             document.getElementById('injury-part').value = ''; document.getElementById('injury-desc').value = '';
             renderPhotoPreview('injury');
             closeModal();
@@ -3107,7 +3055,7 @@
             
             saveData('equipment', equipData); savePhotos('equip', []);
             cancelEdit();
-            renderEquipList('all'); renderOverview(); renderTrainingWidgets();
+            renderEquipList('all');
             
             document.getElementById('equip-name').value = '';
             document.getElementById('equip-brand').value = '';
@@ -3247,74 +3195,170 @@
             }
         }
         
-        // ===== Videos (跟练库) =====
-        function addVideo() {
-            const data = loadData('videos');
+        // ===== Music =====
+        let musicPlaylist = [];
+        
+        async function extractNeteaseId(input) {
+            if (!input) return null;
+            input = input.trim();
+            // Pure number = ID
+            if (/^\d+$/.test(input)) return input;
+            // URL patterns with id=
+            const m = input.match(/[?&]id=(\d+)/);
+            if (m) return m[1];
+            const m2 = input.match(/\/song\/(\d+)/);
+            if (m2) return m2[1];
+            // Short link 163cn.tv — try direct fetch (browser follows redirect)
+            if (input.includes('163cn.tv')) {
+                try {
+                    const resp = await fetch(input, { redirect: 'follow', mode: 'cors' });
+                    if (resp.ok) {
+                        const html = await resp.text();
+                        const mm = html.match(/[?&]id=(\d+)/) || html.match(/\/song\/(\d+)/);
+                        if (mm) return mm[1];
+                    }
+                } catch(e) { console.warn('Short link direct fetch failed:', e); }
+            }
+            return null;
+        }
+        
+        async function addMusic() {
+            const data = loadData('music');
+            const linkVal = document.getElementById('music-link').value;
+            const neteaseId = await extractNeteaseId(linkVal);
             const record = {
-                category: document.getElementById('video-category').value,
-                title: document.getElementById('video-title').value,
-                duration: document.getElementById('video-duration').value,
-                link: document.getElementById('video-link').value,
-                note: document.getElementById('video-note').value
+                category: document.getElementById('music-category').value,
+                name: document.getElementById('music-name').value,
+                artist: document.getElementById('music-artist').value,
+                link: linkVal,
+                neteaseId: neteaseId || ''
             };
-            if (editState.module === 'videos' && editState.index >= 0) {
+            if (editState.module === 'music' && editState.index >= 0) {
                 data[editState.index] = record;
             } else {
                 data.push(record);
             }
-            saveData('videos', data); renderVideoList();
+            saveData('music', data); renderMusicList();
             cancelEdit();
-            document.getElementById('video-category').value = '';
-            document.getElementById('video-title').value = '';
-            document.getElementById('video-duration').value = '';
-            document.getElementById('video-link').value = '';
-            document.getElementById('video-note').value = '';
+            document.getElementById('music-category').value = '';
+            document.getElementById('music-name').value = '';
+            document.getElementById('music-artist').value = '';
+            document.getElementById('music-link').value = '';
             closeModal();
-            renderOverview(); renderTrainingWidgets();
         }
-        function editVideo(index) {
-            const data = loadData('videos');
+        function editMusic(index) {
+            const data = loadData('music');
             const d = data[index];
-            document.getElementById('video-category').value = d.category || '';
-            document.getElementById('video-title').value = d.title || '';
-            document.getElementById('video-duration').value = d.duration || '';
-            document.getElementById('video-link').value = d.link || '';
-            document.getElementById('video-note').value = d.note || '';
-            startEdit('videos', index);
+            document.getElementById('music-category').value = d.category || '';
+            document.getElementById('music-name').value = d.name || '';
+            document.getElementById('music-artist').value = d.artist || '';
+            document.getElementById('music-link').value = d.link || '';
+            startEdit('music', index);
         }
-        function deleteVideo(index) {
-            if (!confirm('Delete this video?')) return;
-            const data = loadData('videos');
+        function deleteMusic(index) {
+            if (!confirm('Delete this song?')) return;
+            const data = loadData('music');
             data.splice(index, 1);
-            saveData('videos', data);
-            renderVideoList();
-            renderOverview(); renderTrainingWidgets();
+            saveData('music', data);
+            renderMusicList();
         }
         
-        function renderVideoList() {
-            const data = loadData('videos');
+        function renderMusicList() {
+            const data = loadData('music');
+            musicPlaylist = data;
             const g = {};
-            data.forEach((d, i) => { const c = d.category || 'Uncategorized'; if(!g[c]) g[c] = []; g[c].push({...d, _idx: i}); });
+            data.forEach((d, i) => { const c = d.category||'Uncategorized'; if(!g[c])g[c]=[]; g[c].push({...d, _idx: i}); });
             let html = '';
             for (const c in g) {
                 html += `<div style="font-size:12px;color:var(--pink-400);font-weight:600;margin:12px 0 8px;letter-spacing:0.04em;text-transform:uppercase">${c}</div>`;
                 g[c].forEach(d => {
-                    const duration = d.duration ? `<div style="font-size:11px;color:var(--text-tertiary)">⏱ ${d.duration}</div>` : '';
-                    const note = d.note ? `<div style="font-size:11px;color:var(--text-secondary);margin-top:4px">${d.note}</div>` : '';
-                    const openBtn = d.link ? `<a href="${d.link}" target="_blank" style="color:var(--pink-400);text-decoration:none;font-size:11px;white-space:nowrap;font-weight:600">▶ 打开 →</a>` : '';
-                    html += `<div class="record-item" style="position:relative;align-items:flex-start">
-                        <div style="flex:1;min-width:0">
-                            <div class="value" style="padding-right:8px">${d.title}</div>
-                            ${duration}
-                            ${note}
-                        </div>
-                        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">${openBtn}</div>
-                        <div class="edit-btn" onclick="editVideo(${d._idx})">Edit</div>
-                        <div class="delete-btn" onclick="deleteVideo(${d._idx})">Delete</div>
-                    </div>`;
+                    const isCur = d._idx === currentTrackIndex;
+                    const playBtn = d.neteaseId ? `<button class="music-play-btn ${isCur && playerVisible ? 'playing' : ''}" onclick="playTrack(${d._idx})">${isCur && playerVisible ? '⏸' : '▶'}</button>` : '';
+                    const openBtn = d.neteaseId ? `<a href="https://music.163.com/song?id=${d.neteaseId}" target="_blank" style="color:var(--pink-400);text-decoration:none;font-size:11px;white-space:nowrap">打开</a>` : '';
+                    const artistLine = d.artist ? `<div style="font-size:11px;color:var(--text-tertiary)">${d.artist}</div>` : '';
+                    html += `<div class="record-item" style="position:relative"><div style="flex:1;min-width:0"><div class="value">${d.name}</div>${artistLine}</div><div style="display:flex;align-items:center;gap:6px">${playBtn}${openBtn}${d.link && !d.neteaseId ? `<a href="${d.link}" target="_blank" style="color:var(--pink-400);text-decoration:none;font-size:11px;white-space:nowrap">Link →</a>` : ''}</div><div class="edit-btn" onclick="editMusic(${d._idx})">Edit</div><div class="delete-btn" onclick="deleteMusic(${d._idx})">Delete</div></div>`;
                 });
             }
-            document.getElementById('video-list').innerHTML = html || '<div class="empty">No videos yet</div>';
+            document.getElementById('music-list').innerHTML = html || '<div class="empty">No music</div>';
+        }
+        
+        // ===== Music Player (iframe-based) =====
+        let currentTrackIndex = -1;
+        let playerVisible = false;  // whether the modal is expanded
+        
+        function playTrack(index) {
+            const track = musicPlaylist[index];
+            if (!track || !track.neteaseId) {
+                if (track && track.link) window.open(track.link, '_blank');
+                return;
+            }
+            currentTrackIndex = index;
+            document.getElementById('mp-title').textContent = track.name;
+            document.getElementById('mp-artist').textContent = track.artist || 'Unknown';
+            document.getElementById('mini-player').classList.add('active');
+            window.open(`https://music.163.com/song?id=${track.neteaseId}`, '_blank');
+            playerVisible = true;
+            renderMusicList();
+        }
+        
+        function expandMusicPlayer() {
+            if (currentTrackIndex < 0) return;
+            const track = musicPlaylist[currentTrackIndex];
+            if (track && track.neteaseId) window.open(`https://music.163.com/song?id=${track.neteaseId}`, '_blank');
+            else if (track && track.link) window.open(track.link, '_blank');
+        }
+        function collapseMusicPlayer() {
+            document.getElementById('music-modal').style.display = 'none';
+            playerVisible = false;
+            renderMusicList();
+        }
+        
+        function togglePlay() {
+            // For iframe, we just toggle the modal visibility
+            if (playerVisible) {
+                collapseMusicPlayer();
+            } else {
+                expandMusicPlayer();
+            }
+        }
+        
+        function closePlayer() {
+            currentTrackIndex = -1;
+            playerVisible = false;
+            document.getElementById('mini-player').classList.remove('active');
+            document.getElementById('music-modal').style.display = 'none';
+            document.getElementById('music-iframe').src = '';
+            renderMusicList();
+        }
+        
+        function playNextTrack() {
+            if (musicPlaylist.length === 0) return;
+            let nextIdx = currentTrackIndex + 1;
+            if (nextIdx >= musicPlaylist.length) nextIdx = 0;
+            let attempts = 0;
+            while (attempts < musicPlaylist.length) {
+                if (musicPlaylist[nextIdx] && musicPlaylist[nextIdx].neteaseId) {
+                    playTrack(nextIdx);
+                    return;
+                }
+                nextIdx = (nextIdx + 1) % musicPlaylist.length;
+                attempts++;
+            }
+        }
+        
+        function playPrevTrack() {
+            if (musicPlaylist.length === 0) return;
+            let prevIdx = currentTrackIndex - 1;
+            if (prevIdx < 0) prevIdx = musicPlaylist.length - 1;
+            let attempts = 0;
+            while (attempts < musicPlaylist.length) {
+                if (musicPlaylist[prevIdx] && musicPlaylist[prevIdx].neteaseId) {
+                    playTrack(prevIdx);
+                    return;
+                }
+                prevIdx = (prevIdx - 1 + musicPlaylist.length) % musicPlaylist.length;
+                attempts++;
+            }
         }
         
         // ===== Edit State Management =====
@@ -3329,7 +3373,7 @@
                 'flexData': 'body-flex',
                 'injuryData': 'body-injury',
                 'equipment': 'equip',
-                'videos': 'videos',
+                'music': 'music',
                 'expenses': 'account',
                 'coursePlans': 'training-course',
                 'selfTrainingPlans': 'training-self'
@@ -3352,7 +3396,7 @@
             } else {
                 data.push(record);
             }
-            saveData('expenses', data); renderExpenseList(); updateTotalExpense(); updateExpenseStat(); renderOverview(); renderTrainingWidgets();
+            saveData('expenses', data); renderExpenseList(); updateTotalExpense(); updateExpenseStat();
             cancelEdit();
             document.getElementById('expense-content').value = ''; document.getElementById('expense-amount').value = '';
             closeModal();
@@ -3568,7 +3612,6 @@
         let mvPickerContext = null; // 'course' or 'self'
         let mvPickerSelectedIds = [];
         let mvPickerCategory = 'posture';
-        let mvPickerActiveNoteIdx = -1;
         let mvEditingId = null; // for edit movement demo
         let mvTrainingEditIndex = -1;
 
@@ -3587,7 +3630,6 @@
                         customTypes: [], // [{key, label}]
                     },
                     custom: false,
-                    favorite: false,
                 }));
                 localStorage.setItem('movementLibrary', JSON.stringify({ movements, customTypes: [] }));
             }
@@ -3604,7 +3646,6 @@
                 }
                 if (!m.training.customTypes) m.training.customTypes = [];
                 if (!m.keyPoints) m.keyPoints = [];
-                if (typeof m.favorite !== 'boolean') m.favorite = false;
                 return m;
             });
             return data;
@@ -3630,19 +3671,6 @@
             }
         }
 
-        function toggleFavorite(id) {
-            const m = getMovementById(id);
-            if (!m) return;
-            updateMovement(id, { favorite: !m.favorite });
-            renderMovementList();
-            // Update detail star if open
-            const starEl = document.getElementById('mv-detail-star');
-            if (starEl && currentMovementId === id) {
-                const updated = getMovementById(id);
-                starEl.classList.toggle('empty', !updated.favorite);
-            }
-        }
-
         function switchMovementTab(cat) {
             currentMovementCategory = cat;
             document.querySelectorAll('.mv-tab').forEach(t => {
@@ -3658,30 +3686,25 @@
         function renderMovementList() {
             const lib = getMovementLibrary();
             const search = (document.getElementById('mv-search-input')?.value || '').toLowerCase().trim();
-            const isFavTab = currentMovementCategory === 'favorite';
             const filtered = lib.movements
-                .filter(m => isFavTab ? m.favorite : m.category === currentMovementCategory)
+                .filter(m => m.category === currentMovementCategory)
                 .filter(m => {
                     if (!search) return true;
                     return m.nameFr.toLowerCase().includes(search) || m.nameZh.includes(search);
                 })
-                .sort((a,b) => {
-                    if (a.favorite !== b.favorite) return a.favorite ? -1 : 1;
-                    return a.nameFr.localeCompare(b.nameFr, 'fr');
-                });
+                .sort((a,b) => a.nameFr.localeCompare(b.nameFr, 'fr'));
 
             const el = document.getElementById('mv-list');
             if (!el) return;
 
             if (filtered.length === 0) {
-                el.innerHTML = '<div class="mv-empty">' + (isFavTab ? '还没有收藏的动作，点击动作旁的⭐收藏' : '暂无匹配的动作') + '</div>';
+                el.innerHTML = '<div class="mv-empty">暂无匹配的动作</div>';
                 return;
             }
 
             el.innerHTML = filtered.map(m => `
                 <div class="mv-card" onclick="openMovementDetail('${m.id}')">
-                    <span class="mv-card-star ${m.favorite ? '' : 'empty'}" onclick="event.stopPropagation(); toggleFavorite('${m.id}')">⭐</span>
-                    <div style="flex:1; min-width:0;">
+                    <div>
                         <div class="mv-card-fr">${m.nameFr}</div>
                         <div class="mv-card-zh">${m.nameZh}</div>
                     </div>
@@ -3715,10 +3738,6 @@
             document.getElementById('mv-detail-zh').textContent = m.nameZh;
             const catLabels = { posture: '姿态', single: '单一动作', combination: '组合动作' };
             document.getElementById('mv-detail-cat').textContent = catLabels[m.category] || '';
-
-            // Favorite star
-            const starEl = document.getElementById('mv-detail-star');
-            if (starEl) starEl.classList.toggle('empty', !m.favorite);
 
             // Demo image
             const imgEl = document.getElementById('mv-demo-image');
@@ -4033,33 +4052,26 @@
                 keyPoints: [],
                 training: { ground: [], barre: [], center: [], pbt: [], customTypes: [] },
                 custom: true,
-                favorite: false,
             };
             lib.movements.push(newMv);
             saveMovementLibrary(lib);
             closeAddMovementModal();
             renderMovementList();
             renderTrainingWidgets();
-            renderOverview();
         }
 
         // ===== Movement Picker (for course/self linking) =====
-        function openMovementPicker(context, noteIdx) {
+        function openMovementPicker(context) {
             mvPickerContext = context;
             mvPickerCategory = 'posture';
             mvPickerSelectedIds = [];
-            mvPickerActiveNoteIdx = (typeof noteIdx === 'number') ? noteIdx : -1;
-
-            // Load already linked movements from the target note (if editing a note)
-            if (mvPickerActiveNoteIdx >= 0) {
-                const notes = getNoteItems(context);
-                const target = notes[mvPickerActiveNoteIdx];
-                if (target && target.movementIds) {
-                    mvPickerSelectedIds = [...target.movementIds];
-                }
-            }
+            // Load already linked movements from form state
+            const key = context === 'course' ? 'course' : 'self';
+            const existing = getLinkedMovements(key);
+            mvPickerSelectedIds = existing.map(m => m.id);
 
             document.getElementById('mv-picker-search').value = '';
+            document.getElementById('mv-picker-note').value = '';
             document.querySelectorAll('.mv-picker-tab').forEach(t => {
                 t.classList.toggle('active', t.dataset.cat === 'posture');
             });
@@ -4131,165 +4143,71 @@
             renderPickerList();
         }
 
-        // ===== Note Items =====
-        // Stored in sessionStorage: noteItems_course, noteItems_self
-        // Structure: [{ text: '', movementIds: [] }]
-        function getNoteItems(context) {
-            const raw = sessionStorage.getItem('noteItems_' + context);
-            if (raw) {
-                try { return JSON.parse(raw); } catch (e) {}
-            }
-            return [{ text: '', movementIds: [] }];
-        }
-        function setNoteItems(context, arr) {
-            sessionStorage.setItem('noteItems_' + context, JSON.stringify(arr));
-        }
-        function addNoteItem(context) {
-            const notes = getNoteItems(context);
-            notes.push({ text: '', movementIds: [] });
-            setNoteItems(context, notes);
-            renderNoteItemList(context);
-        }
-        function removeNoteItem(context, idx) {
-            const notes = getNoteItems(context);
-            notes.splice(idx, 1);
-            // Ensure at least one empty note exists
-            if (notes.length === 0) notes.push({ text: '', movementIds: [] });
-            setNoteItems(context, notes);
-            renderNoteItemList(context);
-        }
-        function updateNoteText(context, idx, text) {
-            const notes = getNoteItems(context);
-            if (!notes[idx]) return;
-            notes[idx].text = text;
-            setNoteItems(context, notes);
-            // don't re-render (would break focus)
-        }
-        function removeNoteMovement(context, noteIdx, mvId) {
-            const notes = getNoteItems(context);
-            if (!notes[noteIdx]) return;
-            notes[noteIdx].movementIds = (notes[noteIdx].movementIds || []).filter(id => id !== mvId);
-            setNoteItems(context, notes);
-            renderNoteItemList(context);
-        }
-        function renderNoteItemList(context) {
-            const notes = getNoteItems(context);
-            const el = document.getElementById(context + '-notes-list');
-            if (!el) return;
-            const lib = getMovementLibrary();
-
-            el.innerHTML = notes.map((n, i) => {
-                const tags = (n.movementIds || []).map(mvId => {
-                    const m = lib.movements.find(x => x.id === mvId);
-                    const name = m ? m.nameFr : mvId;
-                    return `<span class="note-item-tag">${name}<span class="remove" onclick="event.stopPropagation();removeNoteMovement('${context}',${i},'${mvId}')">×</span></span>`;
-                }).join('');
-                const textEscaped = escapeHtml(n.text || '');
-                return `
-                <div class="note-item">
-                    <textarea rows="3" placeholder="笔记内容..." oninput="updateNoteText('${context}',${i},this.value)">${textEscaped}</textarea>
-                    ${tags ? `<div class="note-item-tags">${tags}</div>` : ''}
-                    <div class="note-item-actions">
-                        <span class="note-item-pick" onclick="openMovementPicker('${context}', ${i})">+ 关联动作</span>
-                        <span class="note-item-del" onclick="removeNoteItem('${context}',${i})">删除</span>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        // Legacy getLinkedMovements / setLinkedMovements / renderLinkedMovementsTrigger
-        // These now operate on ALL movements across all notes (used for detail display / history)
+        // We store linked movements in sessionStorage for each form
         function getLinkedMovements(context) {
-            const notes = getNoteItems(context);
-            const ids = new Set();
-            notes.forEach(n => (n.movementIds || []).forEach(id => ids.add(id)));
-            const lib = getMovementLibrary();
-            return Array.from(ids).map(id => {
-                const m = lib.movements.find(x => x.id === id);
-                return { id, note: '' };
-            });
+            return JSON.parse(sessionStorage.getItem('linkedMv_' + context) || '[]');
         }
         function setLinkedMovements(context, arr) {
-            // Legacy compatibility: replaces all linked movements across notes
-            // We assign them to the first note (or create one)
-            const notes = getNoteItems(context);
-            if (notes.length === 0) notes.push({ text: '', movementIds: [] });
-            notes[0].movementIds = arr.map(a => a.id);
-            setNoteItems(context, notes);
-        }
-        function renderLinkedMovementsTrigger(context) {
-            // Legacy: no longer a single trigger since each note has its own picker
-            // Kept for backward compatibility with reset forms etc.
-            renderNoteItemList(context);
-        }
-        function removeLinkedMovement(context, id) {
-            const notes = getNoteItems(context);
-            notes.forEach(n => {
-                n.movementIds = (n.movementIds || []).filter(mid => mid !== id);
-            });
-            setNoteItems(context, notes);
-            renderNoteItemList(context);
+            sessionStorage.setItem('linkedMv_' + context, JSON.stringify(arr));
         }
 
         function confirmMovementPicker() {
-            const context = mvPickerContext;
-            const noteIdx = mvPickerActiveNoteIdx;
-            if (noteIdx >= 0) {
-                const notes = getNoteItems(context);
-                if (!notes[noteIdx]) {
-                    closeMovementPicker();
-                    return;
-                }
-                notes[noteIdx].movementIds = [...mvPickerSelectedIds];
-                setNoteItems(context, notes);
-                renderNoteItemList(context);
-            }
+            const note = document.getElementById('mv-picker-note').value.trim();
+            const linked = mvPickerSelectedIds.map(id => ({ id, note }));
+            setLinkedMovements(mvPickerContext, linked);
+            renderLinkedMovementsTrigger(mvPickerContext);
             closeMovementPicker();
+        }
+
+        function renderLinkedMovementsTrigger(context) {
+            const linked = getLinkedMovements(context);
+            const triggerId = context + '-mv-trigger';
+            const el = document.getElementById(triggerId);
+            if (!el) return;
+
+            if (linked.length === 0) {
+                el.innerHTML = '<span id="' + context + '-mv-placeholder">点击选择关联动作...</span>';
+                el.classList.remove('has-items');
+            } else {
+                const lib = getMovementLibrary();
+                const tags = linked.map(l => {
+                    const m = lib.movements.find(x => x.id === l.id);
+                    const name = m ? m.nameFr : l.id;
+                    return `<span class="mv-picker-tag">${name}<span class="remove" onclick="event.stopPropagation();removeLinkedMovement('${context}','${l.id}')">×</span></span>`;
+                }).join('');
+                el.innerHTML = `<div class="mv-picker-tags">${tags}</div>`;
+                el.classList.add('has-items');
+            }
+        }
+
+        function removeLinkedMovement(context, id) {
+            const linked = getLinkedMovements(context).filter(m => m.id !== id);
+            setLinkedMovements(context, linked);
+            renderLinkedMovementsTrigger(context);
         }
 
         // Sync linked movement key points to movement library (called on save of course/self)
         function syncLinkedKeyPoints(context, record) {
-            const notes = getNoteItems(context);
-            if (!notes || !notes.length) return 0;
+            const linked = getLinkedMovements(context);
+            if (!linked.length) return;
             const lib = getMovementLibrary();
             const sourceLabel = buildMovementSourceLabel(context, record);
-            let synced = 0;
 
-            notes.forEach(note => {
-                const text = (note.text || '').trim();
-                if (!text) return;
-                const mids = note.movementIds || [];
-                if (!mids.length) return;
-                mids.forEach(mvId => {
-                    const m = lib.movements.find(x => x.id === mvId);
-                    if (!m) return;
-                    if (!m.keyPoints) m.keyPoints = [];
-                    const dup = m.keyPoints.some(kp => kp.text === text && kp.source === sourceLabel);
-                    if (!dup) {
-                        m.keyPoints.push({ text, source: sourceLabel });
-                        synced++;
-                    }
-                });
+            linked.forEach(link => {
+                if (!link.note || !link.note.trim()) return;
+                const m = lib.movements.find(x => x.id === link.id);
+                if (!m) return;
+                if (!m.keyPoints) m.keyPoints = [];
+                // Avoid exact duplicate (same text + same source)
+                const dup = m.keyPoints.some(kp => kp.text === link.note.trim() && kp.source === sourceLabel);
+                if (!dup) {
+                    m.keyPoints.push({
+                        text: link.note.trim(),
+                        source: sourceLabel,
+                    });
+                }
             });
-            if (synced > 0) {
-                saveMovementLibrary(lib);
-            }
-            return synced;
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('global-toast');
-            if (!t) return;
-            t.textContent = msg;
-            t.classList.add('show');
-            clearTimeout(t._timer);
-            t._timer = setTimeout(() => t.classList.remove('show'), 1800);
-        }
-
-        function escapeHtml(s) {
-            return String(s).replace(/[&<>"']/g, c => ({
-                '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-            })[c]);
+            saveMovementLibrary(lib);
         }
 
         function buildMovementSourceLabel(context, record) {
@@ -4303,61 +4221,6 @@
                 const type = record.selfType || record.trainingType || '';
                 return `来自自训${type ? '·' + type : ''} / ${date}`;
             }
-        }
-
-        // Normalize legacy plain-text notes or old linkedMovements to new notes array format
-        function normalizeNotes(notesField) {
-            if (Array.isArray(notesField) && notesField.length > 0) {
-                // Ensure each item has movementIds
-                return notesField.map(n => ({
-                    text: n.text || '',
-                    movementIds: Array.isArray(n.movementIds) ? n.movementIds : []
-                }));
-            }
-            if (typeof notesField === 'string' && notesField.trim()) {
-                return [{ text: notesField, movementIds: [] }];
-            }
-            return [{ text: '', movementIds: [] }];
-        }
-
-        // Get a flat text preview (first non-empty note) for list display
-        function getNotesPreview(notesField, maxLen) {
-            maxLen = maxLen || 50;
-            if (Array.isArray(notesField)) {
-                const firstText = notesField.find(n => n.text && n.text.trim());
-                return firstText ? firstText.text.substring(0, maxLen) + (firstText.text.length > maxLen ? '...' : '') : '';
-            }
-            if (typeof notesField === 'string' && notesField.trim()) {
-                return notesField.substring(0, maxLen) + (notesField.length > maxLen ? '...' : '');
-            }
-            return '';
-        }
-
-        // Render notes array as HTML for detail views (card body)
-        function renderNotesDetailHtml(notesField) {
-            const lib = getMovementLibrary();
-            if (Array.isArray(notesField) && notesField.length > 0) {
-                return notesField.map(n => {
-                    const text = escapeHtml(n.text || '');
-                    if (!text && (!n.movementIds || !n.movementIds.length)) return '';
-                    let tags = '';
-                    if (n.movementIds && n.movementIds.length) {
-                        tags = '<div class="note-item-tags">';
-                        n.movementIds.forEach(mvId => {
-                            const m = lib.movements.find(x => x.id === mvId);
-                            const name = m ? m.nameFr : mvId;
-                            tags += '<span class="note-item-tag">' + name + '</span>';
-                        });
-                        tags += '</div>';
-                    }
-                    return '<div class="note-item">' + (text ? '<div style="font-size:13px;color:var(--text-primary);white-space:pre-wrap;">' + text + '</div>' : '') + tags + '</div>';
-                }).filter(Boolean).join('');
-            }
-            // Legacy plain text
-            if (typeof notesField === 'string' && notesField.trim()) {
-                return '<div class="note-item"><div style="font-size:13px;color:var(--text-primary);white-space:pre-wrap;">' + escapeHtml(notesField) + '</div></div>';
-            }
-            return '';
         }
 
         
@@ -4457,11 +4320,12 @@
             document.getElementById('course-type').selectedIndex = 0;
             document.getElementById('course-difficulty').selectedIndex = 0;
             document.getElementById('course-price').value = '';
-            setNoteItems('course', [{ text: '', movementIds: [] }]);
-            renderNoteItemList('course');
+            document.getElementById('course-notes').value = '';
             savePhotos('course', []); savePhotos('course-notes', []);
             renderPhotoPreview('course'); renderPhotoPreview('course-notes');
             updateDifficultyVisibility();
+            setLinkedMovements('course', []);
+            renderLinkedMovementsTrigger('course');
         }
         
         function resetSelfForm() {
@@ -4472,10 +4336,11 @@
             document.getElementById('self-hours').value = '';
             document.getElementById('self-location').selectedIndex = 0;
             document.getElementById('self-type').selectedIndex = 0;
-            setNoteItems('self', [{ text: '', movementIds: [] }]);
-            renderNoteItemList('self');
+            document.getElementById('self-notes').value = '';
             savePhotos('self', []); savePhotos('self-notes', []);
             renderPhotoPreview('self'); renderPhotoPreview('self-notes');
+            setLinkedMovements('self', []);
+            renderLinkedMovementsTrigger('self');
         }
         
         // ===== Course Plan CRUD =====
@@ -4492,8 +4357,9 @@
                 difficulty: document.getElementById('course-difficulty').value,
                 price: document.getElementById('course-price').value,
                 photos: getPhotos('course'),
-                notes: getNoteItems('course'),
-                notePhotos: getPhotos('course-notes')
+                notes: document.getElementById('course-notes').value,
+                notePhotos: getPhotos('course-notes'),
+                linkedMovements: getLinkedMovements('course')
             };
             if (editState.module === 'coursePlans' && editState.index >= 0) {
                 data[editState.index] = record;
@@ -4503,12 +4369,11 @@
             saveData('coursePlans', data);
             savePhotos('course', []); savePhotos('course-notes', []);
             syncCourseToExpenses();
-            const syncedCount = syncLinkedKeyPoints('course', record);
-            if (syncedCount > 0) showToast('已同步' + syncedCount + '条要点到动作库');
-            setNoteItems('course', [{ text: '', movementIds: [] }]);
-            renderNoteItemList('course');
+            syncLinkedKeyPoints('course', record);
+            setLinkedMovements('course', []);
+            renderLinkedMovementsTrigger('course');
             cancelEdit();
-            renderCourseList(); renderCalendar(); renderOverview(); renderTrainingWidgets();
+            renderCourseList(); renderCalendar();
             resetCourseForm();
             closeModal();
         }
@@ -4526,13 +4391,13 @@
             document.getElementById('course-type').value = d.courseType || '';
             document.getElementById('course-difficulty').value = d.difficulty || '';
             document.getElementById('course-price').value = d.price || '';
-            const courseNotes = normalizeNotes(d.notes);
-            setNoteItems('course', courseNotes);
-            renderNoteItemList('course');
+            document.getElementById('course-notes').value = d.notes || '';
             if (d.photos?.length) { savePhotos('course', [...d.photos]); renderPhotoPreview('course'); }
             else { savePhotos('course', []); renderPhotoPreview('course'); }
             if (d.notePhotos?.length) { savePhotos('course-notes', [...d.notePhotos]); renderPhotoPreview('course-notes'); }
             else { savePhotos('course-notes', []); renderPhotoPreview('course-notes'); }
+            if (d.linkedMovements?.length) { setLinkedMovements('course', [...d.linkedMovements]); renderLinkedMovementsTrigger('course'); }
+            else { setLinkedMovements('course', []); renderLinkedMovementsTrigger('course'); }
             updateDifficultyVisibility();
             startEdit('coursePlans', index);
         }
@@ -4542,7 +4407,7 @@
             const data = loadData('coursePlans');
             data.splice(index, 1);
             saveData('coursePlans', data);
-            renderCourseList(); renderCalendar(); renderOverview(); renderTrainingWidgets();
+            renderCourseList(); renderCalendar();
         }
         
         function toggleCourseStatus(index) {
@@ -4550,7 +4415,7 @@
             if (!data[index]) return;
             data[index].type = data[index].type === 'done' ? 'pending' : 'done';
             saveData('coursePlans', data);
-            renderCourseList(); renderCalendar(); renderOverview(); renderTrainingWidgets();
+            renderCourseList(); renderCalendar();
         }
         
         function syncCourseToExpenses() {
@@ -4660,8 +4525,9 @@
                 location: document.getElementById('self-location').value,
                 trainingType: document.getElementById('self-type').value,
                 photos: getPhotos('self'),
-                notes: getNoteItems('self'),
-                notePhotos: getPhotos('self-notes')
+                notes: document.getElementById('self-notes').value,
+                notePhotos: getPhotos('self-notes'),
+                linkedMovements: getLinkedMovements('self')
             };
             if (editState.module === 'selfTrainingPlans' && editState.index >= 0) {
                 data[editState.index] = record;
@@ -4670,12 +4536,11 @@
             }
             saveData('selfTrainingPlans', data);
             savePhotos('self', []); savePhotos('self-notes', []);
-            const syncedCount = syncLinkedKeyPoints('self', record);
-            if (syncedCount > 0) showToast('已同步' + syncedCount + '条要点到动作库');
-            setNoteItems('self', [{ text: '', movementIds: [] }]);
-            renderNoteItemList('self');
+            syncLinkedKeyPoints('self', record);
+            setLinkedMovements('self', []);
+            renderLinkedMovementsTrigger('self');
             cancelEdit();
-            renderSelfTrainingList(); renderCalendar(); renderOverview(); renderTrainingWidgets();
+            renderSelfTrainingList(); renderCalendar();
             resetSelfForm();
             closeModal();
         }
@@ -4691,13 +4556,13 @@
             document.getElementById('self-hours').value = d.hours || '';
             document.getElementById('self-location').value = d.location || '';
             document.getElementById('self-type').value = d.trainingType || '';
-            const selfNotes = normalizeNotes(d.notes);
-            setNoteItems('self', selfNotes);
-            renderNoteItemList('self');
+            document.getElementById('self-notes').value = d.notes || '';
             if (d.photos?.length) { savePhotos('self', [...d.photos]); renderPhotoPreview('self'); }
             else { savePhotos('self', []); renderPhotoPreview('self'); }
             if (d.notePhotos?.length) { savePhotos('self-notes', [...d.notePhotos]); renderPhotoPreview('self-notes'); }
             else { savePhotos('self-notes', []); renderPhotoPreview('self-notes'); }
+            if (d.linkedMovements?.length) { setLinkedMovements('self', [...d.linkedMovements]); renderLinkedMovementsTrigger('self'); }
+            else { setLinkedMovements('self', []); renderLinkedMovementsTrigger('self'); }
             startEdit('selfTrainingPlans', index);
         }
         
@@ -4706,7 +4571,7 @@
             const data = loadData('selfTrainingPlans');
             data.splice(index, 1);
             saveData('selfTrainingPlans', data);
-            renderSelfTrainingList(); renderCalendar(); renderOverview(); renderTrainingWidgets();
+            renderSelfTrainingList(); renderCalendar();
         }
         
         function toggleSelfStatus(index) {
@@ -4714,7 +4579,7 @@
             if (!data[index]) return;
             data[index].type = data[index].type === 'done' ? 'pending' : 'done';
             saveData('selfTrainingPlans', data);
-            renderSelfTrainingList(); renderCalendar(); renderOverview(); renderTrainingWidgets();
+            renderSelfTrainingList(); renderCalendar();
         }
         
         function renderSelfTrainingList() {
@@ -5083,8 +4948,7 @@
                             '<img src="'+p+'" onclick="openPhotoViewer(\''+p+'\')">'
                         ).join('') + '</div>';
                     }
-                    const notePreview = getNotesPreview(r.notes, 50);
-                    let noteHtml = notePreview ? '<div class="training-list-note">'+notePreview+'</div>' : '';
+                    let noteHtml = r.notes ? '<div class="training-list-note">'+r.notes.substring(0,50)+(r.notes.length>50?'...':'')+'</div>' : '';
                     
                     const toggleFn = r._source === 'course' ? 'toggleCourseStatus' : 'toggleSelfStatus';
                     const editFn = r._source === 'course' ? 'editCoursePlan' : 'editSelfTraining';
@@ -5208,91 +5072,15 @@
             }
         }
         
-        function initNoteForms() {
-            setNoteItems('course', [{ text: '', movementIds: [] }]);
-            setNoteItems('self', [{ text: '', movementIds: [] }]);
-            renderNoteItemList('course');
-            renderNoteItemList('self');
-        }
-
         function renderAll() {
             syncCourseToExpenses();
             renderOverview(); renderBodyRecords(); renderBodyTrend();
             renderMuscleRecords(); updateMuscleFilter(); renderMuscleTrend();
             renderFlexRecords(); updateFlexFilter(); renderFlexTrend();
-            renderInjuryRecords(); renderEquipList('all'); renderVideoList();
+            renderInjuryRecords(); renderEquipList('all'); renderMusicList();
             renderExpenseList(); updateTotalExpense(); updateExpenseStat();
             renderCourseList(); renderSelfTrainingList(); renderCalendar();
             renderTrainingWidgets();
-        }
-        
-        // ===== Import / Export =====
-        function exportAllData() {
-            const keys = [
-                'bodyData', 'muscleData', 'flexData', 'injuryData',
-                'equipment', 'videos', 'expenses', 'expenseCategories',
-                'coursePlans', 'selfTrainingPlans',
-                'movementLibrary', 'hotFlashRecords',
-                'settings', 'customOptions'
-            ];
-            const data = {};
-            keys.forEach(k => {
-                const v = localStorage.getItem(k);
-                if (v) {
-                    try { data[k] = JSON.parse(v); }
-                    catch(e) { data[k] = v; }
-                }
-            });
-            data._exportMeta = {
-                version: '1.0',
-                exportTime: new Date().toISOString(),
-                app: 'ballet-journal'
-            };
-            const jsonStr = JSON.stringify(data, null, 2);
-            const blob = new Blob([jsonStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            const date = new Date().toISOString().split('T')[0];
-            a.href = url;
-            a.download = `ballet-journal-backup-${date}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast('数据导出成功');
-        }
-        
-        function importAllData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            if (!confirm('导入会覆盖当前所有数据，确定继续吗？建议先导出备份。')) {
-                event.target.value = '';
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (data._exportMeta && data._exportMeta.app !== 'ballet-journal') {
-                        alert('文件格式不正确，不是芭蕾日记的备份文件');
-                        return;
-                    }
-                    let count = 0;
-                    Object.keys(data).forEach(k => {
-                        if (k === '_exportMeta') return;
-                        const v = typeof data[k] === 'string' ? data[k] : JSON.stringify(data[k]);
-                        localStorage.setItem(k, v);
-                        count++;
-                    });
-                    event.target.value = '';
-                    renderAll();
-                    showToast(`导入成功，共恢复 ${count} 项数据`);
-                } catch(err) {
-                    alert('导入失败：文件格式错误');
-                    event.target.value = '';
-                }
-            };
-            reader.readAsText(file);
         }
         
         // ===== Chart (SVG) =====
